@@ -1,0 +1,426 @@
+[
+  {
+    "houseId": "1302",
+    "building": "1栋",
+    "unit": "1单元",
+    "floor": "13层",
+    "room": "1302室",
+    "area": 89.5,
+    "layout": "三室两厅一卫",
+    "micModuleId": "MIC-1F-13-1302",
+    "productionDate": "2026-01-15",
+    "deliveryDate": "2026-03-20",
+    "digitalId": "DR-1302-20260320",
+    "qrCode": "HOUSE-1302",
+    "components": {
+      "plumbing": [
+        {
+          "id": "PL-1302-K-01",
+          "name": "冷水管",
+          "spec": "PPR-25",
+          "location": "厨房墙体东侧",
+          "installDate": "2026-03-18",
+          "manufacturer": "伟星管业",
+          "warrantyPeriod": "50年"
+        },
+        {
+          "id": "PL-1302-K-02",
+          "name": "热水管",
+          "spec": "PPR-20",
+          "location": "厨房墙体东侧",
+          "installDate": "2026-03-18",
+          "manufacturer": "伟星管业",
+          "warrantyPeriod": "50年"
+        },
+        {
+          "id": "EQ-1302-K-01",
+          "name": "水槽",
+          "spec": "XX-203",
+          "location": "厨房操作台下方",
+          "installDate": "2026-03-20",
+          "manufacturer": "欧琳",
+          "warrantyPeriod": "5年"
+        },
+        {
+          "id": "EQ-1302-K-02",
+          "name": "角阀",
+          "spec": "AF-105",
+          "location": "厨房水槽下方左侧",
+          "installDate": "2026-03-18",
+          "manufacturer": "九牧",
+          "warrantyPeriod": "5年"
+        },
+        {
+          "id": "EQ-1302-K-03",
+          "name": "连接软管",
+          "spec": "SH-300",
+          "location": "厨房水槽下方",
+          "installDate": "2026-03-20",
+          "manufacturer": "潜水艇",
+          "warrantyPeriod": "3年"
+        }
+      ],
+      "electrical": [
+        {
+          "id": "EL-1302-K-01",
+          "name": "厨房插座-1",
+          "spec": "10A五孔",
+          "location": "厨房操作台上方",
+          "installDate": "2026-03-15",
+          "manufacturer": "公牛",
+          "warrantyPeriod": "10年"
+        },
+        {
+          "id": "EL-1302-K-02",
+          "name": "厨房插座-2",
+          "spec": "16A三孔",
+          "location": "厨房冰箱位",
+          "installDate": "2026-03-15",
+          "manufacturer": "公牛",
+          "warrantyPeriod": "10年"
+        }
+      ],
+      "bathroom": [
+        {
+          "id": "EQ-1302-B-01",
+          "name": "马桶",
+          "spec": "MT-500",
+          "location": "卫生间",
+          "installDate": "2026-03-19",
+          "manufacturer": "恒洁",
+          "warrantyPeriod": "5年"
+        },
+        {
+          "id": "EQ-1302-B-02",
+          "name": "花洒",
+          "spec": "HS-200",
+          "location": "卫生间淋浴区",
+          "installDate": "2026-03-19",
+          "manufacturer": "九牧",
+          "warrantyPeriod": "3年"
+        },
+        {
+          "id": "PL-1302-B-01",
+          "name": "排水管",
+          "spec": "PVC-110",
+          "location": "卫生间地面",
+          "installDate": "2026-03-17",
+          "manufacturer": "联塑",
+          "warrantyPeriod": "50年"
+        }
+      ],
+      "hvac": [
+        {
+          "id": "EQ-1302-L-01",
+          "name": "卧室空调",
+          "spec": "KFR-35GW",
+          "location": "主卧室",
+          "installDate": "2026-03-22",
+          "manufacturer": "美的",
+          "warrantyPeriod": "6年"
+        },
+        {
+          "id": "EQ-1302-L-02",
+          "name": "客厅空调",
+          "spec": "KFR-50GW",
+          "location": "客厅",
+          "installDate": "2026-03-22",
+          "manufacturer": "美的",
+          "warrantyPeriod": "6年"
+        }
+      ],
+      "doors_windows": [
+        {
+          "id": "DW-1302-01",
+          "name": "入户门",
+          "spec": "防盗门DM-1",
+          "location": "入户",
+          "installDate": "2026-03-10",
+          "manufacturer": "步阳",
+          "warrantyPeriod": "10年"
+        },
+        {
+          "id": "DW-1302-02",
+          "name": "阳台推拉门",
+          "spec": "TL-210",
+          "location": "阳台",
+          "installDate": "2026-03-12",
+          "manufacturer": "富轩",
+          "warrantyPeriod": "5年"
+        }
+      ]
+    },
+    "pipelineLayout": {
+      "厨房": {
+        "冷水管": "墙体东侧，距地450mm，管径PPR-25",
+        "热水管": "墙体东侧，距地600mm，管径PPR-20",
+        "排水管": "地面下方，管径PVC-50"
+      },
+      "卫生间": {
+        "冷水管": "墙体西侧，距地500mm，管径PPR-25",
+        "热水管": "墙体西侧，距地650mm，管径PPR-20",
+        "排水管": "地面下方，管径PVC-110"
+      }
+    },
+    "warranty": {
+      "startDate": "2026-03-20",
+      "endDate": "2031-03-20",
+      "coverage": "主体结构终身保修，设备保修见各设备说明"
+    },
+    "maintenanceRecords": []
+  },
+  {
+    "houseId": "805",
+    "building": "1栋",
+    "unit": "1单元",
+    "floor": "8层",
+    "room": "805室",
+    "area": 65.0,
+    "layout": "两室一厅一卫",
+    "micModuleId": "MIC-1F-8-805",
+    "productionDate": "2025-12-20",
+    "deliveryDate": "2026-02-10",
+    "digitalId": "DR-805-20260210",
+    "qrCode": "HOUSE-805",
+    "components": {
+      "plumbing": [
+        {
+          "id": "PL-805-K-01",
+          "name": "冷水管",
+          "spec": "PPR-25",
+          "location": "厨房墙体北侧",
+          "installDate": "2026-02-08",
+          "manufacturer": "伟星管业",
+          "warrantyPeriod": "50年"
+        },
+        {
+          "id": "EQ-805-K-01",
+          "name": "水槽",
+          "spec": "XX-180",
+          "location": "厨房操作台下方",
+          "installDate": "2026-02-10",
+          "manufacturer": "欧琳",
+          "warrantyPeriod": "5年"
+        },
+        {
+          "id": "EQ-805-K-02",
+          "name": "角阀",
+          "spec": "AF-102",
+          "location": "厨房水槽下方",
+          "installDate": "2026-02-08",
+          "manufacturer": "九牧",
+          "warrantyPeriod": "5年"
+        }
+      ],
+      "electrical": [
+        {
+          "id": "EL-805-K-01",
+          "name": "厨房插座",
+          "spec": "10A五孔",
+          "location": "厨房操作台上方",
+          "installDate": "2026-02-05",
+          "manufacturer": "公牛",
+          "warrantyPeriod": "10年"
+        }
+      ],
+      "bathroom": [
+        {
+          "id": "EQ-805-B-01",
+          "name": "马桶",
+          "spec": "MT-300",
+          "location": "卫生间",
+          "installDate": "2026-02-09",
+          "manufacturer": "恒洁",
+          "warrantyPeriod": "5年"
+        },
+        {
+          "id": "PL-805-B-01",
+          "name": "地漏",
+          "spec": "DL-50",
+          "location": "卫生间地面",
+          "installDate": "2026-02-07",
+          "manufacturer": "潜水艇",
+          "warrantyPeriod": "3年"
+        }
+      ],
+      "hvac": [
+        {
+          "id": "EQ-805-L-01",
+          "name": "卧室空调",
+          "spec": "KFR-26GW",
+          "location": "主卧室",
+          "installDate": "2026-02-12",
+          "manufacturer": "格力",
+          "warrantyPeriod": "6年"
+        }
+      ],
+      "doors_windows": [
+        {
+          "id": "DW-805-01",
+          "name": "入户门",
+          "spec": "防盗门DM-1",
+          "location": "入户",
+          "installDate": "2026-01-28",
+          "manufacturer": "步阳",
+          "warrantyPeriod": "10年"
+        }
+      ]
+    },
+    "pipelineLayout": {
+      "厨房": {
+        "冷水管": "墙体北侧，距地450mm，管径PPR-25",
+        "排水管": "地面下方，管径PVC-50"
+      },
+      "卫生间": {
+        "冷水管": "墙体东侧，距地500mm，管径PPR-25",
+        "排水管": "地面下方，管径PVC-110"
+      }
+    },
+    "warranty": {
+      "startDate": "2026-02-10",
+      "endDate": "2031-02-10",
+      "coverage": "主体结构终身保修，设备保修见各设备说明"
+    },
+    "maintenanceRecords": [
+      {
+        "id": "MR-805-001",
+        "date": "2026-06-15",
+        "location": "卫生间",
+        "fault": "地漏排水缓慢",
+        "cause": "地漏滤网堵塞",
+        "action": "清理地漏滤网",
+        "repairPerson": "李工",
+        "result": "完成",
+        "orderId": "WO-805-001"
+      }
+    ]
+  },
+  {
+    "houseId": "503",
+    "building": "1栋",
+    "unit": "1单元",
+    "floor": "5层",
+    "room": "503室",
+    "area": 75.0,
+    "layout": "两室两厅一卫",
+    "micModuleId": "MIC-1F-5-503",
+    "productionDate": "2025-12-05",
+    "deliveryDate": "2026-01-28",
+    "digitalId": "DR-503-20260128",
+    "qrCode": "HOUSE-503",
+    "components": {
+      "plumbing": [
+        {
+          "id": "PL-503-K-01",
+          "name": "冷水管",
+          "spec": "PPR-25",
+          "location": "厨房墙体南侧",
+          "installDate": "2026-01-26",
+          "manufacturer": "伟星管业",
+          "warrantyPeriod": "50年"
+        },
+        {
+          "id": "EQ-503-K-01",
+          "name": "水槽",
+          "spec": "XX-200",
+          "location": "厨房操作台下方",
+          "installDate": "2026-01-28",
+          "manufacturer": "欧琳",
+          "warrantyPeriod": "5年"
+        }
+      ],
+      "electrical": [
+        {
+          "id": "EL-503-K-01",
+          "name": "厨房插座-1",
+          "spec": "10A五孔",
+          "location": "厨房操作台上方",
+          "installDate": "2026-01-23",
+          "manufacturer": "公牛",
+          "warrantyPeriod": "10年"
+        },
+        {
+          "id": "EL-503-L-01",
+          "name": "客厅灯",
+          "spec": "LED-PD-100",
+          "location": "客厅天花板",
+          "installDate": "2026-01-24",
+          "manufacturer": "欧普",
+          "warrantyPeriod": "3年"
+        }
+      ],
+      "bathroom": [
+        {
+          "id": "EQ-503-B-01",
+          "name": "花洒",
+          "spec": "HS-180",
+          "location": "卫生间淋浴区",
+          "installDate": "2026-01-27",
+          "manufacturer": "九牧",
+          "warrantyPeriod": "3年"
+        }
+      ],
+      "hvac": [
+        {
+          "id": "EQ-503-L-01",
+          "name": "客厅空调",
+          "spec": "KFR-35GW",
+          "location": "客厅",
+          "installDate": "2026-01-30",
+          "manufacturer": "海尔",
+          "warrantyPeriod": "6年"
+        }
+      ],
+      "doors_windows": [
+        {
+          "id": "DW-503-01",
+          "name": "阳台窗",
+          "spec": "PY-150",
+          "location": "阳台",
+          "installDate": "2026-01-20",
+          "manufacturer": "富轩",
+          "warrantyPeriod": "5年"
+        }
+      ]
+    },
+    "pipelineLayout": {
+      "厨房": {
+        "冷水管": "墙体南侧，距地450mm，管径PPR-25",
+        "排水管": "地面下方，管径PVC-50"
+      },
+      "卫生间": {
+        "冷水管": "墙体北侧，距地500mm，管径PPR-25",
+        "排水管": "地面下方，管径PVC-110"
+      }
+    },
+    "warranty": {
+      "startDate": "2026-01-28",
+      "endDate": "2031-01-28",
+      "coverage": "主体结构终身保修，设备保修见各设备说明"
+    },
+    "maintenanceRecords": [
+      {
+        "id": "MR-503-001",
+        "date": "2026-05-10",
+        "location": "客厅",
+        "fault": "客厅灯不亮",
+        "cause": "LED驱动电源故障",
+        "action": "更换LED驱动电源",
+        "repairPerson": "王工",
+        "result": "完成",
+        "orderId": "WO-503-001"
+      },
+      {
+        "id": "MR-503-002",
+        "date": "2026-07-20",
+        "location": "阳台",
+        "fault": "雨天阳台窗渗水",
+        "cause": "窗框密封胶老化",
+        "action": "重新打密封胶",
+        "repairPerson": "张工",
+        "result": "完成",
+        "orderId": "WO-503-002"
+      }
+    ]
+  }
+]
