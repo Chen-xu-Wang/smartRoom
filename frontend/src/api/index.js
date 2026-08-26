@@ -25,6 +25,11 @@ export default {
   getWorkOrder: (id) => api.get(`/workorders/${id}`),
   reviewWorkOrder: (id, data) => api.put(`/workorders/${id}/review`, data),
   completeWorkOrder: (id, data) => api.put(`/workorders/${id}/complete`, data),
+  // 阶段5.7：独立派单流程
+  getRepairers: () => api.get('/workorders/repairers'),          // 在册维修人员列表（派单下拉）
+  assignWorkOrder: (id, data) => api.put(`/workorders/${id}/assign`, data),  // 独立派单
+  // 阶段5.8：开始维修（已派单 → 维修中）
+  startWorkOrder: (id, data) => api.put(`/workorders/${id}/start`, data),    // 开始维修
   getWorkOrderStats: () => api.get('/workorders/stats/summary'),
 
   // Maintenance

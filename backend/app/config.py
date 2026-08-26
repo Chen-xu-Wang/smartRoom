@@ -53,7 +53,7 @@ HOUSES_FILE = os.path.join(DATA_DIR, "houses.json")
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
 DB_PORT = int(os.getenv("DB_PORT", "3306"))
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "feastforyou123456")
 DB_NAME = os.getenv("DB_NAME", "SmartRoom")
 # 连接池大小：同时保持的数据库连接数量上限
 DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "5"))

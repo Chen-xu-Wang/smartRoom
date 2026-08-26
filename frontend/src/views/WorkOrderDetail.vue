@@ -10,7 +10,15 @@
           <el-button v-if="order.status === 'pending_review'" type="primary" @click="showReviewDialog = true">
             审核
           </el-button>
-          <el-button v-if="order.status === 'approved'" type="success" @click="showCompleteDialog = true">
+          <!-- 阶段5.7：独立派单入口，仅「已审核通过且未派单」显示 -->
+          <el-button v-if="showAssignBtn" type="primary" @click="openAssignDialog">
+            派单
+          </el-button>
+          <!-- 阶段5.8：开始维修入口，仅「已派单待开始」显示（pending_assign + assigned_to 非空） -->
+          <el-button v-if="showStartRepairBtn" type="success" :loading="starting" @click="startRepair">
+            开始维修
+          </el-button>
+          <el-button v-if="order.status === 'processing'" type="success" @click="openCompleteDialog">
             完成维修
           </el-button>
         </div>
@@ -35,7 +43,7 @@
           <el-descriptions-item label="审核人" v-if="order.reviewed_by">{{ order.reviewed_by }}</el-descriptions-item>
           <el-descriptions-item label="审核时间" v-if="order.reviewed_at">{{ formatTime(order.reviewed_at) }}</el-descriptions-item>
           <el-descriptions-item label="审核备注" :span="2" v-if="order.review_notes">{{ order.review_notes }}</el-descriptions-item>
-          <el-descriptions-item label="维修人员" v-if="order.repair_person">{{ order.repair_person }}</el-descriptions-item>
+          <el-descriptions-item label="维修人员" v-if="order.assigned_to">{{ order.assigned_to }}</el-descriptions-item>
           <el-descriptions-item label="完成时间" v-if="order.completed_at">{{ formatTime(order.completed_at) }}</el-descriptions-item>
           <el-descriptions-item label="实际故障" :span="2" v-if="order.actual_fault">{{ order.actual_fault }}</el-descriptions-item>
           <el-descriptions-item label="处理方式" :span="2" v-if="order.actual_action">{{ order.actual_action }}</el-descriptions-item>
@@ -44,17 +52,23 @@
         </el-descriptions>
       </div>
 
-      <!-- Related Equipment -->
+      <!-- Related Equipment（阶段5.10：改用 GET /houses/{id}/components 获取设备，
+           不再依赖 getHouse 返回的 components（该字段后端从不返回）） -->
       <div v-if="relatedEquipment.length" class="card">
         <h3 class="section-title">关联设备（来自一房一码档案）</h3>
         <el-table :data="relatedEquipment" border size="small">
           <el-table-column prop="name" label="设备名称" width="120" />
           <el-table-column prop="spec" label="规格型号" width="120" />
-          <el-table-column prop="id" label="设备编号" width="160" />
+          <el-table-column prop="device_code" label="设备编号" width="160" />
+          <el-table-column prop="location" label="位置" width="100" />
           <el-table-column prop="manufacturer" label="厂家" width="100" />
           <el-table-column prop="installDate" label="安装日期" />
-          <el-table-column prop="warrantyPeriod" label="保修期" />
         </el-table>
+      </div>
+      <!-- 空状态：工单声明了关联设备，但房屋查无匹配设备时给出提示，不报错 -->
+      <div v-else-if="equipmentMissing" class="card">
+        <h3 class="section-title">关联设备（来自一房一码档案）</h3>
+        <el-empty description="该工单关联的设备未在房屋档案中找到" :image-size="60" />
       </div>
 
       <!-- Back to house archive -->
@@ -79,9 +93,6 @@
         <el-form-item label="维修工种">
           <el-input v-model="reviewForm.suggested_trade" />
         </el-form-item>
-        <el-form-item label="指派人员">
-          <el-input v-model="reviewForm.assigned_to" placeholder="如：水电维修组A" />
-        </el-form-item>
         <el-form-item label="审核备注">
           <el-input v-model="reviewForm.review_notes" type="textarea" :rows="2" placeholder="如：持续漏水可能影响楼下，升级为高优先级" />
         </el-form-item>
@@ -93,11 +104,34 @@
       </template>
     </el-dialog>
 
+    <!-- Assign Dialog（阶段5.7：独立派单，只能从在册维修人员中选择） -->
+    <el-dialog v-model="showAssignDialog" title="派单" width="460px">
+      <el-form label-width="100px">
+        <el-form-item label="维修人员" required>
+          <el-select v-model="assignForm.assigned_to" placeholder="请选择在册维修人员" filterable style="width: 100%">
+            <el-option
+              v-for="r in repairers"
+              :key="r.id"
+              :label="r.real_name"
+              :value="r.real_name"
+            />
+          </el-select>
+          <div class="form-tip">仅能选择维修人员名单中的人员，不能手动输入</div>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showAssignDialog = false">取消</el-button>
+        <el-button type="primary" :disabled="!assignForm.assigned_to" @click="submitAssign">确认派单</el-button>
+      </template>
+    </el-dialog>
+
     <!-- Complete Dialog -->
     <el-dialog v-model="showCompleteDialog" title="完成维修" width="500px">
       <el-form label-width="100px">
         <el-form-item label="维修人员">
-          <el-input v-model="completeForm.repair_person" placeholder="如：张工" />
+          <!-- 阶段5.9：自动带出本工单已指派的维修人，禁止手动输入。
+               完成后端 complete 的「完成人必须=派单人」校验；后端仍会只读校验兜底 -->
+          <el-input v-model="completeForm.repair_person" disabled />
         </el-form-item>
         <el-form-item label="实际故障">
           <el-input v-model="completeForm.actual_fault" type="textarea" :rows="2" placeholder="如：角阀密封圈失效" />
@@ -131,16 +165,21 @@ import WorkOrderCard from '../components/WorkOrderCard.vue'
 const route = useRoute()
 const router = useRouter()
 const order = ref(null)
-const houseData = ref(null)
+// 阶段5.10：房屋设备清单（GET /houses/{id}/components 返回的按分类分组对象，
+// 如 {"plumbing":[...], "electrical":[...]}）。不再依赖 getHouse()——它不带 components 字段。
+const houseComponents = ref({})
 const showReviewDialog = ref(false)
 const showCompleteDialog = ref(false)
 
 const reviewForm = ref({
   urgency: '',
   suggested_trade: '',
-  assigned_to: '',
   review_notes: '',
 })
+// 阶段5.7：独立派单表单（只存维修人员姓名，从 repairers 下拉中选择）
+const showAssignDialog = ref(false)
+const assignForm = ref({ assigned_to: '' })
+const repairers = ref([])
 const completeForm = ref({
   repair_person: '',
   actual_fault: '',
@@ -148,22 +187,56 @@ const completeForm = ref({
   used_parts: '',
 })
 
+// 工单状态显示字典（与后端 STATUS_EN2CN 输出对齐）
+// pending_assign 的 label 由 statusTag 根据是否已派单动态生成
 const statusMap = {
   pending_review: { type: 'warning', label: '待审核' },
-  approved: { type: 'primary', label: '已批准' },
-  rejected: { type: 'danger', label: '已驳回' },
-  in_progress: { type: 'info', label: '维修中' },
+  pending_assign: { type: 'primary', label: '' },      // 动态：待派单 / 已派单·待维修
+  processing: { type: 'info', label: '维修中' },
   completed: { type: 'success', label: '已完成' },
+  cancelled: { type: 'info', label: '已取消' },
+  rejected: { type: 'danger', label: '已驳回' },
 }
 
-const statusTag = computed(() => statusMap[order.value?.status] || { type: 'info', label: order.value?.status })
+const statusTag = computed(() => {
+  const s = order.value?.status
+  const base = statusMap[s]
+  if (!base) return { type: 'info', label: s }
+  if (s === 'pending_assign') {
+    return { ...base, label: order.value?.assigned_to ? '已派单/待维修' : '待派单' }
+  }
+  return base
+})
 
+// 阶段5.7：仅在「待派单（审核通过且未派单）」时显示派单按钮
+// pending_assign + assigned_to 有值 → 已派单，不再显示派单入口
+const showAssignBtn = computed(() => {
+  return order.value?.status === 'pending_assign' && !order.value?.assigned_to
+})
+
+// 阶段5.8：仅在「已派单待开始维修」时显示开始维修按钮
+// （pending_assign + assigned_to 有值；未派单 / 维修中 / 已完成均不显示）
+const showStartRepairBtn = computed(() => {
+  return order.value?.status === 'pending_assign' && !!order.value?.assigned_to
+})
+// 阶段5.8：开始维修请求中的 loading 标记（防重复点击）
+const starting = ref(false)
+
+// 阶段5.10：关联设备 = 工单 AI 记录的设备 id 列表 ∩ 房屋档案设备清单。
+// related_equipment 存的是设备数字主键（如 [1,2,3,4,5]），
+// 与 /houses/{id}/components 返回的设备 id（house_device 主键）一致。
 const relatedEquipment = computed(() => {
-  if (!order.value || !houseData.value) return []
+  if (!order.value) return []
   const eqIds = order.value.related_equipment || []
-  const allComponents = houseData.value.components || {}
-  const allEquip = Object.values(allComponents).flat()
+  const allEquip = Object.values(houseComponents.value || {}).flat()
   return allEquip.filter(e => eqIds.includes(e.id))
+})
+
+// 空状态判断：工单声明了关联设备，但房屋档案里查不到任何匹配设备
+const equipmentMissing = computed(() => {
+  if (!order.value) return false
+  const eqIds = order.value.related_equipment || []
+  return eqIds.length > 0 && relatedEquipment.value.length === 0
 })
 
 const formatTime = (t) => {
@@ -173,6 +246,7 @@ const formatTime = (t) => {
 
 const submitReview = async (status) => {
   try {
+    // 阶段5.7：审核不再携带 assigned_to，审核与派单彻底分离
     await api.reviewWorkOrder(route.params.id, {
       ...reviewForm.value,
       reviewed_by: '物业管理员',
@@ -184,6 +258,61 @@ const submitReview = async (status) => {
   } catch (e) {
     ElMessage.error('操作失败')
   }
+}
+
+// 阶段5.7：打开派单弹窗，按需加载在册维修人员列表（GET /workorders/repairers）
+const openAssignDialog = async () => {
+  try {
+    if (!repairers.value.length) {
+      const res = await api.getRepairers()
+      repairers.value = res.data.repairers || []
+    }
+    assignForm.value.assigned_to = ''
+    showAssignDialog.value = true
+  } catch (e) {
+    ElMessage.error('获取维修人员列表失败')
+  }
+}
+
+// 阶段5.7：确认派单（PUT /workorders/{id}/assign），成功后刷新详情
+const submitAssign = async () => {
+  if (!assignForm.value.assigned_to) return
+  try {
+    await api.assignWorkOrder(route.params.id, {
+      assigned_to: assignForm.value.assigned_to,
+      assigned_by: '物业管理员',
+    })
+    ElMessage.success(`已派单给「${assignForm.value.assigned_to}」，等待开始维修`)
+    showAssignDialog.value = false
+    await loadOrder()
+  } catch (e) {
+    ElMessage.error(e.response?.data?.detail || '派单失败')
+  }
+}
+
+// 阶段5.8：开始维修（PUT /workorders/{id}/start）
+// 显式传当前工单已指派的维修人姓名，触发后端「发起人=派单人」只读校验；
+// 成功后刷新详情，状态由「已派单/待维修」变为「维修中」。
+const startRepair = async () => {
+  if (starting.value || !order.value?.assigned_to) return
+  starting.value = true
+  try {
+    await api.startWorkOrder(route.params.id, { repair_person: order.value.assigned_to })
+    ElMessage.success('已开始维修，工单状态更新为维修中')
+    await loadOrder()
+  } catch (e) {
+    ElMessage.error(e.response?.data?.detail || '开始维修失败')
+  } finally {
+    starting.value = false
+  }
+}
+
+// 阶段5.9：打开完成维修弹窗时自动带出本工单已指派的维修人（只读展示）。
+// 完成人必须就是派单人（后端 complete 也会只读校验），
+// 用户无需手动输入姓名，也不会输错成其他维修人员。
+const openCompleteDialog = () => {
+  completeForm.value.repair_person = order.value?.assigned_to || ''
+  showCompleteDialog.value = true
 }
 
 const submitComplete = async () => {
@@ -200,8 +329,14 @@ const submitComplete = async () => {
 const loadOrder = async () => {
   const res = await api.getWorkOrder(route.params.id)
   order.value = res.data
-  const hRes = await api.getHouse(res.data.house_id)
-  houseData.value = hRes.data
+  // 阶段5.10：设备清单改用独立接口获取（getHouse 不带 components 字段，是关联设备
+  // 一直为空的原因）。house_id 即 house_code（如 "1302"），与接口入参一致。
+  try {
+    const cRes = await api.getHouseComponents(res.data.house_id)
+    houseComponents.value = cRes.data.components || {}
+  } catch (e) {
+    houseComponents.value = {}
+  }
 
   // Pre-fill review form
   reviewForm.value.urgency = res.data.urgency || ''
@@ -225,4 +360,5 @@ onMounted(async () => {
   gap: 12px;
 }
 .header-left h2 { font-size: 18px; }
+.form-tip { font-size: 12px; color: #909399; line-height: 1.6; }
 </style>
