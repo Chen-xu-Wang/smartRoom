@@ -2,33 +2,29 @@
   <div class="page-container">
     <h2 class="section-title"><el-icon><OfficeBuilding /></el-icon> 物业管理后台</h2>
 
-    <!-- Stats -->
-    <el-row :gutter="16" class="stats-row">
-      <el-col :span="6">
-        <div class="stat-card card">
-          <div class="stat-value">{{ stats.total || 0 }}</div>
-          <div class="stat-label">工单总数</div>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="stat-card card">
-          <div class="stat-value stat-warn">{{ stats.by_status?.pending_review || 0 }}</div>
-          <div class="stat-label">待审核</div>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="stat-card card">
-          <div class="stat-value stat-primary">{{ stats.by_status?.approved || 0 }}</div>
-          <div class="stat-label">已批准</div>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="stat-card card">
-          <div class="stat-value stat-success">{{ stats.by_status?.completed || 0 }}</div>
-          <div class="stat-label">已完成</div>
-        </div>
-      </el-col>
-    </el-row>
+    <!-- Stats（5 卡：总数/待审核/待派单·待维修/维修中/已完成，与后端 by_status 新键对齐） -->
+    <div class="stats-row">
+      <div class="stat-card card">
+        <div class="stat-value">{{ stats.total || 0 }}</div>
+        <div class="stat-label">工单总数</div>
+      </div>
+      <div class="stat-card card">
+        <div class="stat-value stat-warn">{{ stats.by_status?.pending_review || 0 }}</div>
+        <div class="stat-label">待审核</div>
+      </div>
+      <div class="stat-card card">
+        <div class="stat-value stat-primary">{{ stats.by_status?.pending_assign || 0 }}</div>
+        <div class="stat-label">待派单/待维修</div>
+      </div>
+      <div class="stat-card card">
+        <div class="stat-value stat-info">{{ stats.by_status?.processing || 0 }}</div>
+        <div class="stat-label">维修中</div>
+      </div>
+      <div class="stat-card card">
+        <div class="stat-value stat-success">{{ stats.by_status?.completed || 0 }}</div>
+        <div class="stat-label">已完成</div>
+      </div>
+    </div>
 
     <!-- AI Confidence -->
     <div class="card" v-if="stats.avg_confidence">
@@ -44,7 +40,8 @@
         <el-radio-group v-model="filterStatus" @change="loadOrders">
           <el-radio-button label="">全部</el-radio-button>
           <el-radio-button label="pending_review">待审核</el-radio-button>
-          <el-radio-button label="approved">已批准</el-radio-button>
+          <el-radio-button label="pending_assign">待派单/待维修</el-radio-button>
+          <el-radio-button label="processing">维修中</el-radio-button>
           <el-radio-button label="completed">已完成</el-radio-button>
           <el-radio-button label="rejected">已驳回</el-radio-button>
         </el-radio-group>
@@ -71,9 +68,9 @@
             <el-progress :percentage="row.confidence || 0" :stroke-width="10" :show-text="false" />
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
-            <el-tag :type="statusTag(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
+            <el-tag :type="statusTag(row.status)" size="small">{{ statusLabel(row) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="100" fixed="right">
@@ -115,26 +112,30 @@ const urgencyTag = (u) => {
   return map[u] || 'info'
 }
 
+// 状态标签颜色（与后端 STATUS_EN2CN 输出对齐）
 const statusTag = (s) => {
   const map = {
     pending_review: 'warning',
-    approved: 'primary',
-    rejected: 'danger',
-    in_progress: 'info',
+    pending_assign: 'primary',
+    processing: 'info',
     completed: 'success',
+    cancelled: 'info',
+    rejected: 'danger',
   }
   return map[s] || 'info'
 }
 
-const statusLabel = (s) => {
+// 状态显示文字：pending_assign 需按是否已派单区分（传整行而非只传状态）
+const statusLabel = (row) => {
   const map = {
     pending_review: '待审核',
-    approved: '已批准',
-    rejected: '已驳回',
-    in_progress: '维修中',
+    pending_assign: row.assigned_to ? '已派单/待维修' : '待派单',
+    processing: '维修中',
     completed: '已完成',
+    cancelled: '已取消',
+    rejected: '已驳回',
   }
-  return map[s] || s
+  return map[row.status] || row.status
 }
 
 const loadOrders = async () => {
@@ -169,8 +170,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.stats-row { margin-bottom: 0; }
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
 .stat-card {
+  flex: 1;
   text-align: center;
   padding: 20px;
 }
@@ -181,6 +187,7 @@ onMounted(async () => {
 }
 .stat-warn { color: #ea580c; }
 .stat-primary { color: #2563eb; }
+.stat-info { color: #0891b2; }
 .stat-success { color: #16a34a; }
 .stat-label {
   font-size: 13px;

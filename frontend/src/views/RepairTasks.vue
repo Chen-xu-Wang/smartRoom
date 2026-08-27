@@ -5,7 +5,8 @@
     <!-- Filter -->
     <div class="card">
       <el-radio-group v-model="filterStatus" @change="loadOrders">
-        <el-radio-button label="approved">待处理</el-radio-button>
+        <el-radio-button label="pending_assign">待维修</el-radio-button>
+        <el-radio-button label="processing">维修中</el-radio-button>
         <el-radio-button label="completed">已完成</el-radio-button>
       </el-radio-group>
     </div>
@@ -54,8 +55,25 @@
           <el-button size="small" @click="$router.push(`/archive/${order.house_id}`)">
             查看房屋档案
           </el-button>
-          <el-button v-if="order.status === 'approved'" size="small" type="success" @click="$router.push(`/workorder/${order.id}`)">
-            处理维修
+          <!-- 阶段5.8：已派单待开始维修 → 直接调 /start 开工 -->
+          <!-- 仅当 pending_assign 且 assigned_to 已存在时显示；未派单不显示 -->
+          <el-button
+            v-if="order.status === 'pending_assign' && order.assigned_to"
+            size="small"
+            type="success"
+            :loading="startingId === order.id"
+            @click="startRepair(order)"
+          >
+            开始维修
+          </el-button>
+          <!-- 阶段5.8：维修中 → 只进详情继续处理，不重复调用 /start -->
+          <el-button
+            v-if="order.status === 'processing'"
+            size="small"
+            type="success"
+            @click="$router.push(`/workorder/${order.id}`)"
+          >
+            继续处理
           </el-button>
         </div>
       </div>
@@ -66,11 +84,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { Tools } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import api from '../api'
 
 const orders = ref([])
 const loading = ref(false)
-const filterStatus = ref('approved')
+const filterStatus = ref('pending_assign')
+// 阶段5.8：正在执行「开始维修」的工单号（loading 用，防重复点击）
+const startingId = ref('')
 
 const urgencyTag = (u) => {
   const map = { '紧急': 'danger', '高': 'warning', '中': 'info', '低': 'success' }
@@ -95,6 +116,22 @@ const loadOrders = async () => {
     orders.value = res.data.orders
   } finally {
     loading.value = false
+  }
+}
+
+// 阶段5.8：开始维修 —— 显式传当前工单已指派的维修人姓名
+// （后端会只读校验「发起人 = 派单人」，防止非指派维修人开工）
+const startRepair = async (order) => {
+  if (startingId.value) return
+  startingId.value = order.id
+  try {
+    await api.startWorkOrder(order.id, { repair_person: order.assigned_to })
+    ElMessage.success('已开始维修，工单状态更新为维修中')
+    await loadOrders()  // 刷新列表：该工单从「待维修」移到「维修中」筛选下
+  } catch (e) {
+    ElMessage.error(e.response?.data?.detail || '开始维修失败')
+  } finally {
+    startingId.value = ''
   }
 }
 

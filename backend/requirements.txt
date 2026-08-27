@@ -1,3 +1,33 @@
-fastapi==0.115.6
-uvicorn==0.34.0
-pydantic==2.10.4
+# ============================================================
+# Python 后端依赖清单（相当于 Java Maven 的 pom.xml）
+# ------------------------------------------------------------
+# 安装方法（在 backend 目录下）：
+#   1. 创建虚拟环境：   python -m venv venv
+#   2. 激活后安装依赖： venv\Scripts\pip install -r requirements.txt
+#
+# 版本说明：以下版本均已验证兼容 Python 3.14.4
+# 写死版本号（==）是为了保证团队成员装出完全一致的环境，
+# 相当于 Maven 中不用 SNAPSHOT 的作用
+# ============================================================
+
+# ---------- Web 框架（相当于 Java 的 Spring Boot）----------
+# FastAPI：现代 Python Web 框架，自动生成 Swagger 接口文档（/docs）
+fastapi==0.141.1
+# Uvicorn：运行 FastAPI 的服务器（相当于 Java 内嵌的 Tomcat）
+uvicorn==0.52.4
+# Pydantic：数据校验和类型定义（FastAPI 自带依赖，相当于 Bean Validation）
+# 已随 fastapi 自动安装，这里显式声明版本
+pydantic==2.13.4
+
+# ---------- 数据库（MySQL）----------
+# PyMySQL：纯 Python 实现的 MySQL 驱动（相当于 Java 的 mysql-connector-j）
+# 选用它的原因：不需要 C 编译器，Windows + Python 3.14 下零障碍安装
+PyMySQL==1.2.0
+# DBUtils：数据库连接池（相当于 Java 的 HikariCP / Druid）
+# 数据库在远程服务器（111.229.181.254），每次请求都新建连接会很慢，
+# 连接池可以复用已建立的连接，显著降低接口响应时间
+DBUtils==3.2.0
+
+# ---------- 配置管理 ----------
+# python-dotenv：从 .env 文件读取环境变量（相当于 Spring Boot 读 application.properties）
+python-dotenv==1.2.3
