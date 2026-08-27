@@ -31,3 +31,8 @@ DBUtils==3.2.0
 # ---------- 配置管理 ----------
 # python-dotenv：从 .env 文件读取环境变量（相当于 Spring Boot 读 application.properties）
 python-dotenv==1.2.3
+
+# ---------- 文件上传（报修附件 / 图片，A 端补齐 repair_attachment 写入）----------
+# python-multipart：FastAPI 接收 multipart/form-data（UploadFile）必需
+# 不装会报 400 / 缺少 python-multipart 依赖
+python-multipart==0.0.20

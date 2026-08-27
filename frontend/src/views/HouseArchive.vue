@@ -22,16 +22,16 @@
       <h3 class="section-title">
         <el-icon><component :is="cat.icon" /></el-icon>
         {{ cat.label }}
-        <span class="count-badge">{{ (house.components?.[key] || []).length }}项</span>
+        <span class="count-badge">{{ (houseComponents?.[key] || []).length }}项</span>
       </h3>
-      <el-table :data="house.components?.[key] || []" border size="small">
+      <el-table :data="houseComponents?.[key] || []" border size="small">
         <el-table-column prop="id" label="设备编号" width="160" />
         <el-table-column prop="name" label="名称" width="120" />
         <el-table-column prop="spec" label="规格型号" width="120" />
         <el-table-column prop="location" label="位置" />
         <el-table-column prop="manufacturer" label="厂家" width="100" />
         <el-table-column prop="installDate" label="安装日期" width="120" />
-        <el-table-column prop="warrantyPeriod" label="保修期" width="80" />
+        <el-table-column prop="remark" label="备注" width="120" />
       </el-table>
     </div>
 
@@ -94,6 +94,8 @@ import api from '../api'
 const route = useRoute()
 const houseId = route.params.houseId
 const house = ref(null)
+// 设备清单来自独立接口 GET /api/houses/{id}/components（house 详情不返回 components）
+const houseComponents = ref({})
 const maintenanceHistory = ref([])
 const repeatWarnings = ref([])
 
@@ -106,12 +108,19 @@ const categoryMap = {
 }
 
 onMounted(async () => {
+  // 1. 房屋基础档案
   const res = await api.getHouse(houseId)
   house.value = res.data
-  maintenanceHistory.value = res.data.maintenanceRecords || []
 
-  // Get maintenance history with repeat warnings
+  // 2. 设备清单：独立接口（文档第9节 Bug#2 —— 详情接口不含 components 字段）
+  const cRes = await api.getHouseComponents(houseId)
+  houseComponents.value = cRes.data.components || {}
+
+  // 3. 维修历史 + 重复预警：来自 GET /api/maintenance/history/{id}
+  //    （文档第9节 Bug#1 —— 详情接口不含 maintenanceRecords，
+  //      records 与 repeat_warnings 都在该接口里，一次取回）
   const mRes = await api.getMaintenanceHistory(houseId)
+  maintenanceHistory.value = mRes.data.records || []
   repeatWarnings.value = mRes.data.repeat_warnings || []
 })
 </script>

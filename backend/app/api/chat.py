@@ -15,14 +15,19 @@
     本版本对话消息已全部持久化到 repair_message，重启后至少不丢聊天记录。
 """
 import json
+import os
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
 
 from ..services.agent import MaintenanceAgent
 from ..services.archive import get_house_by_id
+from ..config import BACKEND_DIR
 from ..database import query_one, execute, execute_return_id
+
+# 附件上传目录：backend/uploads/（已在 .gitignore 忽略，不会进仓库）
+UPLOAD_DIR = os.path.join(BACKEND_DIR, "uploads")
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -292,6 +297,72 @@ async def chat_action(req: ChatActionRequest):
         }
 
     raise HTTPException(status_code=400, detail="Unknown action")
+
+
+# ------------------------------------------------------------------
+# 图片 / 附件上传（A 端职责：文档第 2/9 节点名「当前后端没有任何代码实现」）
+# ------------------------------------------------------------------
+@router.post("/attachment")
+async def upload_attachment(
+    repair_order_id: str = Form(...),   # 关联工单号（order_no）
+    uploader_id: int = Form(None),     # 上传人 user.id（可选）
+    file: UploadFile = File(...),      # 图片 / 文件本体
+    attachment_type: str = Form("photo"),  # photo / video / doc
+    ai_description: str = Form(""),    # 多模态模型对图片的理解（暂留空，待接真实模型）
+):
+    """上传报修附件（如厨房漏水照片），落库到 repair_attachment 表.
+
+    【设计说明】
+        - 文件保存在 backend/uploads/ 目录，URL 形如 /uploads/xxx.jpg
+        - 关联 repair_order（用 order_no 反查 repair_order.id）
+        - ai_description 字段预留给多模态模型（图片识别），当前不依赖外部模型，
+          由前端/调用方按需写入「现场可见：水槽下方积水」这类辅助描述
+        - repair_attachment 表已由 B 端建好（含 ai_description 字段），本接口补齐写入能力
+
+    【联调注意】本接口为 A 端补齐，文档第 8 节「图片附件」项依赖它；
+        若联调不需要附件能力，可暂不调用，不影响核心报修流程。
+    """
+    # 1. 保存文件（防止文件名冲突 + 路径穿越，统一加时间戳前缀）
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    safe_name = f"{int(datetime.now().timestamp())}_{os.path.basename(file.filename or 'file')}"
+    save_path = os.path.join(UPLOAD_DIR, safe_name)
+    content = await file.read()
+    with open(save_path, "wb") as f:
+        f.write(content)
+    file_url = f"/uploads/{safe_name}"
+
+    # 2. 关联工单（order_no → repair_order.id）
+    order = query_one(
+        "SELECT id FROM repair_order WHERE order_no = %s", (repair_order_id,)
+    )
+    order_db_id = order["id"] if order else None
+
+    # 3. 写入 repair_attachment 表
+    aid = execute_return_id(
+        "INSERT INTO repair_attachment (repair_order_id, uploader_id, file_name,"
+        " file_url, file_type, attachment_type, ai_description)"
+        " VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        (
+            order_db_id,
+            uploader_id,
+            file.filename or safe_name,
+            file_url,
+            file.content_type or "",
+            attachment_type,
+            ai_description,
+        ),
+    )
+
+    return {
+        "success": True,
+        "attachment_id": aid,
+        "repair_order_id": repair_order_id,
+        "file_url": file_url,
+        "file_name": file.filename,
+        "file_type": file.content_type,
+        "attachment_type": attachment_type,
+        "ai_description": ai_description,
+    }
 
 
 @router.get("/state/{session_id}")

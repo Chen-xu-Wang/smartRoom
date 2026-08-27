@@ -12,6 +12,8 @@ __pycache__/
 backend/.env
 # 本地测试数据库（旧的 SQLite 文件，已改用远程 MySQL）
 backend/app/data/*.db
+# 报修附件上传目录（图片/文件本体不进仓库；数据库只存 URL）
+backend/uploads/
 
 # ---------- 前端 ----------
 # npm 安装的依赖目录（每台机器自己 npm install）
