@@ -4,12 +4,13 @@ State machine:
   START → COLLECTING_INFO → INFO_COMPLETE → QUERYING_ARCHIVE →
   SEARCHING_KB → GENERATING_ORDER → ORDER_PENDING → COMPLETE
 
-The agent uses keyword-based NLP for intent recognition and info extraction,
-followed by tool calls to house archive and RAG knowledge base.
+【v2 变更】意图理解（extract_info）与工单分析（_generate_work_order）已接入
+真实大模型（services/llm.py，OpenAI 兼容协议）。当大模型不可用或返回异常时，
+自动 fallback 到原关键词 / 规则逻辑，保证流程不中断、前端与 A/B 契约不变。
 """
 import json
-import re
-from datetime import datetime, timedelta
+from datetime import datetime
+
 from .archive import (
     get_house_by_id,
     get_house_equipment_by_location,
@@ -22,8 +23,9 @@ from .rag import (
     get_urgency_suggestion,
     get_possible_causes,
 )
+from .llm import is_llm_enabled, chat_json
 
-# ============ Keyword Dictionaries ============
+# ============ Keyword Dictionaries（兜底用，大模型不可用 / 异常时启用）============
 
 LOCATION_KEYWORDS = {
     "厨房": ["厨房", "灶台", "操作台", "水槽下"],
@@ -76,13 +78,15 @@ SEVERITY_KEYWORDS = {
     "突发": ["突然", "刚", "今天", "刚才"],
 }
 
+CONFIRM_KEYWORDS = ["确认", "没问题", "可以", "同意", "好", "提交", "对的", "正确"]
+MODIFY_KEYWORDS = ["修改", "不对", "错了", "不是", "重新", "纠正"]
+
 # ============ Info Extraction ============
 
-def extract_info(text: str, current_info: dict = None):
-    """Extract structured information from natural language input."""
+def _keyword_extract(text: str, current_info: dict = None):
+    """原关键词匹配抽取（兜底用）。"""
     info = dict(current_info) if current_info else {}
 
-    # Extract location
     for loc, keywords in LOCATION_KEYWORDS.items():
         if loc not in info.get("location", ""):
             for kw in keywords:
@@ -90,7 +94,6 @@ def extract_info(text: str, current_info: dict = None):
                     info["location"] = loc
                     break
 
-    # Extract device
     for device, keywords in DEVICE_KEYWORDS.items():
         if not info.get("device"):
             for kw in keywords:
@@ -98,7 +101,6 @@ def extract_info(text: str, current_info: dict = None):
                     info["device"] = device
                     break
 
-    # Extract symptom
     for symptom, keywords in SYMPTOM_KEYWORDS.items():
         if not info.get("symptom"):
             for kw in keywords:
@@ -111,7 +113,6 @@ def extract_info(text: str, current_info: dict = None):
                     info["symptom"] = info["symptom"] + ", " + symptom
                     break
 
-    # Extract severity cues
     for severity, keywords in SEVERITY_KEYWORDS.items():
         if not info.get("severity"):
             for kw in keywords:
@@ -119,7 +120,6 @@ def extract_info(text: str, current_info: dict = None):
                     info["severity"] = severity
                     break
 
-    # Extract time info
     if "今天" in text or "刚才" in text:
         info["occurrence_time"] = "今天"
     elif "昨天" in text:
@@ -127,12 +127,10 @@ def extract_info(text: str, current_info: dict = None):
     elif "这周" in text or "这几天" in text:
         info["occurrence_time"] = "本周"
 
-    # Special: check if water still leaks after closing tap
     if "关掉" in text or "关闭" in text or "关了" in text:
         if "漏" in text or "滴" in text:
             info["leak_after_close"] = True
 
-    # Store raw description
     if "raw_description" not in info:
         info["raw_description"] = text
     else:
@@ -140,10 +138,89 @@ def extract_info(text: str, current_info: dict = None):
 
     return info
 
+
+def _llm_extract(text: str, current_info: dict = None) -> dict | None:
+    """用真实大模型抽取结构化字段；不可用 / 异常时返回 None。"""
+    if not is_llm_enabled():
+        return None
+
+    sys_prompt = (
+        "你是住宅报修智能助手的「意图理解」模块。请从住户的自然语言描述中抽取结构化字段，"
+        "只返回一个 JSON 对象，不要任何解释或代码块标记。\n"
+        "字段与取值：\n"
+        "- location: 故障区域，取值之一或 null：厨房/卫生间/卧室/客厅/阳台/入户\n"
+        "- device: 涉及设备/部件（如 水槽/水龙头/插座/空调/窗户/墙面/角阀/花洒），或 null\n"
+        "- symptom: 故障现象，字符串，可含多个用英文逗号分隔（如 \"漏水,滴水\"）\n"
+        "- severity: 严重程度线索，取值之一或 null：持续/严重/轻微/突发\n"
+        "- occurrence_time: 发生时间，取值之一或 null：今天/昨天/本周\n"
+        "- leak_after_close: 布尔，关闭水源后是否仍在漏（仅漏水相关时判断，否则 null）\n"
+        "- other_devices_affected: 布尔或 null，是否同一区域多个设备受影响（电气相关时判断）\n"
+        "- ac_detail: 字符串或 null，空调相关细节\n"
+        "- is_confirm: 布尔，用户是否在确认/提交工单（含 确认/可以/没问题/提交 等）\n"
+        "- is_modify: 布尔，用户是否在要求修改（含 修改/不对/错了 等）\n"
+        "- raw_description: 住户原话（直接复制最近一句）\n"
+        "规则：若某字段在本次描述中未出现，填空（null 或空串）；"
+        "已存在信息请沿用，不要清空。"
+    )
+    user_payload = {
+        "current_info": current_info or {},
+        "user_input": text,
+    }
+    try:
+        return chat_json([
+            {"role": "system", "content": sys_prompt},
+            {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+        ], temperature=0.2)
+    except Exception:
+        return None
+
+
+def extract_info(text: str, current_info: dict = None):
+    """抽取结构化信息：优先大模型，失败兜底到关键词匹配。"""
+    llm_out = _llm_extract(text, current_info)
+
+    if isinstance(llm_out, dict):
+        info = dict(current_info) if current_info else {}
+        for k in ["location", "device", "symptom", "severity", "occurrence_time"]:
+            v = llm_out.get(k)
+            if v and not info.get(k):
+                info[k] = v
+        if llm_out.get("leak_after_close") and not info.get("leak_after_close"):
+            info["leak_after_close"] = True
+        if llm_out.get("other_devices_affected") is not None and "other_devices_affected" not in info:
+            info["other_devices_affected"] = llm_out.get("other_devices_affected")
+        if llm_out.get("ac_detail") and not info.get("ac_detail"):
+            info["ac_detail"] = llm_out.get("ac_detail")
+        if "raw_description" not in info:
+            info["raw_description"] = text
+        else:
+            info["raw_description"] += " " + text
+        # 记录本次意图判断（供状态机 ORDER_PENDING 分支使用）
+        info["_is_confirm"] = bool(llm_out.get("is_confirm"))
+        info["_is_modify"] = bool(llm_out.get("is_modify"))
+        return info
+
+    return _keyword_extract(text, current_info)
+
+
+def _read_intent(text: str) -> dict:
+    """判断用户意图（确认 / 修改 / 补充）。优先大模型，兜底关键词。"""
+    llm_out = _llm_extract(text, {})
+    if isinstance(llm_out, dict):
+        return {
+            "confirm": bool(llm_out.get("is_confirm")),
+            "modify": bool(llm_out.get("is_modify")),
+        }
+    return {
+        "confirm": any(kw in text for kw in CONFIRM_KEYWORDS),
+        "modify": any(kw in text for kw in MODIFY_KEYWORDS),
+    }
+
+
 # ============ Follow-up Question Logic ============
 
 def check_missing_info(info: dict):
-    """Check what information is missing and generate follow-up questions."""
+    """检查还缺哪些信息并生成追问项（兜底用，大模型追问也基于它判断缺字段）。"""
     questions = []
 
     if not info.get("location"):
@@ -158,7 +235,6 @@ def check_missing_info(info: dict):
             "question": "能否具体描述一下故障现象？比如漏水、不通电、不制冷、异响等？",
         })
 
-    # If symptom is leak-related but no detail on whether it continues after closing
     symptom = info.get("symptom", "")
     if ("漏水" in symptom or "渗水" in symptom or "滴水" in symptom) and not info.get("leak_after_close"):
         questions.append({
@@ -166,7 +242,6 @@ def check_missing_info(info: dict):
             "question": "请问关闭水龙头后是否仍然漏水？是持续滴水还是大量出水？",
         })
 
-    # If symptom is electrical but no detail
     if "不通电" in symptom or "不亮" in symptom or "跳闸" in symptom:
         if not info.get("other_devices_affected"):
             questions.append({
@@ -174,7 +249,6 @@ def check_missing_info(info: dict):
                 "question": "请问是单个插座/灯具无电，还是同一区域多个设备都受影响？",
             })
 
-    # If symptom is AC related
     if "不制冷" in symptom:
         if not info.get("ac_detail"):
             questions.append({
@@ -183,6 +257,36 @@ def check_missing_info(info: dict):
             })
 
     return questions
+
+
+def _make_followup(missing: list, info: dict) -> str:
+    """生成追问话术：优先大模型自然追问，兜底用规则问题。"""
+    if is_llm_enabled():
+        try:
+            sys_prompt = (
+                "你是住宅报修助手。根据已收集信息与缺失字段，用一句自然、友好的话向住户追问，"
+                "只返回追问文案本身，不要解释、不要列表。保持口语化、不超过 40 字。"
+            )
+            user_payload = {
+                "collected": {k: v for k, v in info.items() if not k.startswith("_")},
+                "missing_fields": [q["field"] for q in missing],
+                "fallback_question": missing[0]["question"],
+            }
+            content = chat_json(
+                [
+                    {"role": "system", "content": sys_prompt},
+                    {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+                ],
+                temperature=0.5,
+            )
+            if isinstance(content, dict):
+                # 有些模型会返回 {"question": "..."} 结构
+                return content.get("question") or content.get("text") or missing[0]["question"]
+            return str(content)
+        except Exception:
+            pass
+    return missing[0]["question"]
+
 
 # ============ Agent State Machine ============
 
@@ -195,6 +299,7 @@ class AgentState:
     GENERATING_ORDER = "generating_order"
     ORDER_PENDING = "order_pending"
     COMPLETE = "complete"
+
 
 class MaintenanceAgent:
     """The main AI agent for maintenance reporting."""
@@ -229,18 +334,15 @@ class MaintenanceAgent:
             "timestamp": datetime.now().isoformat(),
         })
 
-        # Extract info from user input
+        # 抽取信息（大模型优先，关键词兜底）
         self.extracted_info = extract_info(user_input, self.extracted_info)
 
         response = None
 
         if self.state == AgentState.COLLECTING_INFO:
-            # Check if we have enough info
             missing = check_missing_info(self.extracted_info)
-
             if missing:
-                # Ask follow-up question
-                question = missing[0]["question"]
+                question = _make_followup(missing, self.extracted_info)
                 self.state = AgentState.COLLECTING_INFO
                 response = {
                     "role": "assistant",
@@ -251,13 +353,12 @@ class MaintenanceAgent:
                     "missing_info": [q["field"] for q in missing],
                 }
             else:
-                # Enough info, move to next stage
                 self.state = AgentState.INFO_COMPLETE
                 response = self._run_tools_and_generate()
 
         elif self.state == AgentState.ORDER_PENDING:
-            # User is responding to the generated order
-            if any(kw in user_input for kw in ["确认", "没问题", "可以", "同意", "好"]):
+            intent = _read_intent(user_input)
+            if intent["confirm"]:
                 self.state = AgentState.COMPLETE
                 response = {
                     "role": "assistant",
@@ -266,7 +367,7 @@ class MaintenanceAgent:
                     "agent_state": self.state,
                     "work_order": self.generated_order,
                 }
-            elif any(kw in user_input for kw in ["修改", "不对", "错了", "不是"]):
+            elif intent["modify"]:
                 self.state = AgentState.COLLECTING_INFO
                 response = {
                     "role": "assistant",
@@ -275,18 +376,17 @@ class MaintenanceAgent:
                     "agent_state": self.state,
                 }
             else:
-                # Treat as additional info
+                # 视为补充信息，回到收集阶段
                 self.state = AgentState.COLLECTING_INFO
                 response = self.process(user_input)
         else:
-            # Re-process
             response = self.process(user_input)
 
         self.conversation_history.append(response)
         return response
 
     def _run_tools_and_generate(self):
-        """Run tools (archive query, RAG search) and generate work order."""
+        """运行工具（档案查询、RAG 检索）并生成工单。"""
         self.tool_calls = []
 
         # Tool 1: Query house archive
@@ -320,7 +420,7 @@ class MaintenanceAgent:
         }
         self.tool_calls[-1]["status"] = "completed"
 
-        # Tool 2: RAG search
+        # Tool 2: RAG search（本地知识库检索仍保留，作为 LLM 分析的事实依据）
         self.state = AgentState.SEARCHING_KB
         self.tool_calls.append({
             "tool": "search_knowledge_base",
@@ -333,37 +433,26 @@ class MaintenanceAgent:
             self.extracted_info.get("raw_description", ""),
             self.extracted_info,
         )
-
-        possible_causes = get_possible_causes(self.rag_results)
-        suggested_trade = get_repair_trade_suggestion(self.extracted_info, self.rag_results)
-        urgency = get_urgency_suggestion(self.extracted_info)
-
-        self.tool_calls[-1]["output"] = {
-            "results_count": len(self.rag_results),
-            "possible_causes": possible_causes,
-            "suggested_trade": suggested_trade,
-            "urgency": urgency,
-            "sections": [{"header": r["header"], "category": r.get("category", "")} for r in self.rag_results[:3]],
-        }
         self.tool_calls[-1]["status"] = "completed"
 
-        # Generate work order
+        # Generate work order（分析交给大模型，失败兜底规则）
         self.state = AgentState.GENERATING_ORDER
-        order = self._generate_work_order(possible_causes, suggested_trade, urgency)
+        order = self._generate_work_order()
 
         # Build response
         equipment_str = "、".join([f"{e['name']}({e['spec']})" for e in equipment[:3]]) if equipment else "未找到关联设备"
-        causes_str = "、".join(possible_causes[:3]) if possible_causes else "需现场检查确定"
+        causes_str = "、".join(order["possible_causes"][:3]) if order.get("possible_causes") else "需现场检查确定"
+        analysis_src = "大模型" if order.get("_by_llm") else "规则"
 
         content = (
-            f"## AI分析完成\n\n"
+            f"## AI分析完成（{analysis_src}）\n\n"
             f"**已调用工具：**\n"
             f"1. ✅ 房屋数字档案查询 — 获取到{location}区域{len(equipment)}个关联设备\n"
             f"2. ✅ 运维知识库检索 — 匹配到{len(self.rag_results)}条相关知识\n\n"
             f"**关联设备：** {equipment_str}\n\n"
-            f"**AI初步分析：** 疑似{causes_str}\n\n"
-            f"**建议工种：** {suggested_trade}\n\n"
-            f"**紧急等级：** {urgency}\n\n"
+            f"**AI初步分析：** {order['ai_analysis']}\n\n"
+            f"**建议工种：** {order['suggested_trade']}\n\n"
+            f"**紧急等级：** {order['urgency']}\n\n"
             f"**AI置信度：** {order['confidence']}%\n\n"
             f"---\n\n"
             f"以上为AI自动生成的维修工单建议，请确认或修改后提交。"
@@ -389,14 +478,66 @@ class MaintenanceAgent:
         self.generated_order = order
         return response
 
-    def _generate_work_order(self, causes, trade, urgency):
-        """Generate a structured work order."""
-        house = get_house_by_id(self.house_id)
-        equipment = self.archive_data.get("equipment", [])
-        equipment_ids = [e["id"] for e in equipment[:5]] if equipment else []
+    def _llm_generate_analysis(self, equipment, rag_results) -> dict | None:
+        """用大模型基于「抽取信息 + 档案 + 知识库」生成维修分析。失败返回 None。"""
+        if not is_llm_enabled():
+            return None
 
-        # Calculate confidence
-        confidence = self._calculate_confidence()
+        equipment_text = "；".join([f"{e['name']}({e.get('spec','')})" for e in equipment]) or "无"
+        rag_text = "\n".join([f"【{r.get('header','')}】{r.get('content','')[:300]}" for r in rag_results[:3]]) or "无"
+
+        sys_prompt = (
+            "你是资深住宅运维工程师。基于住户问题、房屋数字档案、运维知识库，输出维修分析，"
+            "只返回一个 JSON 对象，不要解释或代码块。\n"
+            "字段：\n"
+            "- fault_type: 故障分类，取值之一：给排水故障/电气故障/空调故障/门窗故障/墙面裂缝/其他故障\n"
+            "- ai_analysis: 一句专业分析（说明疑似原因链，不超过 60 字）\n"
+            "- possible_causes: 字符串数组，最多 3 条可能原因\n"
+            "- suggested_trade: 建议工种，取值之一：水电维修/电工维修/空调维修/门窗维修/油漆维修/综合维修\n"
+            "- urgency: 紧急程度，取值之一：紧急/高/中/低\n"
+            "- confidence: 0-100 整数，信息越充分越高（一般 70-92）"
+        )
+        user_payload = {
+            "住户问题": self.extracted_info.get("raw_description", ""),
+            "抽取信息": {k: v for k, v in self.extracted_info.items() if not k.startswith("_")},
+            "关联设备": equipment_text,
+            "知识库片段": rag_text,
+        }
+        try:
+            out = chat_json([
+                {"role": "system", "content": sys_prompt},
+                {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+            ], temperature=0.3)
+            if isinstance(out, dict) and out.get("fault_type"):
+                out["_by_llm"] = True
+                return out
+        except Exception:
+            # 大模型不可用 / 返回非 JSON / 超时：交给调用方走原规则兜底
+            pass
+        return None
+
+    def _rule_analysis(self):
+        """原规则分析（兜底）。"""
+        possible_causes = get_possible_causes(self.rag_results)
+        suggested_trade = get_repair_trade_suggestion(self.extracted_info, self.rag_results)
+        urgency = get_urgency_suggestion(self.extracted_info)
+        return {
+            "fault_type": self._determine_fault_type(),
+            "ai_analysis": f"疑似{'、'.join(possible_causes[:3])}" if possible_causes else "需现场检查确定",
+            "possible_causes": possible_causes,
+            "suggested_trade": suggested_trade,
+            "urgency": urgency,
+            "confidence": self._calculate_confidence(),
+            "_by_llm": False,
+        }
+
+    def _generate_work_order(self):
+        """生成结构化工单（分析来自大模型，失败兜底规则）。"""
+        equipment = self.archive_data.get("equipment", []) if self.archive_data else []
+        analysis = self._llm_generate_analysis(equipment, self.rag_results) or self._rule_analysis()
+
+        house = get_house_by_id(self.house_id)
+        equipment_ids = [e["id"] for e in equipment[:5]] if equipment else []
 
         order_id = f"WO-{self.house_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
@@ -405,24 +546,25 @@ class MaintenanceAgent:
             "house_id": self.house_id,
             "house_name": f"{house['building']}{house['room']}" if house else self.house_id,
             "location": self.extracted_info.get("location", ""),
-            "fault_type": self._determine_fault_type(),
+            "fault_type": analysis.get("fault_type", "其他故障"),
             "user_description": self.extracted_info.get("raw_description", ""),
             "related_equipment": equipment_ids,
             "equipment_details": [{"name": e["name"], "spec": e["spec"], "id": e["id"]} for e in equipment[:3]],
-            "ai_analysis": f"疑似{'、'.join(causes[:3])}" if causes else "需现场检查确定",
-            "possible_causes": causes,
-            "suggested_trade": trade,
-            "urgency": urgency,
-            "confidence": confidence,
+            "ai_analysis": analysis.get("ai_analysis", "需现场检查确定"),
+            "possible_causes": analysis.get("possible_causes", []),
+            "suggested_trade": analysis.get("suggested_trade", "综合维修"),
+            "urgency": analysis.get("urgency", "中"),
+            "confidence": analysis.get("confidence", 60),
             "status": "pending_review",
             "created_at": datetime.now().isoformat(),
-            "pipeline_info": self.archive_data.get("pipeline_layout", {}),
-            "maintenance_history": self.archive_data.get("maintenance_history", []),
+            "pipeline_info": self.archive_data.get("pipeline_layout", {}) if self.archive_data else {},
+            "maintenance_history": self.archive_data.get("maintenance_history", []) if self.archive_data else {},
+            "_by_llm": analysis.get("_by_llm", False),
         }
         return order
 
     def _determine_fault_type(self):
-        """Determine fault type category from symptoms."""
+        """Determine fault type category from symptoms（兜底用）."""
         symptom = self.extracted_info.get("symptom", "")
         if any(kw in symptom for kw in ["漏水", "渗水", "滴水", "排水"]):
             return "给排水故障"
@@ -437,7 +579,7 @@ class MaintenanceAgent:
         return "其他故障"
 
     def _calculate_confidence(self):
-        """Calculate AI confidence score."""
+        """Calculate AI confidence score（兜底用）。"""
         score = 50
         info = self.extracted_info
 
@@ -456,13 +598,14 @@ class MaintenanceAgent:
         if info.get("raw_description") and len(info["raw_description"]) > 20:
             score += 5
 
-        # Cap at 95
         return min(score, 95)
 
     def _safe_info(self):
         """Return a safe copy of extracted info for JSON serialization."""
         info = dict(self.extracted_info)
-        # Remove raw_description for brevity in API response
+        # 去掉内部意图标记与超长原文
+        info.pop("_is_confirm", None)
+        info.pop("_is_modify", None)
         if "raw_description" in info:
             info["raw_description"] = info["raw_description"][:200]
         return info
