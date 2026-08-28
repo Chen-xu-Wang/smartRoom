@@ -23,6 +23,7 @@ from pydantic import BaseModel
 
 from ..database import query_one, query_all, execute, execute_return_id, parse_json_field
 from ..services.archive import get_house_by_id
+from ..services.fault_memory import get_fault_memory as get_fault_memory_service
 
 router = APIRouter(prefix="/api/workorders", tags=["workorders"])
 
@@ -417,6 +418,28 @@ async def get_workorder(order_id: str):
         (row["id"],),
     )
     return order
+
+
+@router.get("/{order_id}/fault-memory")
+async def get_workorder_fault_memory(order_id: str):
+    """故障记忆：查询当前工单所关联设备的历史维修记录（快速开发阶段2）.
+
+    【用途】工单详情页展示「这台设备过去 180 天修过几次、上次怎么修的」，
+    并判断是否属于重复故障，为物业/维修师傅提供历史上下文。
+
+    【实现方式】本接口只做两件事：
+        1. 调用 Service 层 fault_memory.get_fault_memory(order_no) 拿结构化结果
+           （≈ Spring MVC Controller 注入 FaultMemoryService 并调用）；
+        2. 把「工单不存在」翻译成 HTTP 404。
+    所有查询/解析/判定逻辑都在 Service 层，路由保持轻量。
+
+    【为什么独立接口而不是塞进工单详情响应】故障记忆属于「按需加载」的扩展
+    信息（查询较重），详情页默认接口保持轻量；前端进入详情页后再单独请求。
+    """
+    result = get_fault_memory_service(order_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Work order not found")
+    return result
 
 
 @router.put("/{order_id}/review")

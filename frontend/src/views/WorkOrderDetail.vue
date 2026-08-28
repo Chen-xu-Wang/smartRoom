@@ -71,6 +71,82 @@
         <el-empty description="该工单关联的设备未在房屋档案中找到" :image-size="60" />
       </div>
 
+      <!-- 阶段3：【故障记忆】卡片 —— 展示同设备近180天历史维修记录 + 重复故障提醒 + AI维修连续性建议。
+           数据来自独立接口 getFaultMemory（GET /workorders/{order_no}/fault-memory），
+           在工单详情加载成功后自动请求一次；v-loading 显示加载遮罩。
+           请求失败只显示下方兜底文案，绝不影响工单基本信息 / 审核 / 派单 / 维修。 -->
+      <div class="card" v-loading="faultMemoryLoading">
+        <h3 class="section-title">故障记忆</h3>
+
+        <!-- 请求失败兜底：与工单其它功能完全隔离 -->
+        <el-empty v-if="faultMemoryError" description="故障记忆加载失败，不影响当前工单操作" :image-size="60" />
+
+        <template v-else-if="faultMemory">
+          <!-- 重复故障警告（>=2次历史维修时置顶展示）。
+               用黄色警告而不是红色错误：老修不好是「关注/提醒」，不是系统故障。 -->
+          <el-alert
+            v-if="faultMemory.is_repeat_fault"
+            type="warning"
+            :closable="false"
+            show-icon
+            title="⚠ 重复故障"
+            class="repeat-fault-alert"
+          >
+            <div>该设备近 {{ faultMemory.time_range_days }} 天存在 {{ faultMemory.history_count }} 次历史维修，当前再次发生相关故障。</div>
+          </el-alert>
+
+          <!-- 无法识别设备：后端返回的 message 优先展示，不显示时间线 -->
+          <el-empty
+            v-if="faultMemory.can_identify_device === false"
+            :description="faultMemory.message || '暂无法准确查询设备历史维修记录'"
+            :image-size="60"
+          />
+
+          <template v-else-if="faultMemory.has_history">
+            <!-- 设备概览：设备名 + 近180天次数说明 -->
+            <div class="fm-summary">
+              <el-tag type="info" effect="plain">{{ faultMemory.device_name || '未知设备' }}</el-tag>
+              <span>该设备近 {{ faultMemory.time_range_days }} 天存在 {{ faultMemory.history_count }} 次相关维修记录</span>
+            </div>
+
+            <!-- 历史维修时间线：重点展示 日期/工单号/原始报修/实际故障/维修措施，
+                 配件/维修人/结果为次要文字（有才显示，页面不拥挤）。
+                 最后追加「当前工单」节点，帮用户理解：过去维修 → 过去维修 → 当前再次报修。 -->
+            <el-timeline class="fm-timeline">
+              <el-timeline-item
+                v-for="h in faultMemory.history"
+                :key="h.order_no"
+                :timestamp="formatTime(h.created_at)"
+                placement="top"
+              >
+                <div class="fm-history-item">
+                  <div class="fm-line">工单 {{ h.order_no }}</div>
+                  <div class="fm-line">原始报修：{{ h.original_description || '—' }}</div>
+                  <div class="fm-line">实际故障：{{ h.actual_fault || '—' }}</div>
+                  <div class="fm-line">维修措施：{{ h.actual_action || '—' }}</div>
+                  <div class="fm-sub" v-if="h.used_parts || h.repair_person || h.result">
+                    配件：{{ h.used_parts || '—' }} ｜ 维修人：{{ h.repair_person || '—' }} ｜ 结果：{{ h.result || '—' }}
+                  </div>
+                </div>
+              </el-timeline-item>
+              <el-timeline-item timestamp="当前工单" placement="top" color="#e6a23c">
+                <div class="fm-line">本次报修（{{ faultMemory.order_no }}），请使用上方按钮进行审核 / 派单 / 维修</div>
+              </el-timeline-item>
+            </el-timeline>
+
+            <!-- AI维修连续性建议：有历史才展示该区域；AI不可用时显示「暂不可用」兜底文案 -->
+            <div class="fm-ai">
+              <div class="fm-ai-title">AI维修连续性建议</div>
+              <p v-if="faultMemory.ai_suggestion" class="fm-ai-text">{{ faultMemory.ai_suggestion }}</p>
+              <p v-else class="fm-ai-text fm-ai-muted">AI连续性建议暂不可用</p>
+            </div>
+          </template>
+
+          <!-- 无历史：简洁空状态（不显示 AI 建议区域） -->
+          <el-empty v-else description="暂无相关历史维修记录" :image-size="60" />
+        </template>
+      </div>
+
       <!-- Back to house archive -->
       <div class="card" style="text-align: center">
         <el-button @click="$router.push(`/archive/${order.house_id}`)">
@@ -186,6 +262,45 @@ const completeForm = ref({
   actual_action: '',
   used_parts: '',
 })
+
+// ===== 阶段3：故障记忆（工单详情页的辅助上下文）=====
+// faultMemory：保存 GET /workorders/{order_no}/fault-memory 返回的数据
+// （has_history / is_repeat_fault / history[] / ai_suggestion 等）。
+// 用 ref 是因为数据是异步加载的，加载完成后 Vue 会自动更新页面上
+// 【故障记忆】卡片对应的区域（警告条 / 时间线 / AI建议）。
+const faultMemory = ref(null)
+// faultMemoryLoading：故障记忆接口请求中的标记，用于卡片 v-loading 遮罩。
+const faultMemoryLoading = ref(false)
+// faultMemoryError：故障记忆接口请求失败标记。失败只显示兜底文案，
+// 不会抛出异常，保证审核/派单/维修等其它功能不受影响。
+const faultMemoryError = ref(false)
+// faultMemoryLoadedOnce：本页面是否已经请求过故障记忆。
+// 为什么需要：审核/派单/完成维修成功后都会重新 loadOrder() 刷新详情，
+// 而故障记忆（同设备历史维修）不会随当前工单状态变化 ——
+// 若每次刷新都重新请求，就会每次刷新都重新调用 LLM 消耗 Token。
+// 因此只在第一次成功拿到工单号时请求一次（组件重新挂载即进入新页面时自动重置）。
+let faultMemoryLoadedOnce = false
+
+// loadFaultMemory：加载当前工单的故障记忆。
+// 触发时机：loadOrder 成功拿到工单详情（含 order_no）后立即自动调用，
+// 不需要用户点按钮 —— 故障记忆是「当前工单的辅助上下文」，打开页面就该看到。
+// 失败时置 faultMemoryError 显示兜底文案，不影响工单其它功能。
+const loadFaultMemory = async (orderNo) => {
+  if (faultMemoryLoadedOnce) return   // 本页面已加载过，不再重复请求（避免重复消耗LLM Token）
+  faultMemoryLoadedOnce = true
+  faultMemoryLoading.value = true
+  faultMemoryError.value = false
+  try {
+    const res = await api.getFaultMemory(orderNo)
+    faultMemory.value = res.data
+  } catch (e) {
+    // 失败只影响故障记忆卡片本身：显示兜底文案，其余工单功能照常
+    faultMemoryError.value = true
+    faultMemory.value = null
+  } finally {
+    faultMemoryLoading.value = false
+  }
+}
 
 // 工单状态显示字典（与后端 STATUS_EN2CN 输出对齐）
 // pending_assign 的 label 由 statusTag 根据是否已派单动态生成
@@ -341,6 +456,11 @@ const loadOrder = async () => {
   // Pre-fill review form
   reviewForm.value.urgency = res.data.urgency || ''
   reviewForm.value.suggested_trade = res.data.suggested_trade || ''
+
+  // 阶段3：工单详情加载成功后，自动请求一次故障记忆。
+  // order_no 优先取详情数据（后端返回），兜底用路由参数 —— 两者是同一个值；
+  // 不 await：故障记忆是辅助上下文，即使慢或失败也不阻塞上面的主流程。
+  loadFaultMemory(res.data.order_no || route.params.id)
 }
 
 onMounted(async () => {
@@ -361,4 +481,16 @@ onMounted(async () => {
 }
 .header-left h2 { font-size: 18px; }
 .form-tip { font-size: 12px; color: #909399; line-height: 1.6; }
+
+/* ===== 阶段3：故障记忆卡片样式 ===== */
+.repeat-fault-alert { margin-bottom: 16px; }          /* 重复故障警告与下方时间线拉开距离 */
+.fm-summary { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: #606266; font-size: 14px; }
+.fm-timeline { padding-left: 4px; }                   /* 时间线与卡片左边距对齐 */
+.fm-history-item { line-height: 1.8; }
+.fm-line { font-size: 14px; color: #303133; }         /* 主信息：日期/工单号/报修/故障/措施 */
+.fm-sub { font-size: 12px; color: #909399; margin-top: 4px; }  /* 次要信息：配件/维修人/结果 */
+.fm-ai { margin-top: 16px; padding: 12px 16px; background: #f4f4f5; border-radius: 6px; }  /* AI建议灰底区块 */
+.fm-ai-title { font-size: 14px; font-weight: 600; color: #303133; margin-bottom: 8px; }
+.fm-ai-text { font-size: 14px; color: #606266; line-height: 1.8; margin: 0; }
+.fm-ai-muted { color: #909399; }                      /* 「AI连续性建议暂不可用」的弱化文字 */
 </style>
