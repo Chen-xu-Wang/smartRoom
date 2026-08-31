@@ -10,10 +10,13 @@
           <el-button v-if="order.status === 'pending_review'" type="primary" @click="showReviewDialog = true">
             审核
           </el-button>
-          <!-- 阶段5.7：独立派单入口，仅「已审核通过且未派单」显示 -->
-          <el-button v-if="showAssignBtn" type="primary" @click="openAssignDialog">
-            派单
-          </el-button>
+          <!-- 智能派单先展示可解释候选方案，手工派单作为受疲劳保护的补充入口。 -->
+          <template v-if="showAssignBtn">
+            <el-button type="primary" :loading="dispatchPlanLoading" @click="openAutoAssignDialog">
+              AI智能派单
+            </el-button>
+            <el-button @click="openAssignDialog">手动派单</el-button>
+          </template>
           <!-- 阶段5.8：开始维修入口，仅「已派单待开始」显示（pending_assign + assigned_to 非空） -->
           <el-button v-if="showStartRepairBtn" type="success" :loading="starting" @click="startRepair">
             开始维修
@@ -181,6 +184,85 @@
     </el-dialog>
 
     <!-- Assign Dialog（阶段5.7：独立派单，只能从在册维修人员中选择） -->
+    <el-dialog v-model="showAutoAssignDialog" title="AI智能派单方案" width="760px" class="dispatch-plan-dialog">
+      <div v-loading="dispatchPlanLoading">
+        <el-alert
+          v-if="dispatchPlanError"
+          type="error"
+          :closable="false"
+          show-icon
+          :title="dispatchPlanError"
+        />
+        <template v-else-if="dispatchPlan">
+          <el-alert
+            v-if="dispatchPlan.recommended"
+            type="success"
+            :closable="false"
+            show-icon
+            class="recommended-alert"
+          >
+            <template #title>
+              推荐 {{ dispatchPlan.recommended.name }} · 匹配分 {{ dispatchPlan.recommended.score }}
+            </template>
+            {{ (dispatchPlan.recommended.reasons || []).join('；') }}
+          </el-alert>
+          <el-alert
+            v-else
+            type="warning"
+            :closable="false"
+            show-icon
+            title="暂无安全可接单人员"
+          >
+            系统将保留工单待派单，不会为了完成分配而突破疲劳保护。
+          </el-alert>
+
+          <div class="dispatch-policy">{{ dispatchPlan.policy?.principle }}</div>
+          <el-table :data="dispatchPlan.candidates || []" size="small" class="candidate-table">
+            <el-table-column label="维修人员" min-width="110">
+              <template #default="{ row }">
+                <strong>{{ row.name }}</strong>
+                <el-tag v-if="dispatchPlan.recommended?.user_id === row.user_id" type="success" size="small" effect="plain">AI推荐</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="技能" min-width="130">
+              <template #default="{ row }">{{ (row.skills || []).join('、') || '—' }}</template>
+            </el-table-column>
+            <el-table-column label="匹配分" width="82" align="center">
+              <template #default="{ row }">{{ row.score }}</template>
+            </el-table-column>
+            <el-table-column label="在途" width="80" align="center">
+              <template #default="{ row }">{{ row.active_orders }}/{{ row.max_active_orders }}</template>
+            </el-table-column>
+            <el-table-column label="疲劳（接单后）" min-width="130">
+              <template #default="{ row }">
+                {{ row.fatigue_index }} → {{ row.projected_fatigue_index ?? row.fatigue_index }}
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" min-width="180">
+              <template #default="{ row }">
+                <el-tag :type="row.available ? 'success' : 'danger'" size="small">
+                  {{ row.available ? '可安全接单' : '已保护' }}
+                </el-tag>
+                <div class="candidate-note">{{ (row.available ? row.reasons : row.blockers || []).join('；') }}</div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+      </div>
+      <template #footer>
+        <el-button @click="showAutoAssignDialog = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="autoAssigning"
+          :disabled="!dispatchPlan?.recommended"
+          @click="submitAutoAssign"
+        >
+          采用 AI 推荐
+        </el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 手动派单保留给物业处理特殊情况，后端仍会执行疲劳保护。 -->
     <el-dialog v-model="showAssignDialog" title="派单" width="460px">
       <el-form label-width="100px">
         <el-form-item label="维修人员" required>
@@ -192,7 +274,7 @@
               :value="r.real_name"
             />
           </el-select>
-          <div class="form-tip">仅能选择维修人员名单中的人员，不能手动输入</div>
+          <div class="form-tip">系统仍会校验技能、在岗与疲劳保护；不满足条件时将拒绝派单。</div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -252,6 +334,11 @@ const reviewForm = ref({
   suggested_trade: '',
   review_notes: '',
 })
+const showAutoAssignDialog = ref(false)
+const dispatchPlan = ref(null)
+const dispatchPlanLoading = ref(false)
+const dispatchPlanError = ref('')
+const autoAssigning = ref(false)
 // 阶段5.7：独立派单表单（只存维修人员姓名，从 repairers 下拉中选择）
 const showAssignDialog = ref(false)
 const assignForm = ref({ assigned_to: '' })
@@ -359,19 +446,63 @@ const formatTime = (t) => {
   return new Date(t).toLocaleString('zh-CN')
 }
 
+const errorMessage = (error, fallback) => {
+  const detail = error?.response?.data?.detail
+  if (typeof detail === 'string') return detail
+  if (detail?.message) return detail.message
+  return fallback
+}
+
 const submitReview = async (status) => {
   try {
-    // 阶段5.7：审核不再携带 assigned_to，审核与派单彻底分离
-    await api.reviewWorkOrder(route.params.id, {
+    const res = await api.reviewWorkOrder(route.params.id, {
       ...reviewForm.value,
       reviewed_by: '物业管理员',
       status,
     })
-    ElMessage.success(status === 'approved' ? '工单已批准' : '工单已驳回')
+    if (status !== 'approved') {
+      ElMessage.success('工单已驳回')
+    } else if (res.data?.dispatch?.status === 'assigned') {
+      ElMessage.success(`审核通过，已智能派给「${res.data.dispatch.assigned_to}」`)
+    } else if (res.data?.dispatch?.status === 'waiting') {
+      ElMessage.warning(`审核通过，但暂未派单：${res.data.dispatch.message}`)
+    } else {
+      ElMessage.success('工单已批准')
+    }
     showReviewDialog.value = false
     await loadOrder()
   } catch (e) {
-    ElMessage.error('操作失败')
+    ElMessage.error(errorMessage(e, '审核操作失败'))
+  }
+}
+
+const openAutoAssignDialog = async () => {
+  showAutoAssignDialog.value = true
+  dispatchPlan.value = null
+  dispatchPlanError.value = ''
+  dispatchPlanLoading.value = true
+  try {
+    const res = await api.getDispatchPlan(route.params.id)
+    dispatchPlan.value = res.data
+  } catch (e) {
+    dispatchPlanError.value = errorMessage(e, '获取智能派单方案失败')
+  } finally {
+    dispatchPlanLoading.value = false
+  }
+}
+
+const submitAutoAssign = async () => {
+  if (autoAssigning.value || !dispatchPlan.value?.recommended) return
+  autoAssigning.value = true
+  try {
+    const res = await api.autoAssignWorkOrder(route.params.id, { assigned_by: '物业管理员' })
+    ElMessage.success(res.data?.message || `已智能派给「${res.data?.assigned_to || ''}」`)
+    showAutoAssignDialog.value = false
+    await loadOrder()
+  } catch (e) {
+    ElMessage.error(errorMessage(e, '智能派单失败，请刷新方案后重试'))
+  } finally {
+    autoAssigning.value = false
   }
 }
 
@@ -401,7 +532,7 @@ const submitAssign = async () => {
     showAssignDialog.value = false
     await loadOrder()
   } catch (e) {
-    ElMessage.error(e.response?.data?.detail || '派单失败')
+    ElMessage.error(errorMessage(e, '派单失败'))
   }
 }
 
@@ -481,6 +612,15 @@ onMounted(async () => {
 }
 .header-left h2 { font-size: 18px; }
 .form-tip { font-size: 12px; color: #909399; line-height: 1.6; }
+.recommended-alert { margin-bottom: 12px; }
+.dispatch-policy { color: #64748b; font-size: 13px; line-height: 1.6; margin: 10px 0; }
+.candidate-table { margin-top: 10px; }
+.candidate-note { color: #64748b; font-size: 12px; line-height: 1.45; margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .order-header { align-items: flex-start; gap: 12px; flex-direction: column; }
+  .header-right { display: flex; flex-wrap: wrap; gap: 8px; }
+}
 
 /* ===== 阶段3：故障记忆卡片样式 ===== */
 .repeat-fault-alert { margin-bottom: 16px; }          /* 重复故障警告与下方时间线拉开距离 */

@@ -86,11 +86,17 @@ def search_knowledge_base(query: str, extracted_info: dict = None, top_k: int = 
     results = []
     for cat, score in sorted_cats:
         if score == 0 and not results:
-            # Always include at least one category
+            # Always include at least one category（补齐 relevance_score，避免排序时 KeyError）
             if not results:
                 text = knowledge.get(cat, "")
                 sections = split_sections(text)
-                results.extend(sections[:2])
+                for sec in sections[:2]:
+                    results.append({
+                        "category": cat,
+                        "header": sec["header"],
+                        "content": sec["content"].strip(),
+                        "relevance_score": 1,
+                    })
             continue
         if score > 0:
             text = knowledge.get(cat, "")

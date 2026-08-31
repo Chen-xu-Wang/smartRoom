@@ -46,20 +46,49 @@
 
         <!-- Input -->
         <div class="chat-input-area">
+          <!-- 附件预览 -->
+          <div v-if="chatStore.attachments.length" class="attachment-chips">
+            <el-tag v-for="(a,i) in chatStore.attachments" :key="i" closable size="small" @close="chatStore.attachments.splice(i,1)">
+              {{ a.file_name }} <span v-if="a.file_url" style="opacity:.6">✓</span>
+            </el-tag>
+          </div>
           <el-input
             v-model="inputText"
             type="textarea"
             :rows="2"
-            placeholder="描述您遇到的问题，如：厨房水槽下面一直漏水"
+            placeholder="描述您遇到的问题，如：厨房水槽下面一直漏水（支持文字、附件、语音）"
             @keyup.enter.ctrl="send"
-            :disabled="chatStore.loading || chatStore.agentState === 'complete'"
+            :disabled="chatStore.loading"
           />
           <div class="input-actions">
-            <el-button type="primary" @click="send" :disabled="!inputText.trim() || chatStore.loading || chatStore.agentState === 'complete'">
-              发送
-            </el-button>
-            <el-button @click="quickFill" :disabled="chatStore.loading">示例</el-button>
+            <div class="input-tools">
+              <el-upload
+                :show-file-list="false"
+                :multiple="true"
+                :before-upload="() => false"
+                :on-change="handleFileChange"
+                :auto-upload="false"
+                accept="*/*"
+              >
+                <el-button size="small" :loading="uploading" :disabled="chatStore.loading">
+                  <el-icon><Paperclip /></el-icon> 上传文件
+                </el-button>
+              </el-upload>
+              <input ref="fileInputRef" type="file" multiple style="display:none" @change="onNativeFileChange" />
+              <el-button size="small" :type="isRecording ? 'danger' : 'info'" plain @click="toggleVoice" :loading="transcribing">
+                <el-icon><Microphone /></el-icon> {{ isRecording ? '停止录音' : '语音输入' }}
+              </el-button>
+              <span v-if="isRecording" class="recording-hint">正在录音...请说话，松开或点击停止</span>
+            </div>
+            <div class="send-actions">
+              <el-button type="primary" @click="send" :disabled="!inputText.trim() || chatStore.loading">
+                发送
+              </el-button>
+              <el-button @click="quickFill" :disabled="chatStore.loading">快捷输入</el-button>
+            </div>
           </div>
+          <div v-if="voiceError" class="voice-error">{{ voiceError }}</div>
+          <div class="input-tip">支持任意文件（图片/视频/文档/音频等）与语音转文字，AI 会结合附件与语音内容自动建单</div>
         </div>
       </div>
 
@@ -107,10 +136,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { House, Document, Loading, Check, RefreshLeft } from '@element-plus/icons-vue'
+import { House, Document, Loading, Check, RefreshLeft, Paperclip, Microphone } from '@element-plus/icons-vue'
 import { useChatStore } from '../stores/chat'
 import api from '../api'
 import ChatMessage from '../components/ChatMessage.vue'
@@ -122,6 +151,15 @@ const houseId = route.params.houseId
 const house = ref(null)
 const inputText = ref('')
 const messagesRef = ref(null)
+const fileInputRef = ref(null)
+const uploading = ref(false)
+const isRecording = ref(false)
+const transcribing = ref(false)
+const voiceError = ref('')
+let recognition = null
+let mediaRecorder = null
+let audioChunks = []
+let mediaStream = null
 
 const stateMap = {
   start: '初始化',
@@ -131,7 +169,7 @@ const stateMap = {
   searching_kb: '知识库检索中',
   generating_order: '生成工单中',
   order_pending: '等待确认',
-  complete: '已完成',
+  complete: '已自动提交',
 }
 
 const stateLabel = computed(() => stateMap[chatStore.agentState] || '未知')
@@ -156,13 +194,120 @@ const send = async () => {
   if (!inputText.value.trim()) return
   const text = inputText.value
   inputText.value = ''
-  await chatStore.sendMessage(text)
+  const data = await chatStore.sendMessage(text)
   await scrollToBottom()
+  if (data?.auto_submitted && data?.work_order_id) {
+    ElMessage.success(`已自动提交工单 ${data.work_order_id}，等待物业审核`)
+  }
 }
 
 const quickFill = () => {
   inputText.value = quickExamples[exampleIdx % quickExamples.length]
   exampleIdx++
+}
+
+const handleFileChange = async (file) => {
+  const raw = file?.raw || file
+  if (!raw) return
+  uploading.value = true
+  try {
+    await chatStore.uploadAttachments([raw])
+    await scrollToBottom()
+    ElMessage.success(`已上传 ${raw.name}`)
+  } catch (e) {
+    ElMessage.error('上传失败')
+  } finally {
+    uploading.value = false
+  }
+}
+
+const onNativeFileChange = async (e) => {
+  const files = Array.from(e.target.files || [])
+  if (!files.length) return
+  uploading.value = true
+  try {
+    await chatStore.uploadAttachments(files)
+    await scrollToBottom()
+    ElMessage.success(`已上传 ${files.length} 个文件`)
+  } finally {
+    uploading.value = false
+    e.target.value = ''
+  }
+}
+
+const toggleVoice = async () => {
+  voiceError.value = ''
+  if (isRecording.value) {
+    stopVoice()
+    return
+  }
+  // 优先尝试浏览器原生语音识别
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (SR) {
+    recognition = new SR()
+    recognition.lang = 'zh-CN'
+    recognition.interimResults = false
+    recognition.continuous = false
+    recognition.onstart = () => { isRecording.value = true }
+    recognition.onend = () => { isRecording.value = false }
+    recognition.onerror = (e) => {
+      voiceError.value = '语音识别失败：' + (e.error || '未知错误')
+      isRecording.value = false
+      fallbackMediaRecord()
+    }
+    recognition.onresult = (e) => {
+      const text = e.results?.[0]?.[0]?.transcript || ''
+      if (text) inputText.value = (inputText.value ? inputText.value + ' ' : '') + text
+      isRecording.value = false
+    }
+    try { recognition.start() } catch (e) { voiceError.value = String(e); fallbackMediaRecord() }
+    return
+  }
+  fallbackMediaRecord()
+}
+
+const fallbackMediaRecord = async () => {
+  if (isRecording.value) { stopVoice(); return }
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaRecorder = new MediaRecorder(mediaStream, { mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4' })
+    audioChunks = []
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data) }
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' })
+      const file = new File([blob], `voice_${Date.now()}.webm`, { type: blob.type })
+      transcribing.value = true
+      try {
+        const res = await api.transcribeAudio(file)
+        if (res.data?.success && res.data?.text) {
+          inputText.value = (inputText.value ? inputText.value + ' ' : '') + res.data.text
+          ElMessage.success('语音已转文字')
+        } else {
+          voiceError.value = res.data?.error || '转写未返回文字，请手动输入'
+        }
+      } catch (err) {
+        voiceError.value = err.response?.data?.detail || '语音上传失败，请手动输入'
+      } finally {
+        transcribing.value = false
+        if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null }
+      }
+    }
+    mediaRecorder.start()
+    isRecording.value = true
+    voiceError.value = '正在录音...完成后点击停止'
+  } catch (e) {
+    voiceError.value = '无法访问麦克风：' + (e.message || '请检查权限')
+  }
+}
+
+const stopVoice = () => {
+  try { recognition?.stop?.(); } catch {}
+  recognition = null
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    try { mediaRecorder.stop() } catch {}
+  }
+  isRecording.value = false
+  if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null }
 }
 
 const handleConfirm = async () => {
@@ -195,6 +340,10 @@ const scrollToBottom = async () => {
 
 watch(() => chatStore.messages.length, () => {
   scrollToBottom()
+})
+
+onBeforeUnmount(() => {
+  stopVoice()
 })
 
 onMounted(async () => {
@@ -271,12 +420,21 @@ onMounted(async () => {
   padding: 12px;
   border-top: 1px solid var(--border-color);
 }
+.attachment-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
 .input-actions {
   display: flex;
   gap: 8px;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 8px;
+  flex-wrap: wrap;
 }
+.input-tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.send-actions { display:flex; gap:8px; }
+.recording-hint { font-size:12px; color:#ef4444; animation: pulse 1s infinite; }
+.voice-error { font-size:12px; color:#ef4444; margin-top:6px; }
+.input-tip { font-size:11px; color:var(--text-secondary, #909399); margin-top:6px; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
 
 .agent-panel {
   overflow-y: auto;

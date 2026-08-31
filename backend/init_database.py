@@ -1,8 +1,8 @@
-"""数据库初始化脚本 —— 往 MySQL 灌入演示数据（种子数据）.
+"""数据库初始化脚本 —— 往 MySQL 灌入初始业务数据（种子数据）.
 
 作用（相当于 Java 项目里的 data.sql / Flyway 初始化脚本）：
-    1. 创建演示用账号（住户 / 物业 / 维修师傅）
-    2. 把 houses.json 里的 3 套演示房屋导入 house 表
+    1. 创建系统初始账号（住户 / 物业 / 维修师傅）
+    2. 把 houses.json 里的房屋导入 house 表
     3. 把房屋设备清单导入 house_device 表
     4. 把历史维修记录导入 repair_order 表（状态=已完成）
     5. 把户型、管线布局等静态档案信息提取到 house_profiles.json
@@ -23,20 +23,21 @@ from datetime import datetime
 
 from app.config import HOUSES_FILE, HOUSE_PROFILES_FILE
 from app.database import query_one, query_all, execute, execute_return_id
+from app.services.dispatch_schema import ensure_dispatch_schema, seed_default_profiles
 
 
 def hash_password(plain: str) -> str:
     """把明文密码哈希后存储.
 
-    【安全提示】演示项目用简单的 SHA256 即可；
-    正式上线应换成加盐哈希（如 bcrypt / argon2），
+    【安全提示】当前使用 SHA256 加哈希；
+    生产环境建议换成加盐哈希（如 bcrypt / argon2），
     相当于 Java 里的 Spring Security PasswordEncoder。
     """
     return hashlib.sha256(plain.encode("utf-8")).hexdigest()
 
 
 def seed_users():
-    """创建演示账号（已存在则跳过）."""
+    """创建系统初始账号（已存在则跳过）."""
     # (用户名, 姓名, 手机号, 角色)
     demo_users = [
         ("resident1", "张三", "13800000001", "RESIDENT"),   # 住户
@@ -68,7 +69,7 @@ def find_user_id(real_name: str) -> int | None:
 
 
 def seed_houses() -> dict:
-    """导入演示房屋和设备，返回 {房屋编号: house表id} 的映射."""
+    """导入房屋和设备，返回 {房屋编号: house表id} 的映射."""
     with open(HOUSES_FILE, "r", encoding="utf-8") as f:
         houses = json.load(f)
 
@@ -156,7 +157,7 @@ def seed_maintenance_history(house_id_map: dict):
     with open(HOUSES_FILE, "r", encoding="utf-8") as f:
         houses = json.load(f)
 
-    reporter_id = find_user_id("张三")  # 历史工单统一记到演示住户名下
+    reporter_id = find_user_id("张三")  # 历史工单统一记到初始住户名下
 
     for h in houses:
         code = h["houseId"]
@@ -211,11 +212,14 @@ def seed_maintenance_history(house_id_map: dict):
 
 def main():
     print("=" * 50)
-    print("开始初始化数据库演示数据 ...")
+    print("开始初始化数据库基础数据 ...")
     print("=" * 50)
 
-    print("\n[1/3] 创建演示账号：")
+    ensure_dispatch_schema()
+
+    print("\n[1/3] 创建系统账号与维修能力画像：")
     seed_users()
+    seed_default_profiles()
 
     print("\n[2/3] 导入房屋与设备档案：")
     house_id_map = seed_houses()

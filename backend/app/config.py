@@ -37,7 +37,7 @@ KNOWLEDGE_DIR = os.path.join(DATA_DIR, "knowledge")
 # （说明：这类「不常变化的档案描述」暂存本地 JSON；房屋、设备、工单等
 #   业务数据已全部存入 MySQL 数据库，见 app/database.py）
 HOUSE_PROFILES_FILE = os.path.join(DATA_DIR, "house_profiles.json")
-# 演示数据源：种子脚本 init_database.py 用来往 MySQL 灌初始数据
+# 初始化数据源：种子脚本 init_database.py 用来往 MySQL 灌入初始数据
 HOUSES_FILE = os.path.join(DATA_DIR, "houses.json")
 
 # ------------------------------------------------------------------
@@ -59,10 +59,11 @@ DB_NAME = os.getenv("DB_NAME", "SmartRoom")
 DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "5"))
 
 # ------------------------------------------------------------------
-# AI 大模型配置（预留，当前未启用）
+# AI 大模型配置
 # ------------------------------------------------------------------
-# 目前 AI 分析用的是关键词匹配模拟实现（app/services/agent.py）。
-# 后续接真实大模型时，在 .env 里填上这三项即可，不用改这里。
+# AI 分析优先调用真实大模型（app/services/llm.py，OpenAI 兼容协议），
+# 未配置 LLM_API_KEY / LLM_BASE_URL 时自动回退到规则检索，保证流程可用。
+# 在 .env 里填上 LLM_* 三项即可启用真实模型，不用改代码。
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")

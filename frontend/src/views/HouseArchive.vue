@@ -1,19 +1,43 @@
 <template>
   <div class="page-container" v-if="house">
-    <!-- House Header -->
-    <div class="card house-header-card">
-      <div class="house-header-top">
-        <div>
-          <h2>{{ house.building }}{{ house.room }}</h2>
-          <p class="house-meta">{{ house.layout }} | {{ house.area }}㎡ | {{ house.floor }}</p>
+    <!-- House Header Premium -->
+    <div class="card house-header-card" style="padding:0; overflow:hidden; border:none; box-shadow: var(--shadow-lg);">
+      <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 55%, #06B6D4 100%); padding:28px; color:white; position:relative; overflow:hidden">
+        <div style="position:absolute; width:260px; height:260px; background:rgba(255,255,255,0.08); border-radius:50%; top:-80px; right:-60px;"></div>
+        <div style="position:absolute; width:180px; height:180px; background:rgba(255,255,255,0.06); border-radius:50%; bottom:-40px; left:40%;"></div>
+        <div style="position:relative; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+              <div style="width:42px; height:42px; background:rgba(255,255,255,0.15); backdrop-filter:blur(8px); border-radius:12px; display:grid; place-items:center"><el-icon size="22"><House /></el-icon></div>
+              <div>
+                <h2 style="font-size:26px; font-weight:800; letter-spacing:-0.02em; line-height:1">{{ house.building }}{{ house.room }}</h2>
+                <p style="opacity:0.85; font-size:13px; margin-top:4px">{{ house.layout }} · {{ house.area }}㎡ · {{ house.floor }}</p>
+              </div>
+              <el-tag effect="dark" round size="small" style="background:rgba(255,255,255,0.2); border:none; color:white; backdrop-filter:blur(6px)">一房一码</el-tag>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px">
+              <span style="background:rgba(255,255,255,0.14); padding:6px 12px; border-radius:999px; font-size:12px; backdrop-filter:blur(6px)">MiC {{ house.micModuleId }}</span>
+              <span style="background:rgba(255,255,255,0.14); padding:6px 12px; border-radius:999px; font-size:12px; backdrop-filter:blur(6px)">{{ house.digitalId }}</span>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.12); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:16px 20px; min-width:220px">
+            <div class="id-row" style="color:rgba(255,255,255,0.9)"><span style="opacity:0.7">一房一码：</span><code style="color:white; background:rgba(255,255,255,0.15); padding:2px 8px; border-radius:6px">{{ house.qrCode }}</code></div>
+            <div class="id-row" style="color:rgba(255,255,255,0.85); margin-top:6px"><span style="opacity:0.7">交付：</span>{{ house.deliveryDate }} <span style="opacity:0.5">·</span> 生产 {{ house.productionDate }}</div>
+            <div style="margin-top:10px; display:flex; gap:8px">
+              <el-button size="small" style="background:white; color:#4F46E5; border:none; font-weight:600" @click="$router.push(`/chat/${houseId}`)">AI报修</el-button>
+              <el-tag v-if="warrantyStatus" :type="warrantyStatus.type" effect="dark" round size="small" style="border:none">{{ warrantyStatus.label }}</el-tag>
+            </div>
+          </div>
         </div>
-        <div class="house-id-area">
-          <div class="id-row"><span>MiC模块号：</span><code>{{ house.micModuleId }}</code></div>
-          <div class="id-row"><span>数字身份码：</span><code>{{ house.digitalId }}</code></div>
-          <div class="id-row"><span>一房一码：</span><code>{{ house.qrCode }}</code></div>
-          <div class="id-row"><span>生产日期：</span>{{ house.productionDate }}</div>
-          <div class="id-row"><span>交付日期：</span>{{ house.deliveryDate }}</div>
+      </div>
+      <!-- Warranty strip -->
+      <div v-if="house.warranty" style="display:flex; gap:16px; align-items:center; padding:16px 24px; background:#F8FAFC; border-top:1px solid var(--border-light); flex-wrap:wrap">
+        <el-icon color="#059669"><CircleCheck /></el-icon>
+        <div style="flex:1; min-width:200px">
+          <div style="font-weight:600; font-size:13px">质保信息 · {{ house.warranty.coverage || '主体结构终身保修' }}</div>
+          <div style="font-size:12px; color:var(--text-secondary)">{{ house.warranty.startDate }} 至 {{ house.warranty.endDate }} <span v-if="warrantyStatus" :style="{color: warrantyStatus.color}">· {{ warrantyStatus.detail }}</span></div>
         </div>
+        <el-progress v-if="warrantyPercent!==null" :percentage="warrantyPercent" :width="56" type="circle" :stroke-width="6" :color="warrantyStatus.color" />
       </div>
     </div>
 
@@ -86,9 +110,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { House, Lightning, SetUp, WindPower, Tools, Guide, Clock, ChatLineRound } from '@element-plus/icons-vue'
+import { House, Lightning, SetUp, WindPower, Tools, Guide, Clock, ChatLineRound, CircleCheck } from '@element-plus/icons-vue'
 import api from '../api'
 
 const route = useRoute()
@@ -106,6 +130,31 @@ const categoryMap = {
   hvac: { label: '空调设备', icon: 'WindPower' },
   doors_windows: { label: '门窗设备', icon: 'Tools' },
 }
+
+const warrantyStatus = computed(()=>{
+  const w = house.value?.warranty
+  if(!w?.endDate) return null
+  const now = new Date()
+  const end = new Date(w.endDate)
+  const start = w.startDate ? new Date(w.startDate) : now
+  const total = end - start
+  const left = end - now
+  const expired = left <= 0
+  const daysLeft = Math.ceil(left/86400000)
+  if(expired) return { label:'已过保', type:'danger', color:'#DC2626', detail:`已过期 ${Math.abs(daysLeft)} 天` }
+  if(daysLeft<=90) return { label:'即将到期', type:'warning', color:'#D97706', detail:`剩余 ${daysLeft} 天` }
+  return { label:'质保期内', type:'success', color:'#059669', detail:`剩余 ${daysLeft} 天` }
+})
+const warrantyPercent = computed(()=>{
+  const w = house.value?.warranty
+  if(!w?.startDate || !w?.endDate) return null
+  const start = new Date(w.startDate).getTime()
+  const end = new Date(w.endDate).getTime()
+  const now = Date.now()
+  if(now>=end) return 100
+  if(now<=start) return 0
+  return Math.round(((now-start)/(end-start))*100)
+})
 
 onMounted(async () => {
   // 1. 房屋基础档案

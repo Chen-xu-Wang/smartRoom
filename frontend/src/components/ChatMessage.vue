@@ -2,6 +2,11 @@
   <div class="chat-message" :class="`chat-message-${msg.role}`">
     <div class="chat-avatar" v-if="msg.role === 'assistant'">AI</div>
     <div class="chat-bubble">
+      <div v-if="msg.attachment" class="msg-attachment">
+        <el-icon><Paperclip /></el-icon>
+        <span>{{ msg.attachment.file_name }}</span>
+        <a v-if="msg.attachment.file_url" :href="msg.attachment.file_url" target="_blank" style="margin-left:6px;font-size:11px">查看</a>
+      </div>
       <div class="markdown-content" v-html="renderedContent"></div>
 
       <!-- Extracted Info -->
@@ -67,7 +72,18 @@
       <!-- Work Order -->
       <div v-if="msg.workOrder" class="order-panel">
         <div class="order-title">AI生成的维修工单</div>
-        <WorkOrderCard :order="msg.workOrder" :show-actions="true" @confirm="$emit('confirm')" @modify="$emit('modify')" />
+        <div v-if="msg.autoSubmitted || msg.workOrderId" class="auto-submit-banner">
+          <el-alert type="success" :closable="false" show-icon style="margin-bottom:8px">
+            <template #title>✅ 已自动提交工单 {{ msg.workOrderId || msg.workOrder.id }}</template>
+            <div style="font-size:12px">AI 已给出处置建议并自动建单，等待物业审核。无需手动确认。</div>
+          </el-alert>
+          <div style="display:flex;gap:8px">
+            <el-button size="small" type="primary" @click="router.push(`/workorder/${msg.workOrderId || msg.workOrder.id}`)">查看工单</el-button>
+            <el-button size="small" @click="$emit('modify')">补充信息</el-button>
+          </div>
+        </div>
+        <WorkOrderCard v-else :order="msg.workOrder" :show-actions="true" @confirm="$emit('confirm')" @modify="$emit('modify')" />
+        <WorkOrderCard v-if="msg.autoSubmitted" :order="msg.workOrder" :show-actions="false" style="margin-top:8px" />
       </div>
     </div>
   </div>
@@ -75,9 +91,12 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { marked } from 'marked'
-import { Check, Loading } from '@element-plus/icons-vue'
+import { Check, Loading, Paperclip } from '@element-plus/icons-vue'
 import WorkOrderCard from './WorkOrderCard.vue'
+
+const router = useRouter()
 
 const props = defineProps({
   msg: { type: Object, required: true }
@@ -207,6 +226,7 @@ const renderedContent = computed(() => {
   margin-bottom: 6px;
   font-size: 12px;
 }
+.msg-attachment { display:flex; align-items:center; gap:6px; background:#f0f9ff; border:1px solid #dbeafe; padding:6px 10px; border-radius:6px; font-size:12px; margin-bottom:6px; }
 .rag-header { font-weight: 600; margin-left: 4px; }
 .rag-content { color: var(--text-secondary); font-size: 11px; margin-top: 4px; }
 </style>

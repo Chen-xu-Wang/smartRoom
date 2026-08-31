@@ -7,6 +7,9 @@ const api = axios.create({
 })
 
 export default {
+  // Auth
+  login: (username, password) => api.post('/auth/login', { username, password }),
+
   // Houses
   getHouses: () => api.get('/houses'),
   getHouse: (id) => api.get(`/houses/${id}`),
@@ -16,9 +19,27 @@ export default {
   getHouseHistory: (id) => api.get(`/houses/${id}/history`),
 
   // Chat
-  initChat: (houseId) => api.post('/chat/init', { house_id: houseId }),
+  initChat: (houseId, reporterId = null) => api.post('/chat/init', { house_id: houseId, reporter_id: reporterId }),
   sendMessage: (sessionId, message) => api.post('/chat/message', { session_id: sessionId, message }),
   chatAction: (sessionId, action) => api.post('/chat/action', { session_id: sessionId, action }),
+  uploadAttachment: (orderNo, file, attachmentType = 'file', aiDescription = '') => {
+    const fd = new FormData()
+    fd.append('repair_order_id', orderNo)
+    fd.append('file', file)
+    fd.append('attachment_type', attachmentType)
+    fd.append('ai_description', aiDescription)
+    // uploader_id 从本地登录态带上
+    try {
+      const saved = JSON.parse(localStorage.getItem('zw_auth') || 'null')
+      if (saved?.id) fd.append('uploader_id', saved.id)
+    } catch {}
+    return api.post('/chat/attachment', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  transcribeAudio: (file) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return api.post('/chat/transcribe', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
 
   // Work Orders
   getWorkOrders: (params) => api.get('/workorders', { params }),
@@ -40,7 +61,24 @@ export default {
   // 阶段5.8：开始维修（已派单 → 维修中）
   startWorkOrder: (id, data) => api.put(`/workorders/${id}/start`, data),    // 开始维修
   getWorkOrderStats: () => api.get('/workorders/stats/summary'),
+  // AI 智能调度：看板总览、单工单预览与安全自动派单
+  getDispatchOverview: () => api.get('/workorders/dispatch/overview'),
+  getDispatchPlan: (id) => api.get(`/workorders/${id}/dispatch-plan`),
+  autoAssignWorkOrder: (id, data) => api.post(`/workorders/${id}/auto-assign`, data),
+  batchAutoAssignWorkOrders: (data) => api.post('/workorders/dispatch/auto-assign-batch', data),
+
+  // Admin - Houses
+  adminListHouses: () => api.get('/admin/houses'),
+  adminCreateHouse: (data) => api.post('/admin/houses', data),
+  adminUpdateHouse: (code, data) => api.put(`/admin/houses/${code}`, data),
+  adminDeleteHouse: (code) => api.delete(`/admin/houses/${code}`),
+  // Admin - Users
+  adminListUsers: (role) => api.get('/admin/users', { params: role ? { role } : {} }),
+  adminCreateUser: (data) => api.post('/admin/users', data),
+  adminUpdateUser: (id, data) => api.put(`/admin/users/${id}`, data),
+  adminDeleteUser: (id) => api.delete(`/admin/users/${id}`),
 
   // Maintenance
   getMaintenanceHistory: (houseId) => api.get(`/maintenance/history/${houseId}`),
+  getMaintenanceRisks: (params) => api.get('/maintenance/risks', { params }),
 }

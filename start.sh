@@ -15,8 +15,14 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKEND_DIR="$SCRIPT_DIR/backend"
 FRONTEND_DIR="$SCRIPT_DIR/frontend"
-# 后端用项目虚拟环境里的 Python（依赖都装在里面）
-PYTHON="$BACKEND_DIR/venv/Scripts/python.exe"
+# 后端用项目虚拟环境里的 Python（兼容 macOS/Linux 与 Windows）
+if [ -f "$BACKEND_DIR/venv/bin/python" ]; then
+  PYTHON="$BACKEND_DIR/venv/bin/python"
+elif [ -f "$BACKEND_DIR/venv/Scripts/python.exe" ]; then
+  PYTHON="$BACKEND_DIR/venv/Scripts/python.exe"
+else
+  PYTHON="python3"
+fi
 # 前端用系统 PATH 里的 node（npm install 时装的 vite 在 node_modules 里）
 NODE="node"
 
@@ -24,6 +30,16 @@ echo "=========================================="
 echo "  筑维AI - 一房一码住宅智能运维助手"
 echo "=========================================="
 echo ""
+
+# ---------- 清理旧进程（避免 Address already in use）----------
+for PORT in 8000 5173; do
+  OLD_PID=$(lsof -ti :$PORT 2>/dev/null)
+  if [ -n "$OLD_PID" ]; then
+    echo "  检测到端口 $PORT 被占用（PID: $OLD_PID），正在清理..."
+    kill $OLD_PID 2>/dev/null || kill -9 $OLD_PID 2>/dev/null
+    sleep 1
+  fi
+done
 
 # ---------- 启动后端 ----------
 echo "[1/2] 启动后端服务 (FastAPI @ :8000)..."
@@ -33,6 +49,11 @@ BACKEND_PID=$!
 echo "  后端PID: $BACKEND_PID"
 
 sleep 3
+# 若后端未能启动（端口仍被占用），给出提示并退出
+if ! kill -0 $BACKEND_PID 2>/dev/null || ! lsof -ti :8000 >/dev/null 2>&1; then
+  echo "  ❌ 后端启动失败，请手动执行: lsof -ti :8000 | xargs kill -9"
+  echo "     再重新运行 bash start.sh"
+fi
 
 # ---------- 启动前端 ----------
 echo "[2/2] 启动前端服务 (Vite @ :5173)..."

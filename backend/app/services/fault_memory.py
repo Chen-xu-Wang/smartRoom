@@ -41,7 +41,7 @@ from ..database import query_one, query_all, parse_json_field
 # 【阶段3】用「模块引用」而不是 from .llm import xxx：
 #   - 与 agent.py 一样复用项目唯一的一套 LLM 客户端（不新建第二套）；
 #   - 通过 llm.is_llm_enabled() / llm.chat_json() 调用，
-#     便于在测试/演示时可控地模拟「AI 不可用」与「AI 可用」两种路径
+#     便于在测试时可控地验证「AI 不可用」与「AI 可用」两种路径
 #     （Java 里类似通过接口注入，测试时替换 Mock 实现）。
 from . import llm
 

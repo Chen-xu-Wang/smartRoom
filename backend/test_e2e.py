@@ -1,106 +1,105 @@
-"""End-to-end test script."""
-import requests, json
+"""本地端到端冒烟脚本（需要已启动的后端与可写数据库）。
+
+不会作为 unittest 自动运行；它会创建一张真实工单，请仅在开发/测试库执行：
+    cd backend && python test_e2e.py
+"""
+import json
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
 
 BASE = "http://localhost:8000"
 
-print("========== 端到端测试 ==========")
-print()
 
-# 1. Init chat
-print("1. 初始化AI报修对话...")
-r = requests.post(f"{BASE}/api/chat/init", json={"house_id": "1302"})
-data = r.json()
-sid = data["session_id"]
-print(f"   会话ID: {sid}")
-print(f"   AI: {data['message']['content'][:50]}...")
-print()
+def call(method: str, path: str, payload: dict | None = None) -> dict:
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8") if payload else None
+    request = Request(
+        f"{BASE}{path}",
+        data=body,
+        method=method,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urlopen(request, timeout=20) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"{method} {path} → HTTP {exc.code}: {detail}") from exc
+    except URLError as exc:
+        raise RuntimeError(f"无法连接后端 {BASE}，请先启动服务：{exc.reason}") from exc
 
-# 2. First message
-print("2. 住户: 厨房水槽下面今天一直漏水")
-r = requests.post(f"{BASE}/api/chat/message", json={"session_id": sid, "message": "厨房水槽下面今天一直漏水"})
-data = r.json()
-print(f"   Agent状态: {data['agent_state']}")
-print(f"   提取信息: {json.dumps(data.get('extracted_info',{}), ensure_ascii=False)}")
-print(f"   AI追问: {data.get('content','')[:60]}")
-print()
 
-# 3. Answer follow-up
-print("3. 住户: 关掉水龙头之后还是会慢慢漏")
-r = requests.post(f"{BASE}/api/chat/message", json={"session_id": sid, "message": "关掉水龙头之后还是会慢慢漏"})
-data = r.json()
-print(f"   Agent状态: {data['agent_state']}")
-print(f"   工具调用: {len(data.get('tool_calls',[]))}个")
-for tc in data.get("tool_calls", []):
-    print(f"     - {tc['description']}: {tc['status']}")
-wo = data.get("work_order", {})
-print(f"   工单ID: {wo.get('id')}")
-print(f"   故障类型: {wo.get('fault_type')}")
-print(f"   AI分析: {wo.get('ai_analysis')}")
-print(f"   建议工种: {wo.get('suggested_trade')}")
-print(f"   紧急度: {wo.get('urgency')}")
-print(f"   置信度: {wo.get('confidence')}%")
-print()
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise AssertionError(message)
 
-# 4. Confirm order
-print("4. 住户确认提交工单...")
-r = requests.post(f"{BASE}/api/chat/action", json={"session_id": sid, "action": "confirm_order"})
-data = r.json()
-print(f"   结果: {data.get('message')}")
-wo_id = data.get("work_order_id")
-print(f"   工单号: {wo_id}")
-print()
 
-# 5. Property review
-print("5. 物业审核工单...")
-r = requests.put(f"{BASE}/api/workorders/{wo_id}/review", json={
-    "reviewed_by": "物业管理员张姐",
-    "urgency": "高",
-    "assigned_to": "水电维修组A",
-    "review_notes": "持续漏水可能影响楼下，升级为高优先级",
-    "status": "approved"
-})
-print(f"   审核结果: {r.json().get('status')}")
-print()
+def main():
+    print("========== 筑维AI端到端冒烟测试 ==========")
 
-# 6. Complete repair
-print("6. 维修人员完成维修...")
-r = requests.put(f"{BASE}/api/workorders/{wo_id}/complete", json={
-    "repair_person": "水电工李师傅",
-    "actual_fault": "角阀AF-105密封圈老化失效",
-    "actual_action": "更换角阀密封圈及AF-105角阀",
-    "used_parts": "AF-105角阀 x1",
-    "result": "完成"
-})
-data = r.json()
-print(f"   结果: {data.get('message')}")
-print()
+    chat = call("POST", "/api/chat/init", {"house_id": "1302"})
+    session_id = chat["session_id"]
+    print("1. 已创建报修会话")
 
-# 7. Verify data write-back
-print("7. 验证数据回写至一房一码档案...")
-r = requests.get(f"{BASE}/api/houses/1302/history")
-history = r.json()
-print(f"   维修记录数: {len(history['records'])}")
-for rec in history["records"]:
-    print(f"     - {rec.get('date')} | {rec.get('fault')} | {rec.get('cause')} | {rec.get('repairPerson')}")
-print()
+    call("POST", "/api/chat/message", {
+        "session_id": session_id,
+        "message": "厨房水槽下面今天一直漏水",
+    })
+    analyzed = call("POST", "/api/chat/message", {
+        "session_id": session_id,
+        "message": "关掉水龙头之后还是会慢慢漏，地面已经有积水",
+    })
+    require(analyzed.get("work_order"), "AI 未生成结构化工单")
+    print("2. AI 已生成结构化工单")
 
-# 8. Check repeat maintenance warnings
-print("8. 检查重复维修预警...")
-r = requests.get(f"{BASE}/api/maintenance/history/503")
-warnings = r.json().get("repeat_warnings", [])
-if warnings:
-    for w in warnings:
-        print(f"   预警: {w}")
-else:
-    print("   无预警")
-print()
+    confirmed = call("POST", "/api/chat/action", {
+        "session_id": session_id,
+        "action": "confirm_order",
+    })
+    order_no = confirmed.get("work_order_id")
+    require(order_no, "住户确认后未返回工单号")
+    print(f"3. 住户已确认工单：{order_no}")
 
-# 9. Stats
-print("9. 工单统计...")
-r = requests.get(f"{BASE}/api/workorders/stats/summary")
-stats = r.json()
-print(f"   工单总数: {stats['total']}")
-print(f"   状态分布: {json.dumps(stats['by_status'], ensure_ascii=False)}")
-print(f"   平均置信度: {stats['avg_confidence']}%")
-print()
-print("========== 测试完成 ==========")
+    reviewed = call("PUT", f"/api/workorders/{order_no}/review", {
+        "reviewed_by": "物业管理员",
+        "urgency": "高",
+        "suggested_trade": "水电维修",
+        "review_notes": "持续漏水，优先处理",
+        "status": "approved",
+        "auto_assign": True,
+    })
+    dispatch = reviewed.get("dispatch") or {}
+    require(dispatch.get("status") == "assigned", f"审核后未能安全自动派单：{dispatch}")
+    repairer = dispatch.get("assigned_to")
+    require(repairer, "自动派单未返回维修人员")
+    print(f"4. 审核通过，AI 已派给：{repairer}")
+
+    detail = call("GET", f"/api/workorders/{order_no}")
+    require(detail.get("assigned_to") == repairer, "工单详情中的派单人员不一致")
+
+    started = call("PUT", f"/api/workorders/{order_no}/start", {
+        "repair_person": repairer,
+    })
+    require(started.get("status") == "PROCESSING", "工单未成功进入维修中")
+    print("5. 指派维修人员已开工")
+
+    completed = call("PUT", f"/api/workorders/{order_no}/complete", {
+        "repair_person": repairer,
+        "actual_fault": "角阀密封圈老化失效",
+        "actual_action": "更换密封圈并复紧角阀接口",
+        "used_parts": "角阀密封圈 x1",
+        "result": "完成",
+    })
+    require(completed.get("success"), "维修完成接口未成功")
+    print("6. 维修完成并回写数字档案")
+
+    overview = call("GET", "/api/workorders/dispatch/overview")
+    require("summary" in overview and "repairers" in overview, "调度看板接口返回不完整")
+    risks = call("GET", "/api/maintenance/risks")
+    require("risks" in risks and "summary" in risks, "预测性维护接口返回不完整")
+    print("7. 调度看板与预测性维护风险中心返回正常")
+    print("========== 测试通过 ==========")
+
+
+if __name__ == "__main__":
+    main()

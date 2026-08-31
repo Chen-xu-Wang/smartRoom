@@ -379,7 +379,27 @@ class MaintenanceAgent:
                 # 视为补充信息，回到收集阶段
                 self.state = AgentState.COLLECTING_INFO
                 response = self.process(user_input)
+        elif self.state == AgentState.COMPLETE:
+            # 已自动提交后，用户仍可补充信息（视为追加描述，重新进入收集）
+            self.state = AgentState.COLLECTING_INFO
+            # 重新抽取并判断是否需追问或重生成
+            missing = check_missing_info(self.extracted_info)
+            if missing:
+                question = _make_followup(missing, self.extracted_info)
+                response = {
+                    "role": "assistant",
+                    "content": question + "\n\n（您已提交的工单仍在审核中，补充信息将更新工单）",
+                    "timestamp": datetime.now().isoformat(),
+                    "agent_state": self.state,
+                    "extracted_info": self._safe_info(),
+                    "missing_info": [q["field"] for q in missing],
+                }
+            else:
+                response = self._run_tools_and_generate()
+                # 新生成的工单将由 chat API 再次自动提交
         else:
+            # 未知状态回退到信息收集中
+            self.state = AgentState.COLLECTING_INFO
             response = self.process(user_input)
 
         self.conversation_history.append(response)
@@ -439,9 +459,8 @@ class MaintenanceAgent:
         self.state = AgentState.GENERATING_ORDER
         order = self._generate_work_order()
 
-        # Build response
+        # Build response（包含解决方案，工单将由后端自动提交）
         equipment_str = "、".join([f"{e['name']}({e['spec']})" for e in equipment[:3]]) if equipment else "未找到关联设备"
-        causes_str = "、".join(order["possible_causes"][:3]) if order.get("possible_causes") else "需现场检查确定"
         analysis_src = "大模型" if order.get("_by_llm") else "规则"
 
         content = (
@@ -451,18 +470,18 @@ class MaintenanceAgent:
             f"2. ✅ 运维知识库检索 — 匹配到{len(self.rag_results)}条相关知识\n\n"
             f"**关联设备：** {equipment_str}\n\n"
             f"**AI初步分析：** {order['ai_analysis']}\n\n"
-            f"**建议工种：** {order['suggested_trade']}\n\n"
-            f"**紧急等级：** {order['urgency']}\n\n"
-            f"**AI置信度：** {order['confidence']}%\n\n"
+            f"**可能原因：** {'、'.join(order['possible_causes'][:3]) if order.get('possible_causes') else '需现场检查确定'}\n\n"
+            f"**处置建议：** {order.get('solution','建议等待师傅上门')}\n\n"
+            f"**建议工种：** {order['suggested_trade']} ｜ **紧急等级：** {order['urgency']} ｜ **置信度：** {order['confidence']}%\n\n"
             f"---\n\n"
-            f"以上为AI自动生成的维修工单建议，请确认或修改后提交。"
+            f"✅ 已为您自动生成并提交工单，物业将尽快审核派单。"
         )
 
         response = {
             "role": "assistant",
             "content": content,
             "timestamp": datetime.now().isoformat(),
-            "agent_state": self.state,
+            "agent_state": AgentState.ORDER_PENDING,  # 仍先置为待确认，由 chat API 统一自动提交为完成
             "extracted_info": self._safe_info(),
             "tool_calls": self.tool_calls,
             "work_order": order,
@@ -472,6 +491,7 @@ class MaintenanceAgent:
                 "pipeline_info": pipeline.get(location, {}) if pipeline else {},
                 "maintenance_history": history,
             },
+            "solution": order.get("solution", ""),
         }
 
         self.state = AgentState.ORDER_PENDING
@@ -493,6 +513,7 @@ class MaintenanceAgent:
             "- fault_type: 故障分类，取值之一：给排水故障/电气故障/空调故障/门窗故障/墙面裂缝/其他故障\n"
             "- ai_analysis: 一句专业分析（说明疑似原因链，不超过 60 字）\n"
             "- possible_causes: 字符串数组，最多 3 条可能原因\n"
+            "- solution: 字符串，面向住户的处置建议与维修方案（1-2句，包含临时措施与专业维修步骤，不超过80字）\n"
             "- suggested_trade: 建议工种，取值之一：水电维修/电工维修/空调维修/门窗维修/油漆维修/综合维修\n"
             "- urgency: 紧急程度，取值之一：紧急/高/中/低\n"
             "- confidence: 0-100 整数，信息越充分越高（一般 70-92）"
@@ -521,10 +542,19 @@ class MaintenanceAgent:
         possible_causes = get_possible_causes(self.rag_results)
         suggested_trade = get_repair_trade_suggestion(self.extracted_info, self.rag_results)
         urgency = get_urgency_suggestion(self.extracted_info)
+        # 基于 RAG 第一条检索结果构造简易处置建议
+        solution = ""
+        if self.rag_results:
+            first = (self.rag_results[0].get("content") or "")[:120].replace("\n", " ").strip()
+            if first:
+                solution = f"建议：{first[:60]}… 具体以师傅现场处置为准"
+        if not solution:
+            solution = "建议先关闭相关水/电闸并保持现场干燥，等待专业师傅上门检修"
         return {
             "fault_type": self._determine_fault_type(),
             "ai_analysis": f"疑似{'、'.join(possible_causes[:3])}" if possible_causes else "需现场检查确定",
             "possible_causes": possible_causes,
+            "solution": solution,
             "suggested_trade": suggested_trade,
             "urgency": urgency,
             "confidence": self._calculate_confidence(),
@@ -535,6 +565,9 @@ class MaintenanceAgent:
         """生成结构化工单（分析来自大模型，失败兜底规则）。"""
         equipment = self.archive_data.get("equipment", []) if self.archive_data else []
         analysis = self._llm_generate_analysis(equipment, self.rag_results) or self._rule_analysis()
+        # 确保 solution 字段始终存在
+        if not analysis.get("solution"):
+            analysis["solution"] = "建议保持现场并等待专业师傅上门，具体方案以现场检查为准"
 
         house = get_house_by_id(self.house_id)
         equipment_ids = [e["id"] for e in equipment[:5]] if equipment else []
@@ -552,6 +585,7 @@ class MaintenanceAgent:
             "equipment_details": [{"name": e["name"], "spec": e["spec"], "id": e["id"]} for e in equipment[:3]],
             "ai_analysis": analysis.get("ai_analysis", "需现场检查确定"),
             "possible_causes": analysis.get("possible_causes", []),
+            "solution": analysis.get("solution", ""),
             "suggested_trade": analysis.get("suggested_trade", "综合维修"),
             "urgency": analysis.get("urgency", "中"),
             "confidence": analysis.get("confidence", 60),
