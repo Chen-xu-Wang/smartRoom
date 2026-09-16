@@ -1,0 +1,35 @@
+/* 3D 数字孪生的共享样式：内嵌到现有前端时也会加载，因此只包含 .twin-root 内部的样式，
+   不含任何会影响整页的规则（整页规则见 standalone.css，只有独立运行时才引入）。 */
+:root {
+  --panel-bg: rgba(255, 255, 255, 0.92);
+  --panel-fg: var(--text-primary, #0F172A);
+  --panel-sub: var(--text-secondary, #475569);
+  --panel-border: var(--border-color, #E2E8F0);
+  --accent: var(--primary-color, #4F46E5);
+}
+[data-theme='night'] {
+  --panel-bg: rgba(8, 20, 40, 0.86);
+  --panel-fg: #dcecff;
+  --panel-sub: #8fb0d0;
+  --panel-border: rgba(129, 140, 248, 0.32);
+  --accent: #818CF8;
+}
+.twin-root .panel {
+  background: var(--panel-bg);
+  color: var(--panel-fg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--shadow-lg, 0 8px 28px rgba(15, 35, 60, 0.18));
+  backdrop-filter: blur(10px);
+}
+.twin-root .panel h3 { margin: 0 0 8px; font-size: 15px; }
+.twin-root .sub { color: var(--panel-sub); font-size: 12px; }
+.twin-root .scroll { overflow-y: auto; }
+.twin-root .scroll::-webkit-scrollbar { width: 6px; }
+.twin-root .scroll::-webkit-scrollbar-thumb { background: rgba(120, 140, 160, 0.4); border-radius: 3px; }
+.twin-root .kv { display: grid; grid-template-columns: 88px 1fr; gap: 4px 8px; font-size: 12.5px; }
+.twin-root .kv > span:nth-child(odd) { color: var(--panel-sub); }
+.twin-root .sev-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex: none; }
+.twin-root[data-theme='night'] .el-card, [data-theme='night'] .twin-root .el-card, [data-theme='night'] .twin-root .el-table { --el-card-bg-color: transparent; background: transparent; color: var(--panel-fg); }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }

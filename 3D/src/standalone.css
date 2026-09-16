@@ -1,0 +1,22 @@
+/* 仅独立运行（端口 5174）时引入：整页铺满、禁止页面滚动、3D 自己的页脚。
+   内嵌到现有前端时不加载本文件，避免锁死前端页面的滚动。 */
+html, body, #app { margin: 0; height: 100%; overflow: hidden; }
+body { background: #dfe8f0; }
+
+/* 页面底部：与现有前端的 footer 保持一致 */
+.app-footer {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  text-align: center;
+  padding: 7px 16px;
+  color: var(--text-secondary, #475569);
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-top: 1px solid var(--border-color, #E2E8F0);
+  backdrop-filter: blur(10px);
+}
+[data-theme='night'] .app-footer {
+  background: rgba(8, 20, 40, 0.86);
+  color: #8fb0d0;
+  border-top-color: rgba(129, 140, 248, 0.28);
+}
