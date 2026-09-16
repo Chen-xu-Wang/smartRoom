@@ -1,0 +1,24 @@
+{
+  "scenario": "leakage_wet",
+  "description": "厨房插座进水：07-08 19:05 漏电跳闸，19:15、19:40 两次重新合闸又跳闸，21:30 干燥后恢复",
+  "name": "leakage_wet",
+  "leakage_faults": [
+    {
+      "circuit_code": "CB-1302-KT",
+      "mode": "WET",
+      "start": "2026-07-08 19:05",
+      "end": "2026-07-08 21:30",
+      "ma_end": 34.0,
+      "reclose_times": [
+        "2026-07-08 19:15",
+        "2026-07-08 19:40",
+        "2026-07-08 21:35"
+      ],
+      "reclose_daily_at": "07:30",
+      "fault_id": "EF1-WET"
+    }
+  ],
+  "wiring_faults": [],
+  "phase_events": [],
+  "humidity_events": []
+}

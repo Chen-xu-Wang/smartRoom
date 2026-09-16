@@ -1,0 +1,240 @@
+{
+  "event": null,
+  "diagnostics": {
+    "house_id": "1302",
+    "algorithm": "supply_blockage_cv_capability",
+    "config": {
+      "baseline_days": 14,
+      "window_days": 5,
+      "min_events": 6,
+      "capability_quantile": 0.5,
+      "drop_threshold": 0.3,
+      "severe_threshold": 0.6,
+      "persist_days": 3,
+      "persist_window": 4,
+      "component_drop": 0.15,
+      "other_fixture_drop": 0.15,
+      "gradual_days": 7,
+      "shower_min_s": 150,
+      "shower_min_hot_share": 0.2,
+      "other_max_s": 120,
+      "max_gap_s": 3,
+      "steady_tolerance": 0.15,
+      "steady_fraction": 0.7
+    },
+    "data_range": {
+      "start": "2026-06-01",
+      "end": "2026-07-12"
+    },
+    "as_of": "2026-07-12",
+    "episodes": {
+      "shower": 120,
+      "other": 1174
+    },
+    "baseline": {
+      "cv_cap": 0.1774,
+      "events": 44,
+      "other_cv_cap": 0.3033,
+      "inlet_static_mpa": 0.3477
+    },
+    "daily": [
+      {
+        "date": "2026-06-15",
+        "events": 3,
+        "cv_cap": null,
+        "change_ratio": null,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-16",
+        "events": 6,
+        "cv_cap": 0.1606,
+        "change_ratio": -0.095,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-17",
+        "events": 8,
+        "cv_cap": 0.1654,
+        "change_ratio": -0.068,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-18",
+        "events": 10,
+        "cv_cap": 0.2026,
+        "change_ratio": 0.142,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-19",
+        "events": 13,
+        "cv_cap": 0.2395,
+        "change_ratio": 0.35,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-20",
+        "events": 12,
+        "cv_cap": 0.253,
+        "change_ratio": 0.426,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-21",
+        "events": 12,
+        "cv_cap": 0.238,
+        "change_ratio": 0.342,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-22",
+        "events": 12,
+        "cv_cap": 0.2344,
+        "change_ratio": 0.321,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-23",
+        "events": 13,
+        "cv_cap": 0.2057,
+        "change_ratio": 0.16,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-24",
+        "events": 13,
+        "cv_cap": 0.2057,
+        "change_ratio": 0.16,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-25",
+        "events": 14,
+        "cv_cap": 0.1978,
+        "change_ratio": 0.115,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-26",
+        "events": 14,
+        "cv_cap": 0.2182,
+        "change_ratio": 0.23,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-27",
+        "events": 15,
+        "cv_cap": 0.2307,
+        "change_ratio": 0.3,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-28",
+        "events": 15,
+        "cv_cap": 0.2307,
+        "change_ratio": 0.3,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-29",
+        "events": 15,
+        "cv_cap": 0.1861,
+        "change_ratio": 0.049,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-30",
+        "events": 15,
+        "cv_cap": 0.2224,
+        "change_ratio": 0.253,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-01",
+        "events": 15,
+        "cv_cap": 0.1976,
+        "change_ratio": 0.114,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-02",
+        "events": 15,
+        "cv_cap": 0.1861,
+        "change_ratio": 0.049,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-03",
+        "events": 15,
+        "cv_cap": 0.1861,
+        "change_ratio": 0.049,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-04",
+        "events": 16,
+        "cv_cap": 0.1824,
+        "change_ratio": 0.028,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-05",
+        "events": 14,
+        "cv_cap": 0.1816,
+        "change_ratio": 0.024,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-06",
+        "events": 14,
+        "cv_cap": 0.1816,
+        "change_ratio": 0.024,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-07",
+        "events": 14,
+        "cv_cap": 0.1816,
+        "change_ratio": 0.024,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-08",
+        "events": 14,
+        "cv_cap": 0.1818,
+        "change_ratio": 0.024,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-09",
+        "events": 12,
+        "cv_cap": 0.2011,
+        "change_ratio": 0.133,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-10",
+        "events": 13,
+        "cv_cap": 0.206,
+        "change_ratio": 0.161,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-11",
+        "events": 13,
+        "cv_cap": 0.1674,
+        "change_ratio": -0.057,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-12",
+        "events": 12,
+        "cv_cap": 0.1768,
+        "change_ratio": -0.004,
+        "flagged": false
+      }
+    ],
+    "status": "NO_EVENT"
+  }
+}

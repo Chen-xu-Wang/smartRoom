@@ -1,0 +1,59 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260623-805-0002",
+  "scope": "HOUSE",
+  "house_id": "805",
+  "related_houses": ["705"],
+  "batch_id": "B",
+  "domain": "WATER",
+  "event_type": "PIPE_BURST",
+  "severity": "CRITICAL",
+  "detected_at": "2026-06-23T14:06:10+08:00",
+  "location_candidates": [
+    {
+      "segment_code": "WS-805-K-HS",
+      "segment_name": "厨房-水槽下连接软管",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.74
+    },
+    {
+      "segment_code": "WS-805-K-AV",
+      "segment_name": "厨房-角阀接口",
+      "device_code": "EQ-805-K-02",
+      "in_archive": true,
+      "confidence": 0.21
+    }
+  ],
+  "evidence": {
+    "peak_flow_lpm": 21.5,
+    "duration_s": 95,
+    "rated_max_lpm": 12,
+    "matched_fixture": null,
+    "est_loss_l": 34,
+    "branch": "厨房冷水支路",
+    "occupancy": "ABSENT",
+    "water_intrusion_sensor": "TRIGGERED:SN-805-K-WL01"
+  },
+  "evidence_text": "家中无人时厨房冷水支路突发21.5升/分钟大流量，超出厨房器具额定上限，持续95秒，厨柜下水浸传感器报警，已自动关闭入户总阀",
+  "control_actions_taken": [
+    {
+      "action": "CLOSE_MAIN_VALVE",
+      "target": "WS-805-IN-MV",
+      "executed_at": "2026-06-23T14:06:12+08:00",
+      "result": "SUCCESS"
+    }
+  ],
+  "archive_context": {
+    "building": "1栋",
+    "unit": "1单元",
+    "floor": "8层",
+    "layout": "两室一厅一卫",
+    "in_archive": true,
+    "device_name": "角阀",
+    "device_model": "AF-102",
+    "install_date": "2026-02-08",
+    "recent_repairs_180d": 0
+  },
+  "data_source": "SIMULATED"
+}

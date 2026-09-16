@@ -1,0 +1,20 @@
+{
+  "scenario": "leakage_gradual",
+  "description": "EF1 卫生间插座回路绝缘渐进劣化：06-15 起漏电流按平方规律增大，约 07-05 达到保护动作值",
+  "name": "leakage_gradual",
+  "leakage_faults": [
+    {
+      "circuit_code": "CB-1302-BT",
+      "mode": "GRADUAL",
+      "start": "2026-06-15",
+      "end": "2026-07-10",
+      "ma_end": 32.0,
+      "reclose_times": [],
+      "reclose_daily_at": "07:30",
+      "fault_id": "EF1"
+    }
+  ],
+  "wiring_faults": [],
+  "phase_events": [],
+  "humidity_events": []
+}

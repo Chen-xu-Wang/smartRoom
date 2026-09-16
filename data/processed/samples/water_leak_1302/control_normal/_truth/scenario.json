@@ -1,0 +1,5 @@
+{
+  "scenario": "control_normal",
+  "description": "无故障对照：暗漏与爆管都不应报出",
+  "faults": []
+}

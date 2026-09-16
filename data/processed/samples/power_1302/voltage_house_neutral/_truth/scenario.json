@@ -1,0 +1,17 @@
+{
+  "scenario": "voltage_house_neutral",
+  "description": "本户接线：06-26 起 1302 进线/零线端子松动，附加电阻至 07-04 增到 1.4 Ω",
+  "name": "voltage_house_neutral",
+  "leakage_faults": [],
+  "wiring_faults": [
+    {
+      "house_id": "1302",
+      "start": "2026-06-26",
+      "end": "2026-07-04",
+      "r_end_ohm": 1.4,
+      "fault_id": "EF-NEUTRAL"
+    }
+  ],
+  "phase_events": [],
+  "humidity_events": []
+}

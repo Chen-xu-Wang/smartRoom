@@ -1,0 +1,50 @@
+[
+  {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260621-1302-0001",
+    "actionable": true,
+    "priority": "NORMAL",
+    "fault_summary": "1302卫生间疑似暗漏：马桶进水阀或排水阀密封不严（可能性约52%）",
+    "notices": [
+      {
+        "audience": "RESIDENT",
+        "house_ids": [
+          "1302"
+        ],
+        "title": "马桶可能在悄悄漏水",
+        "content": "最近3晚，您家半夜没人用水时水表也一直在走，每天约多用144升水（一个月约15元），漏水出现在卫生间冷水管路，大概率是马桶进水阀或排水阀密封不严（可能性约52%）。可以先按下面的方法自查；如果这几天夜里有人持续用水（如给鱼缸补水），请忽略本提醒。",
+        "self_check_steps": [
+          "在水箱里滴几滴食用色素，30分钟内不冲水，看马桶内壁是否出现颜色",
+          "关闭马桶角阀，观察水表是否停止走动",
+          "留意水箱是否有持续的细小进水声"
+        ],
+        "show_repair_button": true
+      }
+    ],
+    "workorders": [
+      {
+        "create_mode": "DEFERRED",
+        "recheck_after_days": 3,
+        "fault_type": "给排水故障",
+        "suggested_trade": "水电维修",
+        "house_ids": [
+          "1302"
+        ],
+        "location": "卫生间-马桶进水阀",
+        "device_code": "EQ-1302-B-01",
+        "ai_summary": "1302连续3晚凌晨总表最小流量0.1 L/min（约144 L/天），持续小流量在卫生间冷水管路，支路之外未解释流量0.0 L/min。首选卫生间-马桶进水阀(0.52)，次选卫生间-洗脸盆冷水角阀(0.12)，次选卫生间-卫生间冷水支路(0.08)。建议先关闭该处角阀确认水表是否停转，再更换密封件。",
+        "materials": [
+          "马桶进水阀",
+          "排水阀密封垫",
+          "马桶角阀"
+        ],
+        "worker_safety_notice": [
+          "作业前关闭马桶角阀并排空水箱"
+        ]
+      }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+  }
+]

@@ -1,0 +1,5 @@
+{
+  "scenario": "control_night_use",
+  "description": "干扰：06-20 至 07-05 每晚凌晨多次起夜冲马桶、洗手，隔天夜间谷电洗衣",
+  "faults": []
+}

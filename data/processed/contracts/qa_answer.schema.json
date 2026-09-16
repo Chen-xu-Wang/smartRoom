@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartroom.example/contracts/v2/qa_answer.schema.json",
+  "title": "契约④-输出 水电问答回答（百炼应用③ 输出 → 前端）",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "answer", "evidence", "suggested_actions", "out_of_scope"],
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "answer": {
+      "description": "面向住户的回答，通俗、先给结论。",
+      "type": "string", "minLength": 1, "maxLength": 300
+    },
+    "evidence": {
+      "description": "回答中引用的数字及其出处，用于前端展示“依据”并便于核对。",
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "value", "source_path"],
+        "properties": {
+          "label": { "type": "string", "maxLength": 20 },
+          "value": { "type": "string", "maxLength": 20 },
+          "source_path": {
+            "description": "在输入 JSON 中的路径，如 monthly[1].power.by_circuit_kwh.空调。",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "suggested_actions": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "label", "payload"],
+        "properties": {
+          "type": { "type": "string", "enum": ["CREATE_AUTOMATION_RULE", "BOOK_SERVICE", "VIEW_EVENT", "VIEW_REPORT"] },
+          "label": { "type": "string", "maxLength": 16 },
+          "payload": { "type": "object" }
+        }
+      }
+    },
+    "out_of_scope": {
+      "description": "问题超出所给数据能回答的范围时为 true，此时 answer 说明无法回答的原因。",
+      "type": "boolean"
+    }
+  }
+}

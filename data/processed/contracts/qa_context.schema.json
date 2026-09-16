@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartroom.example/contracts/v2/qa_context.schema.json",
+  "title": "契约④-输入 水电问答上下文（后端组装 → 百炼应用③ 输入）",
+  "description": "后端把住户问题与该户近几个月的月度聚合、近期事件摘要一起传入。百炼只基于这些数据作答，不回调后端。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "house_id", "asked_at", "question", "monthly", "recent_events", "price_note", "data_source"],
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "house_id": { "$ref": "common.schema.json#/$defs/houseId" },
+    "asked_at": { "$ref": "common.schema.json#/$defs/dateTime" },
+    "question": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "monthly": {
+      "description": "按月份升序，最多 3 个月，每项为契约③ RESIDENT_MONTHLY 的 water/power/weather 子集。",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["month", "days", "water", "power"],
+        "properties": {
+          "month": { "$ref": "common.schema.json#/$defs/month" },
+          "days": { "type": "integer", "minimum": 1, "maximum": 31 },
+          "weather": { "type": "object" },
+          "water": { "type": "object" },
+          "power": { "type": "object" }
+        }
+      }
+    },
+    "recent_events": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event_id", "event_type", "summary", "status"],
+        "properties": {
+          "event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+          "event_type": { "$ref": "common.schema.json#/$defs/eventType" },
+          "summary": { "type": "string", "maxLength": 60 },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    "price_note": { "type": "string" },
+    "data_source": { "$ref": "common.schema.json#/$defs/dataSource" }
+  }
+}

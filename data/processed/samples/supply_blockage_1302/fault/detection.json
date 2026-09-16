@@ -1,0 +1,299 @@
+{
+  "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260707-1302-0001",
+    "scope": "HOUSE",
+    "house_id": "1302",
+    "related_houses": [],
+    "batch_id": "C",
+    "domain": "WATER",
+    "event_type": "SUPPLY_BLOCKAGE",
+    "severity": "MEDIUM",
+    "detected_at": "2026-07-07T21:50:15+08:00",
+    "fault_started_est": "2026-06-29",
+    "location_candidates": [
+      {
+        "segment_code": "WS-1302-B-SH",
+        "segment_name": "卫生间-花洒头",
+        "device_code": "EQ-1302-B-02",
+        "in_archive": true,
+        "confidence": 0.64
+      },
+      {
+        "segment_code": "WS-1302-B-MV",
+        "segment_name": "卫生间-淋浴混水阀",
+        "device_code": "EQ-1302-B-04",
+        "in_archive": false,
+        "confidence": 0.1
+      }
+    ],
+    "evidence": {
+      "metric": "cv_p50",
+      "baseline": 0.177,
+      "recent": 0.119,
+      "change_ratio": -0.33,
+      "duration_days": 3,
+      "window_days": 5,
+      "trend": "GRADUAL",
+      "inlet_pressure_change": -0.003,
+      "same_branch_other_fixtures": "NORMAL",
+      "other_fixtures_change_ratio": -0.08,
+      "hot_cold": "BOTH",
+      "cold_change_ratio": -0.2,
+      "hot_change_ratio": -0.35,
+      "events_used": 14,
+      "baseline_events": 44
+    },
+    "evidence_text": "花洒近5天出水能力比入住初期下降33%；冷热水同时下降；同卫生间其它用水点正常；入户水压正常；约1周内逐渐变差",
+    "control_actions_taken": [],
+    "archive_context": {
+      "building": "1栋",
+      "unit": "1单元",
+      "floor": "13层",
+      "layout": "三室两厅一卫",
+      "in_archive": true,
+      "recent_repairs_180d": 0,
+      "device_name": "花洒",
+      "device_model": "HS-200",
+      "install_date": "2026-03-19"
+    },
+    "data_source": "SIMULATED"
+  },
+  "diagnostics": {
+    "house_id": "1302",
+    "algorithm": "supply_blockage_cv_capability",
+    "config": {
+      "baseline_days": 14,
+      "window_days": 5,
+      "min_events": 6,
+      "capability_quantile": 0.5,
+      "drop_threshold": 0.3,
+      "severe_threshold": 0.6,
+      "persist_days": 3,
+      "persist_window": 4,
+      "component_drop": 0.15,
+      "other_fixture_drop": 0.15,
+      "gradual_days": 7,
+      "shower_min_s": 150,
+      "shower_min_hot_share": 0.2,
+      "other_max_s": 120,
+      "max_gap_s": 3,
+      "steady_tolerance": 0.15,
+      "steady_fraction": 0.7
+    },
+    "data_range": {
+      "start": "2026-06-01",
+      "end": "2026-07-12"
+    },
+    "as_of": "2026-07-12",
+    "episodes": {
+      "shower": 120,
+      "other": 1174
+    },
+    "baseline": {
+      "cv_cap": 0.1775,
+      "events": 44,
+      "other_cv_cap": 0.3028,
+      "inlet_static_mpa": 0.3479
+    },
+    "daily": [
+      {
+        "date": "2026-06-15",
+        "events": 3,
+        "cv_cap": null,
+        "change_ratio": null,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-16",
+        "events": 6,
+        "cv_cap": 0.1606,
+        "change_ratio": -0.095,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-17",
+        "events": 8,
+        "cv_cap": 0.1654,
+        "change_ratio": -0.068,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-18",
+        "events": 10,
+        "cv_cap": 0.2025,
+        "change_ratio": 0.141,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-19",
+        "events": 13,
+        "cv_cap": 0.2392,
+        "change_ratio": 0.348,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-20",
+        "events": 12,
+        "cv_cap": 0.2533,
+        "change_ratio": 0.427,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-21",
+        "events": 12,
+        "cv_cap": 0.2341,
+        "change_ratio": 0.319,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-22",
+        "events": 12,
+        "cv_cap": 0.2242,
+        "change_ratio": 0.263,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-23",
+        "events": 13,
+        "cv_cap": 0.1908,
+        "change_ratio": 0.075,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-24",
+        "events": 13,
+        "cv_cap": 0.1908,
+        "change_ratio": 0.075,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-25",
+        "events": 14,
+        "cv_cap": 0.1867,
+        "change_ratio": 0.052,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-26",
+        "events": 14,
+        "cv_cap": 0.1969,
+        "change_ratio": 0.109,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-27",
+        "events": 15,
+        "cv_cap": 0.2031,
+        "change_ratio": 0.144,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-28",
+        "events": 15,
+        "cv_cap": 0.2031,
+        "change_ratio": 0.144,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-29",
+        "events": 15,
+        "cv_cap": 0.1449,
+        "change_ratio": -0.184,
+        "flagged": false
+      },
+      {
+        "date": "2026-06-30",
+        "events": 15,
+        "cv_cap": 0.1821,
+        "change_ratio": 0.026,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-01",
+        "events": 15,
+        "cv_cap": 0.1474,
+        "change_ratio": -0.17,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-02",
+        "events": 15,
+        "cv_cap": 0.1449,
+        "change_ratio": -0.184,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-03",
+        "events": 15,
+        "cv_cap": 0.1449,
+        "change_ratio": -0.184,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-04",
+        "events": 16,
+        "cv_cap": 0.1315,
+        "change_ratio": -0.259,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-05",
+        "events": 14,
+        "cv_cap": 0.1209,
+        "change_ratio": -0.319,
+        "flagged": true
+      },
+      {
+        "date": "2026-07-06",
+        "events": 14,
+        "cv_cap": 0.1208,
+        "change_ratio": -0.319,
+        "flagged": true
+      },
+      {
+        "date": "2026-07-07",
+        "events": 14,
+        "cv_cap": 0.119,
+        "change_ratio": -0.329,
+        "flagged": true
+      },
+      {
+        "date": "2026-07-08",
+        "events": 14,
+        "cv_cap": 0.1167,
+        "change_ratio": -0.342,
+        "flagged": true
+      },
+      {
+        "date": "2026-07-09",
+        "events": 12,
+        "cv_cap": 0.1248,
+        "change_ratio": -0.297,
+        "flagged": false
+      },
+      {
+        "date": "2026-07-10",
+        "events": 13,
+        "cv_cap": 0.1182,
+        "change_ratio": -0.334,
+        "flagged": true
+      },
+      {
+        "date": "2026-07-11",
+        "events": 13,
+        "cv_cap": 0.0972,
+        "change_ratio": -0.452,
+        "flagged": true
+      },
+      {
+        "date": "2026-07-12",
+        "events": 12,
+        "cv_cap": 0.0952,
+        "change_ratio": -0.464,
+        "flagged": true
+      }
+    ],
+    "status": "EVENT"
+  }
+}

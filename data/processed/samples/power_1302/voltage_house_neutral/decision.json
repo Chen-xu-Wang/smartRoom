@@ -1,0 +1,52 @@
+[
+  {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260705-1302-0001",
+    "actionable": true,
+    "priority": "HIGH",
+    "fault_summary": "1302欠电压，疑似进线/零线接头松动",
+    "notices": [
+      {
+        "audience": "RESIDENT",
+        "house_ids": [
+          "1302"
+        ],
+        "title": "家里电压明显偏低",
+        "content": "系统发现您家用电较多时电压会降到176伏左右，低于正常的198伏，已超出冰箱、电热水器、电水壶/微波炉/电饭煲/吹风机的允许电压，而同楼层邻居电压正常。可能是家里进线或零线接头松动，接头松动会发热，存在安全隐患。请暂时避免同时使用热水器、电水壶、空调等大功率电器，电工将尽快上门检查。",
+        "self_check_steps": [
+          "避免同时使用热水器、电水壶、空调等大功率电器",
+          "留意配电箱附近是否有焦味或异响"
+        ],
+        "show_repair_button": false
+      }
+    ],
+    "workorders": [
+      {
+        "create_mode": "IMMEDIATE",
+        "recheck_after_days": null,
+        "fault_type": "电气故障",
+        "suggested_trade": "电工维修",
+        "house_ids": [
+          "1302"
+        ],
+        "location": "户配电箱进线及零线端子",
+        "device_code": null,
+        "ai_summary": "1302欠电压：3天内37分钟超出198.0–235.4 V（最低176.3 V），同相邻户0%同时越限；等效线路电阻1.5 Ω（入住初期0.11 Ω），判断为户内进线或零线端子松动，重点检查户表箱与配电箱接线端子温升与紧固力矩。",
+        "materials": [
+          "接线端子",
+          "扭力螺丝刀",
+          "红外测温仪",
+          "绝缘胶带"
+        ],
+        "worker_safety_notice": [
+          "作业前断开该回路断路器并用验电笔验电",
+          "断电后挂牌警示，防止他人误合闸",
+          "紧固端子前确认上级开关已断开并验电"
+        ]
+      }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+  }
+]

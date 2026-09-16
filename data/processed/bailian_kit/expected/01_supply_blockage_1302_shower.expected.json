@@ -1,0 +1,41 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260712-1302-0007",
+  "actionable": true,
+  "priority": "NORMAL",
+  "fault_summary": "1302卫生间花洒头水垢堵塞（可能性约82%）",
+  "notices": [
+    {
+      "audience": "RESIDENT",
+      "house_ids": ["1302"],
+      "title": "卫生间花洒出水变小",
+      "content": "最近5天，您家卫生间花洒的最大出水量比刚入住时少了约四成，洗脸盆和入户水压都正常，大概率是花洒头里积了水垢（可能性约82%）。可以先按下面的方法自行清理；如果您近期自己调小过阀门，请忽略本提醒。",
+      "self_check_steps": [
+        "拧下花洒头",
+        "用白醋浸泡约2小时后用清水冲洗",
+        "装回后打开热水和冷水试一下出水"
+      ],
+      "show_repair_button": true
+    }
+  ],
+  "workorders": [
+    {
+      "create_mode": "DEFERRED",
+      "recheck_after_days": 3,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": ["1302"],
+      "location": "卫生间-花洒头",
+      "device_code": "EQ-1302-B-02",
+      "ai_summary": "1302花洒(HS-200)最大出水能力较基线降43%，冷热同降，约3周渐进恶化；同卫生间其它器具及入户水压正常。首选花洒头水垢堵塞(0.82)，次选淋浴混水阀芯堵塞(0.13)。建议先除垢，无效再更换阀芯。",
+      "materials": ["花洒头", "淋浴混水阀芯", "生料带"],
+      "worker_safety_notice": [
+        "拆卸前关闭卫生间冷热水支路阀门",
+        "注意热水烫伤，确认热水已放凉"
+      ]
+    }
+  ],
+  "control_suggestions": [],
+  "escalation": null,
+  "knowledge_refs": ["给排水维修手册-卫生间花洒出水异常"]
+}

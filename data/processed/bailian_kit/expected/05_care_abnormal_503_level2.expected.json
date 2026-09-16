@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260818-503-0004",
+  "actionable": true,
+  "priority": "HIGH",
+  "fault_summary": "503独居住户上午活动迟迟未出现，语音询问无回应，已通知家属",
+  "notices": [
+    {
+      "audience": "FAMILY",
+      "house_ids": ["503"],
+      "title": "请尽快联系家中老人",
+      "content": "今天上午，老人家里的日常用水、用电比平时晚了很久仍未出现，室内有人但长时间没有走动，智能音箱询问也没有回应。请您尽快打电话确认老人是否安好。如果20分钟内仍无法确认，物业将安排工作人员上门查看。",
+      "self_check_steps": [
+        "立即拨打老人电话",
+        "联系不上请点击“请物业上门”"
+      ],
+      "show_repair_button": false
+    },
+    {
+      "audience": "PROPERTY",
+      "house_ids": ["503"],
+      "title": "503独居守护二级预警",
+      "content": "503独居住户今日上午日常活动信号较个人习惯推迟超过2.5小时，雷达显示有人但长时间静止，一级语音询问无回应，已通知家属。请做好上门准备；若20分钟内家属未确认安全，系统将自动生成上门工单。",
+      "self_check_steps": [],
+      "show_repair_button": false
+    }
+  ],
+  "workorders": [],
+  "control_suggestions": [],
+  "escalation": {
+    "next_level": 3,
+    "after_minutes": 20,
+    "condition": "家属未确认老人安全，且期间仍无用水、用电或走动信号",
+    "action": "CREATE_ONSITE_WORKORDER"
+  },
+  "knowledge_refs": ["主动运维补充-独居守护分级响应"]
+}

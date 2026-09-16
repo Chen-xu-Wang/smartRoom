@@ -1,0 +1,76 @@
+[
+  {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260701-1302-0001",
+    "actionable": true,
+    "priority": "URGENT",
+    "fault_summary": "1302厨房爆管/软管脱落，已自动关阀（约漏30升）",
+    "notices": [
+      {
+        "audience": "RESIDENT",
+        "house_ids": [
+          "1302"
+        ],
+        "title": "紧急：家中疑似水管爆裂",
+        "content": "14:21检测到您家厨房用水量异常大（每分钟约29升），不像正常用水，系统已自动关闭入户总阀，估计漏水约30升。物业维修人员将尽快上门；确认安全前请不要自行打开总阀。",
+        "self_check_steps": [
+          "回家后先查看水槽下方软管和角阀",
+          "地面有积水时不要触碰插座和电器"
+        ],
+        "show_repair_button": false
+      },
+      {
+        "audience": "PROPERTY",
+        "house_ids": [
+          "1302"
+        ],
+        "title": "1302爆管，已自动关阀",
+        "content": "厨房冷水支路流量29 L/min的同时末端水压降到0.02 MPa，出水口通流能力是该支路全部器具之和的7.8倍，持续60秒，不像任何正常用水；已自动关闭入户总阀，估计漏水约30 L。请立即安排维修人员上门，并联系住户；同时查看楼下住户是否渗水。",
+        "self_check_steps": [],
+        "show_repair_button": false
+      },
+      {
+        "audience": "NEIGHBOR",
+        "house_ids": [
+          "1202"
+        ],
+        "title": "楼上住户家中发生漏水",
+        "content": "楼上住户家中刚发生水管漏水，总阀已自动关闭。请留意厨房、卫生间天花板是否有渗水，如有请联系物业。",
+        "self_check_steps": [
+          "查看厨房和卫生间天花板、吊顶是否有水渍"
+        ],
+        "show_repair_button": false
+      }
+    ],
+    "workorders": [
+      {
+        "create_mode": "IMMEDIATE",
+        "recheck_after_days": null,
+        "fault_type": "给排水故障",
+        "suggested_trade": "水电维修",
+        "house_ids": [
+          "1302"
+        ],
+        "location": "厨房-厨房冷水连接软管",
+        "device_code": "EQ-1302-K-03",
+        "ai_summary": "1302厨房支路流量峰值28.9 L/min，超过该支路器具额定流量之和12.0 L/min，判定爆管/软管脱落；系统已自动关闭入户总阀，估计漏水30 L。首选厨房-厨房冷水连接软管(0.70)。到场后更换软管或角阀，打压试验无渗漏后再开总阀。",
+        "materials": [
+          "连接软管",
+          "角阀",
+          "生料带",
+          "吸水工具"
+        ],
+        "worker_safety_notice": [
+          "进场前确认入户总阀已关闭并泄压",
+          "地面有积水时先断开厨房插座回路电源再作业",
+          "维修后打压试验无渗漏再开总阀"
+        ]
+      }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": [
+      "给排水维修手册-厨房水槽持续漏水"
+    ]
+  }
+]

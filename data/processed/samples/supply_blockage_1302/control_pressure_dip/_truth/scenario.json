@@ -1,0 +1,13 @@
+{
+  "scenario": "control_pressure_dip",
+  "description": "干扰工况 N1：06-25 起高区变频泵出口压力下降 0.06 MPa，检测不应报进水堵塞",
+  "faults": [],
+  "pressure_events": [
+    {
+      "start": "2026-06-25",
+      "end": "2026-07-13",
+      "delta_mpa": -0.06,
+      "note": "高区变频泵出口压力下降"
+    }
+  ]
+}

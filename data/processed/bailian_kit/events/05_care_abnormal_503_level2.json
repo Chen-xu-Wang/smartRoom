@@ -1,0 +1,42 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260818-503-0004",
+  "scope": "HOUSE",
+  "house_id": "503",
+  "related_houses": [],
+  "batch_id": "A",
+  "domain": "CARE",
+  "event_type": "CARE_ABNORMAL",
+  "severity": "HIGH",
+  "detected_at": "2026-08-18T09:35:00+08:00",
+  "location_candidates": [],
+  "evidence": {
+    "care_level": 2,
+    "signals": {
+      "water": "ABSENT",
+      "power": "ABSENT",
+      "presence": "STATIONARY_LONG"
+    },
+    "delay_vs_baseline_min": 150,
+    "baseline_days": 60,
+    "similar_deviation_last_60d": 0
+  },
+  "evidence_text": "今天上午的日常用水、用电活动比个人习惯推迟超过2.5小时仍未出现，雷达显示室内有人但长时间静止；一级语音询问未获回应",
+  "control_actions_taken": [
+    {
+      "action": "SPEAKER_INQUIRY",
+      "target": "SPK-503-L-01",
+      "executed_at": "2026-08-18T09:05:00+08:00",
+      "result": "NO_RESPONSE"
+    }
+  ],
+  "archive_context": {
+    "building": "1栋",
+    "unit": "1单元",
+    "floor": "5层",
+    "layout": "两室两厅一卫",
+    "in_archive": true,
+    "persona_hint": "独居老人"
+  },
+  "data_source": "SIMULATED"
+}

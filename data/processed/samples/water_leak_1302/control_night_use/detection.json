@@ -1,0 +1,611 @@
+[
+  {
+    "event": null,
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "pipe_burst_branch_overflow",
+      "config": {
+        "night_start_h": 2,
+        "night_end_h": 5,
+        "night_quantile": 0.05,
+        "min_leak_lpm": 0.05,
+        "consecutive_nights": 3,
+        "min_night_minutes": 120,
+        "unexplained_ratio": 0.3,
+        "burst_factor": 1.5,
+        "burst_min_flow_lpm": 6.0,
+        "burst_min_duration_s": 60,
+        "burst_max_gap_s": 3,
+        "valve_close_delay_s": 5
+      },
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "branch_cv_capacity": {
+        "SN-1302-B-FL01": 1.091,
+        "SN-1302-B-FL02": 0.775,
+        "SN-1302-K-FL01": 0.395,
+        "SN-1302-K-FL02": 0.395,
+        "SN-1302-Y-FL01": 0.633
+      },
+      "trace": [],
+      "status": "NO_EVENT"
+    }
+  },
+  {
+    "event": null,
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "hidden_leak_min_night_flow",
+      "config": {
+        "night_start_h": 2,
+        "night_end_h": 5,
+        "night_quantile": 0.05,
+        "min_leak_lpm": 0.05,
+        "consecutive_nights": 3,
+        "min_night_minutes": 120,
+        "unexplained_ratio": 0.3,
+        "burst_factor": 1.5,
+        "burst_min_flow_lpm": 6.0,
+        "burst_min_duration_s": 60,
+        "burst_max_gap_s": 3,
+        "valve_close_delay_s": 5
+      },
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "as_of": "2026-07-12",
+      "nightly": [
+        {
+          "date": "2026-06-01",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-02",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-03",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-04",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-05",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-06",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-07",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-08",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-09",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-10",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-11",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-12",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-13",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-14",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-15",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-16",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-17",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-18",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-19",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-20",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-21",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-22",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-23",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-24",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-25",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-26",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-27",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-28",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-29",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-30",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-01",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-02",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-03",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-04",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-05",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-06",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-07",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-08",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-09",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-10",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-11",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-12",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        }
+      ],
+      "status": "NO_EVENT"
+    }
+  }
+]

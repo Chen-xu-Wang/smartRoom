@@ -1,0 +1,827 @@
+[
+  {
+    "event": {
+      "schema_version": "2.0",
+      "event_id": "EVT-20260701-1302-0001",
+      "scope": "HOUSE",
+      "house_id": "1302",
+      "related_houses": [
+        "1202"
+      ],
+      "batch_id": "C",
+      "domain": "WATER",
+      "event_type": "PIPE_BURST",
+      "severity": "CRITICAL",
+      "detected_at": "2026-07-01T14:21:00+08:00",
+      "location_candidates": [
+        {
+          "segment_code": "WS-1302-K-HS",
+          "segment_name": "厨房-厨房冷水连接软管",
+          "device_code": "EQ-1302-K-03",
+          "in_archive": true,
+          "confidence": 0.7
+        },
+        {
+          "segment_code": "WS-1302-K-AV",
+          "segment_name": "厨房-厨房冷水角阀",
+          "device_code": "EQ-1302-K-02",
+          "in_archive": true,
+          "confidence": 0.2
+        }
+      ],
+      "evidence": {
+        "peak_flow_lpm": 28.9,
+        "duration_s": 65,
+        "rated_max_lpm": 12.0,
+        "outlet_cv": 3.1,
+        "cv_capacity": 0.4,
+        "threshold_cv": 0.59,
+        "branch_pressure_mpa": 0.0223,
+        "matched_fixture": "NONE",
+        "est_loss_l": 30,
+        "occupancy": "UNKNOWN",
+        "branch_sensor": "SN-1302-K-FL01",
+        "onset_at": "2026-07-01T14:20:00+08:00"
+      },
+      "evidence_text": "厨房冷水支路流量29 L/min的同时末端水压降到0.02 MPa，出水口通流能力是该支路全部器具之和的7.8倍，持续60秒，不像任何正常用水；已自动关闭入户总阀，估计漏水约30 L",
+      "control_actions_taken": [
+        {
+          "action": "CLOSE_MAIN_VALVE",
+          "target": "WS-1302-IN-MV",
+          "executed_at": "2026-07-01T14:21:05+08:00",
+          "result": "SUCCESS"
+        }
+      ],
+      "archive_context": {
+        "building": "1栋",
+        "unit": "1单元",
+        "floor": "13层",
+        "layout": "三室两厅一卫",
+        "in_archive": true,
+        "recent_repairs_180d": 0,
+        "device_name": "连接软管",
+        "device_model": "SH-300",
+        "install_date": "2026-03-20"
+      },
+      "data_source": "SIMULATED"
+    },
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "pipe_burst_branch_overflow",
+      "config": {
+        "night_start_h": 2,
+        "night_end_h": 5,
+        "night_quantile": 0.05,
+        "min_leak_lpm": 0.05,
+        "consecutive_nights": 3,
+        "min_night_minutes": 120,
+        "unexplained_ratio": 0.3,
+        "burst_factor": 1.5,
+        "burst_min_flow_lpm": 6.0,
+        "burst_min_duration_s": 60,
+        "burst_max_gap_s": 3,
+        "valve_close_delay_s": 5
+      },
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "branch_cv_capacity": {
+        "SN-1302-B-FL01": 1.091,
+        "SN-1302-B-FL02": 0.775,
+        "SN-1302-K-FL01": 0.395,
+        "SN-1302-K-FL02": 0.395,
+        "SN-1302-Y-FL01": 0.633
+      },
+      "trace": [
+        {
+          "time": "14:10",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:11",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:12",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:13",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:14",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:15",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:16",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:17",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:18",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:19",
+          "meter_lpm": 0.0,
+          "branch_lpm": 0.0
+        },
+        {
+          "time": "14:20",
+          "meter_lpm": 28.9,
+          "branch_lpm": 28.6
+        },
+        {
+          "time": "14:21",
+          "meter_lpm": 29.3,
+          "branch_lpm": 28.7
+        },
+        {
+          "time": "14:22",
+          "meter_lpm": 29.1,
+          "branch_lpm": 29.2
+        },
+        {
+          "time": "14:23",
+          "meter_lpm": 28.9,
+          "branch_lpm": 28.5
+        },
+        {
+          "time": "14:24",
+          "meter_lpm": 28.5,
+          "branch_lpm": 29.1
+        },
+        {
+          "time": "14:25",
+          "meter_lpm": 28.6,
+          "branch_lpm": 29.0
+        },
+        {
+          "time": "14:26",
+          "meter_lpm": 28.8,
+          "branch_lpm": 28.4
+        },
+        {
+          "time": "14:27",
+          "meter_lpm": 28.8,
+          "branch_lpm": 29.0
+        },
+        {
+          "time": "14:28",
+          "meter_lpm": 29.2,
+          "branch_lpm": 28.9
+        },
+        {
+          "time": "14:29",
+          "meter_lpm": 28.6,
+          "branch_lpm": 29.2
+        },
+        {
+          "time": "14:30",
+          "meter_lpm": 28.6,
+          "branch_lpm": 29.4
+        },
+        {
+          "time": "14:31",
+          "meter_lpm": 28.8,
+          "branch_lpm": 28.7
+        },
+        {
+          "time": "14:32",
+          "meter_lpm": 28.8,
+          "branch_lpm": 28.8
+        },
+        {
+          "time": "14:33",
+          "meter_lpm": 28.8,
+          "branch_lpm": 28.9
+        },
+        {
+          "time": "14:34",
+          "meter_lpm": 28.7,
+          "branch_lpm": 28.7
+        },
+        {
+          "time": "14:35",
+          "meter_lpm": 29.2,
+          "branch_lpm": 28.6
+        },
+        {
+          "time": "14:36",
+          "meter_lpm": 28.5,
+          "branch_lpm": 28.6
+        },
+        {
+          "time": "14:37",
+          "meter_lpm": 28.6,
+          "branch_lpm": 29.1
+        },
+        {
+          "time": "14:38",
+          "meter_lpm": 28.8,
+          "branch_lpm": 29.1
+        },
+        {
+          "time": "14:39",
+          "meter_lpm": 29.0,
+          "branch_lpm": 28.8
+        }
+      ],
+      "status": "EVENT",
+      "threshold_cv": 0.593
+    }
+  },
+  {
+    "event": null,
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "hidden_leak_min_night_flow",
+      "config": {
+        "night_start_h": 2,
+        "night_end_h": 5,
+        "night_quantile": 0.05,
+        "min_leak_lpm": 0.05,
+        "consecutive_nights": 3,
+        "min_night_minutes": 120,
+        "unexplained_ratio": 0.3,
+        "burst_factor": 1.5,
+        "burst_min_flow_lpm": 6.0,
+        "burst_min_duration_s": 60,
+        "burst_max_gap_s": 3,
+        "valve_close_delay_s": 5
+      },
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "as_of": "2026-07-12",
+      "nightly": [
+        {
+          "date": "2026-06-01",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-02",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-03",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-04",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-05",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-06",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-07",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-08",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-09",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-10",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-11",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-12",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-13",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-14",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-15",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-16",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-17",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-18",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-19",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-20",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-21",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-22",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-23",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-24",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-25",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-26",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-27",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-28",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-29",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-30",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-01",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-02",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-03",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-04",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-05",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-06",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-07",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-08",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-09",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-10",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-11",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-07-12",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        }
+      ],
+      "status": "NO_EVENT"
+    }
+  }
+]

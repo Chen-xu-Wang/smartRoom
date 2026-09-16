@@ -1,0 +1,16 @@
+{
+  "scenario": "control_humid",
+  "description": "干扰：06-18 至 07-02 梅雨季室外湿度约 94%，漏电检测不应报出",
+  "name": "control_humid",
+  "leakage_faults": [],
+  "wiring_faults": [],
+  "phase_events": [],
+  "humidity_events": [
+    {
+      "start": "2026-06-18",
+      "end": "2026-07-02",
+      "rh_pct": 94.0,
+      "note": "梅雨季"
+    }
+  ]
+}

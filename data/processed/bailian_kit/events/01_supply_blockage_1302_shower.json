@@ -1,0 +1,55 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260712-1302-0007",
+  "scope": "HOUSE",
+  "house_id": "1302",
+  "related_houses": [],
+  "batch_id": "C",
+  "domain": "WATER",
+  "event_type": "SUPPLY_BLOCKAGE",
+  "severity": "MEDIUM",
+  "detected_at": "2026-07-12T07:42:00+08:00",
+  "fault_started_est": "2026-06-20",
+  "location_candidates": [
+    {
+      "segment_code": "WS-1302-B-SH",
+      "segment_name": "卫生间-花洒头",
+      "device_code": "EQ-1302-B-02",
+      "in_archive": true,
+      "confidence": 0.82
+    },
+    {
+      "segment_code": "WS-1302-B-MV",
+      "segment_name": "卫生间-淋浴混水阀",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.13
+    }
+  ],
+  "evidence": {
+    "metric": "cv_p90",
+    "baseline": 0.3,
+    "recent": 0.17,
+    "change_ratio": -0.43,
+    "duration_days": 5,
+    "trend": "GRADUAL",
+    "inlet_pressure_change": 0.02,
+    "same_branch_other_fixtures": "NORMAL",
+    "hot_cold": "BOTH",
+    "events_used": 11
+  },
+  "evidence_text": "花洒近5天最大出水能力比基线下降43%，冷热水同时下降；同卫生间洗脸盆与入户水压正常；约3周内逐渐变差",
+  "control_actions_taken": [],
+  "archive_context": {
+    "building": "1栋",
+    "unit": "1单元",
+    "floor": "13层",
+    "layout": "三室两厅一卫",
+    "in_archive": true,
+    "device_name": "花洒",
+    "device_model": "HS-200",
+    "install_date": "2026-03-19",
+    "recent_repairs_180d": 0
+  },
+  "data_source": "SIMULATED"
+}

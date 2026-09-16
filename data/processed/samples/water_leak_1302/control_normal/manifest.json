@@ -1,0 +1,79 @@
+{
+  "house_id": "1302",
+  "window": {
+    "start": "2026-06-01",
+    "end": "2026-07-12"
+  },
+  "sampling": {
+    "active_s": 1,
+    "idle_s": 60
+  },
+  "columns": [
+    {
+      "sensor_code": "SN-1302-B-FL01",
+      "type": "FL",
+      "target": "WS-1302-B-C",
+      "unit": "L/min"
+    },
+    {
+      "sensor_code": "SN-1302-B-FL02",
+      "type": "FL",
+      "target": "WS-1302-B-H",
+      "unit": "L/min"
+    },
+    {
+      "sensor_code": "SN-1302-B-PR01",
+      "type": "PR",
+      "target": "WS-1302-B-MV",
+      "unit": "MPa"
+    },
+    {
+      "sensor_code": "SN-1302-IN-FL01",
+      "type": "FL",
+      "target": "WS-1302-IN-MT",
+      "unit": "L/min"
+    },
+    {
+      "sensor_code": "SN-1302-IN-PR01",
+      "type": "PR",
+      "target": "WS-1302-IN-MV",
+      "unit": "MPa"
+    },
+    {
+      "sensor_code": "SN-1302-IN-PR02",
+      "type": "PR",
+      "target": "WS-1302-IN-MAIN",
+      "unit": "MPa"
+    },
+    {
+      "sensor_code": "SN-1302-K-FL01",
+      "type": "FL",
+      "target": "WS-1302-K-C",
+      "unit": "L/min"
+    },
+    {
+      "sensor_code": "SN-1302-K-FL02",
+      "type": "FL",
+      "target": "WS-1302-K-H",
+      "unit": "L/min"
+    },
+    {
+      "sensor_code": "SN-1302-K-PR01",
+      "type": "PR",
+      "target": "WS-1302-K-HS",
+      "unit": "MPa"
+    },
+    {
+      "sensor_code": "SN-1302-Y-FL01",
+      "type": "FL",
+      "target": "WS-1302-Y-C",
+      "unit": "L/min"
+    }
+  ],
+  "scenario": "control_normal",
+  "seed": 1001,
+  "timezone": "+08:00",
+  "data_source": "SIMULATED",
+  "generator": "data/scripts/run_sample_*.py",
+  "note": "只含传感器读数；故障注入计划与器具使用真值在 _truth/ 中，检测算法不得读取。"
+}

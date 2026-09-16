@@ -1,0 +1,16 @@
+{
+  "scenario": "hidden_leak",
+  "description": "WF8 马桶进水阀密封渐渐失效：06-18 起漏水量一周内增到约 0.35 L/min 后持续",
+  "faults": [
+    {
+      "fault_id": "WF8",
+      "fault_type": "TOILET_FILL_VALVE_LEAK",
+      "target": "WS-1302-B-WC",
+      "mode": "leak",
+      "start": "2026-06-18",
+      "end": "2026-06-25",
+      "factor_end": 0.01,
+      "profile": "LINEAR"
+    }
+  ]
+}

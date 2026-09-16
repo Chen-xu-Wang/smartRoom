@@ -1,0 +1,52 @@
+{
+  "schema_version": "2.0",
+  "report_type": "BATCH_BRIEF",
+  "subject": {
+    "house_id": null,
+    "batch_id": "B",
+    "period_label": "2026-06-01至07-15"
+  },
+  "title": "MiC B批次质量简报",
+  "summary": "B批次（7-12层，36户）马桶暗漏发生率是其它批次的3.5倍，统计显著，高度集中在马桶进水阀，疑似同批部件问题。厨房回路端子发热也偏高，但样本少，需巡检确认。建议对25户开展预防性巡检并反馈工厂。",
+  "sections": [
+    {
+      "heading": "暗漏：结论明确",
+      "content": "45天内B批次7户发生暗漏（19.4%），A、C批次合计72户中4户（5.6%），发生率比3.5，单侧Fisher检验p=0.031。7例中6例位于马桶进水阀（86%），指向同一批次的水箱配件。",
+      "highlights": [
+        { "label": "B批次", "value": "7/36户" },
+        { "label": "其它批次", "value": "4/72户" },
+        { "label": "发生率比", "value": "3.5倍" },
+        { "label": "显著性", "value": "p=0.031" }
+      ]
+    },
+    {
+      "heading": "端子发热：需确认",
+      "content": "B批次4户发生厨房回路端子发热（11.1%），其它批次2户（2.8%），发生率比4.0，但p=0.094，样本量不足以下定论。4例均位于厨房回路断路器端子，属于火灾隐患，建议借本次巡检一并测温排查，扩大样本后再判断。",
+      "highlights": [
+        { "label": "B批次", "value": "4/36户" },
+        { "label": "其它批次", "value": "2/72户" },
+        { "label": "显著性", "value": "p=0.094" }
+      ]
+    },
+    {
+      "heading": "建议行动",
+      "content": "1. 对B批次尚未发生故障的25户开展预防性巡检，检查马桶进水阀并对配电箱端子测温复紧。2. 巡检时记录进水阀与断路器的型号和批号，回写一房一码档案。3. 将结果反馈MiC生产厂，核查该批次采购部件。",
+      "highlights": [
+        { "label": "建议巡检", "value": "25户" },
+        { "label": "已发故障", "value": "11户" }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "CREATE_BATCH_INSPECTION",
+      "label": "生成25户巡检工单",
+      "payload": { "batch_id": "B", "trigger_event_id": "EVT-20260715-BATCHB-0001", "house_count": 25 }
+    },
+    {
+      "type": "VIEW_EVENT",
+      "label": "查看预警事件",
+      "payload": { "event_id": "EVT-20260715-BATCHB-0001" }
+    }
+  ]
+}

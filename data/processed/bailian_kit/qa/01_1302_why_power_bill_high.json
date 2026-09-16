@@ -1,0 +1,50 @@
+{
+  "schema_version": "2.0",
+  "house_id": "1302",
+  "asked_at": "2026-08-03T20:15:00+08:00",
+  "question": "为什么我家7月电费比6月高了这么多？",
+  "monthly": [
+    {
+      "month": "2026-06",
+      "days": 30,
+      "weather": { "outdoor_avg_temp_c": 27.1 },
+      "water": { "total_m3": 12.1, "cost_yuan": 42.35 },
+      "power": {
+        "total_kwh": 318,
+        "by_circuit_kwh": { "空调": 92, "热水器": 83, "厨房插座": 60, "普通插座": 50, "照明": 33 },
+        "peak_kwh": 196,
+        "valley_kwh": 122,
+        "cost_yuan": 160.56,
+        "ac_runtime_hours": { "主卧空调": 101, "客厅空调": 64 },
+        "standby_kw": 0.11
+      }
+    },
+    {
+      "month": "2026-07",
+      "days": 31,
+      "weather": { "outdoor_avg_temp_c": 31.4 },
+      "water": { "total_m3": 13.6, "cost_yuan": 47.6 },
+      "power": {
+        "total_kwh": 486,
+        "by_circuit_kwh": { "空调": 231, "热水器": 88, "厨房插座": 61, "普通插座": 72, "照明": 34 },
+        "peak_kwh": 301,
+        "valley_kwh": 185,
+        "cost_yuan": 245.82,
+        "ac_runtime_hours": { "主卧空调": 214, "客厅空调": 176 },
+        "standby_kw": 0.11,
+        "shiftable_kwh": 72,
+        "est_saving_yuan": 21.6
+      }
+    }
+  ],
+  "recent_events": [
+    {
+      "event_id": "EVT-20260712-1302-0007",
+      "event_type": "SUPPLY_BLOCKAGE",
+      "summary": "卫生间花洒头水垢堵塞",
+      "status": "RESIDENT_SELF_FIXED"
+    }
+  ],
+  "price_note": "示例价格：峰时电价0.62元/kWh(8:00-22:00)，谷时电价0.32元/kWh；水价3.5元/m³。均为可配置示例值。",
+  "data_source": "SIMULATED"
+}
