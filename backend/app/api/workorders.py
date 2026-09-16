@@ -24,6 +24,7 @@ from pydantic import BaseModel
 from ..database import query_one, query_all, execute, execute_return_id, parse_json_field
 from ..services.archive import get_house_by_id
 from ..services.fault_memory import get_fault_memory as get_fault_memory_service
+from ..services.sensing_service import on_workorder_completed
 from ..services.dispatch_service import (
     DispatchError,
     auto_assign,
@@ -168,6 +169,11 @@ def _order_row_to_dict(row: dict, extra: dict) -> dict:
         "assigned_to": row.get("assigned_name") or "",
         "reviewed_by": row.get("reviewer_name") or "",
         "related_equipment": extra.get("related_equipment", []),
+        # ---- 主动感知工单：来源、触发事件、建议材料与作业安全提示 ----
+        "source": row.get("source") or "RESIDENT_CHAT",
+        "trigger_event_id": row.get("trigger_event_id"),
+        "materials": extra.get("materials", []),
+        "worker_safety_notice": extra.get("worker_safety_notice", []),
         # ---- 数据库原始字段（新页面/后续开发可用）----
         "order_no": row["order_no"],
         "order_db_id": row["id"],
@@ -802,6 +808,12 @@ async def complete_workorder(order_id: str, req: CompleteRequest):
             "结果": req.result,
         }, ensure_ascii=False),
     )
+    # 主动感知工单：完成后把触发它的感知事件标记为已解决（失败不影响完工本身）
+    if row.get("source") == "AUTO_SENSOR":
+        try:
+            on_workorder_completed(row["id"])
+        except Exception as exc:  # noqa: BLE001
+            print(f"[主动感知] 事件闭环更新失败：{exc}")
 
     return {
         "success": True,

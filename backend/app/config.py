@@ -41,6 +41,19 @@ HOUSE_PROFILES_FILE = os.path.join(DATA_DIR, "house_profiles.json")
 HOUSES_FILE = os.path.join(DATA_DIR, "houses.json")
 
 # ------------------------------------------------------------------
+# 主动感知（模拟数据）配置
+# ------------------------------------------------------------------
+# 扩展的一房一码档案（给水拓扑、传感器布点）与模拟传感器数据，由 data/scripts 生成。
+# 路径可在 .env 中覆盖；默认指向仓库内 data/processed。
+PROJECT_DIR = BACKEND_DIR.parent
+SIM_BUILDING_FILE = os.getenv(
+    "SIM_BUILDING_FILE", str(PROJECT_DIR / "data" / "processed" / "sim_config" / "sim_building.json")
+)
+SENSING_SAMPLE_DIR = os.getenv(
+    "SENSING_SAMPLE_DIR", str(PROJECT_DIR / "data" / "processed" / "samples")
+)
+
+# ------------------------------------------------------------------
 # MySQL 数据库配置
 # ------------------------------------------------------------------
 # 各项含义：

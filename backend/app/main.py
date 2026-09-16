@@ -9,10 +9,11 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from .api import houses, chat, workorders, maintenance, auth, admin
+from .api import houses, chat, workorders, maintenance, auth, admin, sensing
 from .config import BACKEND_DIR
 from .database import query_one
 from .services.dispatch_schema import ensure_dispatch_schema, seed_default_profiles
+from .services.sensing_schema import ensure_sensing_schema
 
 app = FastAPI(
     title="筑维AI - 一房一码住宅智能运维助手",
@@ -41,6 +42,8 @@ async def startup():
         # 独立于 house 是否为空执行幂等迁移，确保已有数据库也能补齐调度画像表。
         ensure_dispatch_schema()
         row = query_one("SELECT COUNT(*) AS c FROM house")
+        # 主动感知：事件表、提醒表，工单来源字段（幂等）
+        ensure_sensing_schema()
         if row and row["c"] == 0:
             # house 表为空说明是全新数据库 → 自动执行种子脚本
             # 注意：init_database.py 位于 backend 目录（不在 app 包内），
@@ -77,6 +80,8 @@ async def root():
             "maintenance": "/api/maintenance",
             "dispatch_overview": "/api/workorders/dispatch/overview",
             "maintenance_risks": "/api/maintenance/risks",
+            "sensing_events": "/api/sensing/events",
+            "sensing_notices": "/api/sensing/notices",
         },
     }
 
@@ -93,3 +98,4 @@ app.include_router(houses.router)        # 房屋档案
 app.include_router(chat.router)          # AI 报修对话
 app.include_router(workorders.router)    # 工单管理
 app.include_router(maintenance.router)   # 维修历史
+app.include_router(sensing.router)       # 主动感知：检测事件、住户提醒、复查建单
