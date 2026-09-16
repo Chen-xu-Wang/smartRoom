@@ -5,6 +5,7 @@
         <div class="header-left">
           <h2>维修工单 {{ order.id }}</h2>
           <el-tag :type="statusTag.type">{{ statusTag.label }}</el-tag>
+          <el-tag v-if="order.source === 'AUTO_SENSOR'" type="success" effect="plain">系统主动感知</el-tag>
         </div>
         <div class="header-right">
           <el-button v-if="order.status === 'pending_review'" type="primary" @click="showReviewDialog = true">
@@ -43,6 +44,11 @@
           <el-descriptions-item label="创建时间" :span="2">{{ formatTime(order.created_at) }}</el-descriptions-item>
           <el-descriptions-item label="用户描述" :span="2">{{ order.user_description }}</el-descriptions-item>
           <el-descriptions-item label="AI分析" :span="2">{{ order.ai_analysis }}</el-descriptions-item>
+          <el-descriptions-item label="触发事件" :span="2" v-if="order.trigger_event_id">{{ order.trigger_event_id }}</el-descriptions-item>
+          <el-descriptions-item label="建议携带" :span="2" v-if="order.materials?.length">{{ order.materials.join('、') }}</el-descriptions-item>
+          <el-descriptions-item label="作业安全提示" :span="2" v-if="order.worker_safety_notice?.length">
+            <span class="safety-notice">⚠ {{ order.worker_safety_notice.join('；') }}</span>
+          </el-descriptions-item>
           <el-descriptions-item label="审核人" v-if="order.reviewed_by">{{ order.reviewed_by }}</el-descriptions-item>
           <el-descriptions-item label="审核时间" v-if="order.reviewed_at">{{ formatTime(order.reviewed_at) }}</el-descriptions-item>
           <el-descriptions-item label="审核备注" :span="2" v-if="order.review_notes">{{ order.review_notes }}</el-descriptions-item>
@@ -154,6 +160,10 @@
       <div class="card" style="text-align: center">
         <el-button @click="$router.push(`/archive/${order.house_id}`)">
           <el-icon><Document /></el-icon> 查看房屋完整档案
+        </el-button>
+        <!-- 主动感知工单带 trigger_event_id，可直接在 3D 里定位到故障部位 -->
+        <el-button @click="$router.push({ path: '/twin', query: { role: 'repairer', house: order.house_id, event: order.trigger_event_id || undefined, live: 1 } })">
+          <el-icon><Box /></el-icon> {{ order.trigger_event_id ? '在 3D 中定位故障部位' : '在 3D 中查看本户' }}
         </el-button>
       </div>
     </div>
@@ -316,7 +326,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Document } from '@element-plus/icons-vue'
+import { Document, Box } from '@element-plus/icons-vue'
 import api from '../api'
 import WorkOrderCard from '../components/WorkOrderCard.vue'
 
@@ -600,6 +610,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.safety-notice { color: #b91c1c; font-weight: 600; }
 .order-header {
   display: flex;
   justify-content: space-between;

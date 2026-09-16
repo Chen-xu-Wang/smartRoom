@@ -20,6 +20,9 @@
       <div class="guide-tip">工单创建后状态为 <b>待物业审核</b>，物业审核通过后自动进入智能派单，真实写入 MySQL 并可全程追踪。</div>
     </el-alert>
 
+    <!-- 主动感知：系统检测到的设备异常提醒（有提醒时才显示） -->
+    <SensingNotices />
+
     <!-- 扫码区 -->
     <div class="scan-area card">
       <div class="scan-grid">
@@ -95,6 +98,7 @@ import { Iphone, Camera, Upload } from '@element-plus/icons-vue'
 import QRCode from 'qrcode'
 import { Html5Qrcode } from 'html5-qrcode'
 import api from '../api'
+import SensingNotices from '../components/SensingNotices.vue'
 
 const router = useRouter()
 const houses = ref([])

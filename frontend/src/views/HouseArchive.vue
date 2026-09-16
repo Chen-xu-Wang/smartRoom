@@ -105,6 +105,10 @@
       <el-button type="primary" @click="$router.push(`/chat/${houseId}`)">
         <el-icon><ChatLineRound /></el-icon> AI智能报修
       </el-button>
+      <!-- 3D 数字孪生：档案透视视角直接落到本户，可查看管线、回路与传感器布点 -->
+      <el-button @click="$router.push({ path: '/twin', query: { role: 'archive', house: houseId } })">
+        <el-icon><Box /></el-icon> 在 3D 中查看本户
+      </el-button>
     </div>
   </div>
 </template>
@@ -112,7 +116,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { House, Lightning, SetUp, WindPower, Tools, Guide, Clock, ChatLineRound, CircleCheck } from '@element-plus/icons-vue'
+import { House, Lightning, SetUp, WindPower, Tools, Guide, Clock, ChatLineRound, CircleCheck, Box } from '@element-plus/icons-vue'
 import api from '../api'
 
 const route = useRoute()

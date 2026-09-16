@@ -20,6 +20,8 @@
           </template>
           <!-- 维修工：仅看自己工单 -->
           <router-link v-if="auth.isRepairer" to="/repair" class="nav-item">我的工单</router-link>
+          <!-- 3D 数字孪生：登录后才出现，和其它导航一样在当前页面内切换 -->
+          <router-link v-if="auth.isLoggedIn" :to="{ path: '/twin', query: twinQuery }" class="nav-item">3D 数字孪生</router-link>
           <template v-if="auth.isLoggedIn">
             <el-dropdown @command="onUserCommand">
               <span class="user-chip">
@@ -50,13 +52,35 @@
 </template>
 
 <script setup>
+import { computed, onMounted } from 'vue'
 import { HomeFilled, Avatar } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from './stores/auth'
+import { twinRoleOf, adoptAuthFromUrl } from './utils/twin'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
+
+// 进入 3D 时带上角色；居民在扫码/报修/档案页时把当前房号一并带上，直接落到自己家
+const twinQuery = computed(() => {
+  const q = { role: twinRoleOf(auth) }
+  const house = auth.isResident ? (route.params.houseId || auth.user?.houseId || '') : ''
+  if (house) q.house = house
+  return q
+})
+
+// 从 3D 页面跳回控制台时，接收它带回来的登录态，保持两边登录用户一致
+onMounted(() => {
+  const user = adoptAuthFromUrl()
+  if (!user) return
+  auth.user = user
+  // 清掉地址栏上的 auth 参数（用路由替换，避免被路由初始化又写回去）
+  const query = { ...route.query }
+  delete query.auth
+  router.replace({ path: route.path, query })
+})
 
 function onUserCommand(cmd) {
   if (cmd === 'logout') {

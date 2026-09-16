@@ -49,6 +49,13 @@ const routes = [
     meta: { requiresAuth: true, requiresRepairer: true }
   },
   {
+    // 3D 数字孪生：登录后可见，四个视角在页面内切换
+    path: '/twin',
+    name: 'Twin3D',
+    component: () => import('../views/Twin3D.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/admin/houses',
     name: 'AdminHouses',
     component: () => import('../views/AdminHouses.vue'),

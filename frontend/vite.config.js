@@ -9,12 +9,25 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
+  // ---------- 路径别名 ----------
+  // @twin 指向 3D 数字孪生工程的源码（作为本前端的一个页面内嵌），
+  // @app 指向本前端自身（3D 代码里用 @app 复用接口封装、登录状态、图表组件）。
+  resolve: {
+    alias: [
+      { find: /^@twin\//, replacement: new URL('../3D/src/', import.meta.url).pathname.replace(/^\/(?=[A-Za-z]:)/, '') },
+      { find: /^@app\//, replacement: new URL('./src/', import.meta.url).pathname.replace(/^\/(?=[A-Za-z]:)/, '') },
+    ],
+    dedupe: ['vue', 'pinia', 'vue-router', 'element-plus', '@element-plus/icons-vue', 'axios', 'three'],
+  },
+
   // ---------- 插件 ----------
   // Vue 官方插件：让 Vite 能识别和编译 .vue 单文件组件
   plugins: [vue()],
 
   // ---------- 开发服务器配置 ----------
   server: {
+    // 允许读取工程目录之外的 3D 源码（@twin 指向 ../3D/src）
+    fs: { allow: ['..'] },
     // 端口号：浏览器访问 http://localhost:5173
     port: 5173,
     // 监听地址：true 表示局域网内其他设备也能访问

@@ -81,4 +81,18 @@ export default {
   // Maintenance
   getMaintenanceHistory: (houseId) => api.get(`/maintenance/history/${houseId}`),
   getMaintenanceRisks: (params) => api.get('/maintenance/risks', { params }),
+
+  // 主动感知（模拟数据）：检测事件、住户提醒、复查与建单
+  getSensingSamples: (houseId = '1302') => api.get('/sensing/samples', { params: { house_id: houseId } }),
+  runWaterBlockage: (houseId, scenario) => api.post('/sensing/water-blockage/run', { house_id: houseId, scenario }, { timeout: 120000 }),
+  runSensingDetection: (houseId, detector, scenario) => api.post('/sensing/run', { house_id: houseId, detector, scenario }, { timeout: 180000 }),
+  resetSensingDemo: (houseId) => api.post('/sensing/demo/reset', null, { params: { house_id: houseId } }),
+  getSensingEvents: (params) => api.get('/sensing/events', { params }),
+  getSensingEvent: (eventId) => api.get(`/sensing/events/${eventId}`),
+  recheckSensingEvent: (eventId) => api.post(`/sensing/events/${eventId}/recheck`, null, { timeout: 120000 }),
+  createSensingWorkOrder: (eventId, operator) => api.post(`/sensing/events/${eventId}/workorder`, { operator }),
+  getSensingNotices: (params) => api.get('/sensing/notices', { params }),
+  readSensingNotice: (id) => api.post(`/sensing/notices/${id}/read`),
+  repairFromNotice: (id, reporterId) => api.post(`/sensing/notices/${id}/repair`, { reporter_id: reporterId ?? null }),
+  dismissNotice: (id) => api.post(`/sensing/notices/${id}/dismiss`),
 }

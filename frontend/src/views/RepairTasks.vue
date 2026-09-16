@@ -54,6 +54,12 @@
             <span class="task-label">建议检查：</span>
             <span v-if="order.ai_analysis">{{ parseCauses(order.ai_analysis) }}</span>
           </div>
+          <div v-if="order.worker_safety_notice?.length" class="task-section safety-section">
+            <span class="task-label">⚠ 作业安全：</span>{{ order.worker_safety_notice.join('；') }}
+          </div>
+          <div v-if="order.materials?.length" class="task-section">
+            <span class="task-label">建议携带：</span>{{ order.materials.join('、') }}
+          </div>
           <div v-if="order.assigned_to" class="task-section">
             <span class="task-label">指派：</span>{{ order.assigned_to }}
           </div>
@@ -221,6 +227,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.safety-section { color: #b91c1c; background: #fef2f2; border-radius: 6px; padding: 4px 8px; }
 .task-card {
   padding: 16px;
   margin-bottom: 12px;
