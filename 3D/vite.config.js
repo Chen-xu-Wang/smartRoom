@@ -7,8 +7,8 @@ import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
   plugins: [vue()],
-  // 楼栋与事件数据只放一份，在现有前端的 public 下；独立工程直接复用该目录
-  publicDir: fileURLToPath(new URL('../frontend/public', import.meta.url)),
+  // 楼栋与事件数据含全部住户档案，不放 public：由后端 /api/twin/* 按登录账号裁剪后下发
+  publicDir: false,
   resolve: {
     alias: [
       { find: /^@app\//, replacement: fileURLToPath(new URL('../frontend/src/', import.meta.url)).replace(/\\/g, '/') },

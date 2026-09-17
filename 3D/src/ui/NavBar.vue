@@ -9,7 +9,7 @@
       <template v-if="lvl.houseId"><el-icon><ArrowRight /></el-icon><span class="crumb" @click="e().goHouse(lvl.buildingNo, lvl.houseId)">{{ lvl.houseId }}室</span></template>
       <template v-if="partName"><el-icon><ArrowRight /></el-icon><span class="crumb cur">{{ partName }}</span></template>
     </div>
-    <template v-if="lvl.buildingNo && store.role !== 'owner'">
+    <template v-if="lvl.buildingNo && !store.houseScope">
       <el-button size="small" icon="ArrowDown" :disabled="(lvl.floor || 19) <= 1" @click="floorStep(-1)" title="下一层" />
       <el-button size="small" icon="ArrowUp" :disabled="lvl.floor === 18" @click="floorStep(1)" title="上一层" />
     </template>
@@ -35,7 +35,8 @@ const partName = computed(() => (store.selected?.kind === 'code' && lvl.value.le
 const SEV = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(k => ({ k, c: SEVERITY_META[k].color, l: SEVERITY_META[k].label }))
 const up = () => {
   const l = lvl.value
-  if (l.level === 'house') return store.role === 'owner' ? null : e().goFloor(l.buildingNo, l.floor)
+  // 受限账号（业主、维修人员）不能浏览整层，从户内直接退到楼栋外观
+  if (l.level === 'house') return store.houseScope ? e().goBuilding(l.buildingNo) : e().goFloor(l.buildingNo, l.floor)
   if (l.level === 'floor') return e().goBuilding(l.buildingNo)
   return e().goSite()
 }

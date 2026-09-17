@@ -12,8 +12,9 @@
         <el-button text circle size="small" icon="Close" @click="store.clearEvent()" />
       </div>
       <el-alert :title="ORIGIN_LABEL[ev.origin]" :type="ev.origin === 'DETECTION_SAMPLE' || ev.origin === 'LIVE' ? 'success' : 'info'" :closable="false" show-icon class="origin" />
-      <p class="summary">{{ ev.title }}</p>
-      <p class="evidence sub">{{ ev.event.evidence_text }}</p>
+      <!-- 邻居家的问题：业主只看影响提示，不显示原始标题与证据（含邻居户号、监测数据） -->
+      <p class="summary">{{ neighbor ? (notices[0]?.title || '附近住户或公共管线的问题可能影响您家') : ev.title }}</p>
+      <p v-if="!neighbor" class="evidence sub">{{ ev.event.evidence_text }}</p>
 
       <section v-if="cands.length">
         <h4>定位候选</h4>
@@ -24,22 +25,22 @@
         </div>
       </section>
 
-      <section v-if="ev.event.control_actions_taken?.length">
+      <section v-if="controls.length">
         <h4>已执行的自动控制</h4>
-        <div v-for="c in ev.event.control_actions_taken" :key="c.action + c.target" class="ctrl" @click="c.target && store.selectCode(c.target)">
+        <div v-for="c in controls" :key="c.action + c.target" class="ctrl" @click="c.target && store.selectCode(c.target)">
           <el-icon color="#52c41a"><CircleCheckFilled /></el-icon>
           <span>{{ CONTROL_LABEL[c.action] || c.action }}</span>
           <span class="sub code">{{ c.target }} · {{ c.result }}</span>
         </div>
       </section>
 
-      <section v-if="chart && role !== 'repairer'">
+      <section v-if="chart && role !== 'repairer' && !neighbor">
         <h4>检测诊断数据</h4>
         <SensingChart :chart="chart" />
       </section>
 
       <section v-if="notices.length">
-        <h4>提醒 <span class="sub">（{{ role === 'owner' ? '本户可见' : '按对象' }}）</span></h4>
+        <h4>提醒 <span class="sub">（{{ ownerScope ? '本户可见' : '按对象' }}）</span></h4>
         <el-card v-for="(n, i) in notices" :key="i" shadow="never" class="notice">
           <div class="notice-top">
             <el-tag size="small" :type="AUD[n.audience]?.tag">{{ AUD[n.audience]?.label || n.audience }}</el-tag>
@@ -52,7 +53,7 @@
         </el-card>
       </section>
 
-      <section v-if="orders.length && role !== 'owner'">
+      <section v-if="orders.length && !ownerScope">
         <h4>工单</h4>
         <el-card v-for="(w, i) in orders" :key="i" shadow="never" class="order">
           <div class="notice-top">
@@ -92,7 +93,7 @@
         <h4>档案原文</h4>
         <p class="sub">{{ card.archiveText }}</p>
       </section>
-      <section v-if="isolation.length && role !== 'owner'">
+      <section v-if="isolation.length && !ownerScope">
         <h4>作业前隔离点</h4>
         <div v-for="p in isolation" :key="p.name" class="ctrl" @click="p.code && store.selectCode(p.code)">
           <el-icon color="#fa8c16"><Lock /></el-icon><span>{{ p.action }}{{ p.name }}</span><span class="sub code">{{ p.code }}</span>
@@ -142,7 +143,7 @@ import { ElMessage } from 'element-plus'
 import SensingChart from '@app/components/SensingChart.vue'
 import api from '@app/api/index.js'
 import { useTwinStore } from '../stores/twin'
-import { TYPE_META, SEVERITY_META, ORIGIN_LABEL, STATUS_LABEL, PRIORITY_LABEL, CONTROL_LABEL, eventTargets, isolationPoints } from '../data/events'
+import { TYPE_META, SEVERITY_META, ORIGIN_LABEL, STATUS_LABEL, PRIORITY_LABEL, CONTROL_LABEL, isolationPoints } from '../data/events'
 import { resolveCode, houseById, buildingData } from '../data/resolver'
 import { ROOM_NAMES } from '../data/layouts'
 import { SENSOR_NAME } from '../engine/buildUnit'
@@ -152,6 +153,8 @@ const role = computed(() => store.role)
 const level = computed(() => store.level)
 const isLive = computed(() => store.isLiveBuilding)
 const ev = computed(() => store.activeEvent)
+const ownerScope = computed(() => store.scopeKind === 'owner')
+const neighbor = computed(() => store.isNeighborEvent(ev.value))
 
 const AUD = { RESIDENT: { label: '住户', tag: 'primary' }, NEIGHBOR: { label: '相关住户', tag: 'warning' }, PROPERTY: { label: '物业', tag: 'info' }, FAMILY: { label: '家属', tag: 'success' } }
 const ZONE = { LOW: '低区（市政直供）', MID: '中区（变频泵）', HIGH: '高区（变频泵）' }
@@ -164,10 +167,24 @@ const FACILITY_TEXT = {
 
 const typeMeta = computed(() => TYPE_META[ev.value?.type] || { label: ev.value?.type })
 const sevMeta = computed(() => SEVERITY_META[ev.value?.severity] || SEVERITY_META.LOW)
-const cands = computed(() => ev.value?.event.location_candidates || [])
+// 业主视角只保留本户内的定位候选与控制动作（store.activeTargets 已按本户裁剪）
+const cands = computed(() => {
+  const list = ev.value?.event.location_candidates || []
+  if (!ownerScope.value) return list
+  const t = store.activeTargets
+  const own = new Set([t?.primary, ...(t?.secondary || [])].filter(Boolean))
+  return list.filter(c => own.has(c.segment_code))
+})
+const controls = computed(() => {
+  const list = ev.value?.event.control_actions_taken || []
+  if (!ownerScope.value) return list
+  const own = new Set(store.activeTargets?.controls || [])
+  return list.filter(c => own.has(c.target))
+})
 const scopeText = computed(() => {
   const e = ev.value?.event
   if (!e) return ''
+  if (neighbor.value) return '关联问题 · 可能影响您家'
   if (e.scope === 'BATCH') return `1栋 ${e.batch_id} 批次`
   if (e.scope === 'STACK') return `1栋 ${e.archive_context?.stack_id || ''} 立管`
   if (e.scope === 'BUILDING' || !e.house_id) return `1栋 公共部位 · ${(e.related_houses || []).length} 户受影响`
@@ -176,7 +193,7 @@ const scopeText = computed(() => {
 const notices = computed(() => {
   const list = ev.value?.notices?.length ? ev.value.notices.map(n => ({ ...n, house_ids: [n.house_id] })) : (ev.value?.decision?.notices || [])
   let out = list
-  if (role.value === 'owner') out = list.filter(n => ['RESIDENT', 'NEIGHBOR'].includes(n.audience) && (n.house_ids || []).includes(store.ownerHouse))
+  if (ownerScope.value) out = list.filter(n => ['RESIDENT', 'NEIGHBOR'].includes(n.audience) && (n.house_ids || []).includes(store.ownerHouse))
   else if (role.value === 'repairer') out = list.filter(n => n.audience === 'PROPERTY')
   // 楼栋级事件会给几十户发同一条提醒，按「对象 + 标题 + 正文」合并，房号汇总显示
   const merged = new Map()
@@ -207,7 +224,7 @@ const fmtTime = (t) => (t ? t.replace('T', ' ').slice(0, 16) : '')
 
 async function repair(n) {
   if (ev.value.origin === 'LIVE' && n.id) {
-    try { await api.repairFromNotice(n.id, store.loginUser?.id); ElMessage.success('已提交报修，物业审核后派单') } catch (e) { ElMessage.error(e?.response?.data?.detail?.message || '报修失败') }
+    try { await api.repairFromNotice(n.id); ElMessage.success('已提交报修，物业审核后派单') } catch (e) { ElMessage.error(e?.response?.data?.detail?.message || '报修失败') }
   } else {
     ev.value.status = 'REPAIR_REQUESTED'
     ElMessage.success('演示模式：已模拟一键报修，工单进入物业待审核')
@@ -215,7 +232,7 @@ async function repair(n) {
 }
 async function createOrder() {
   if (ev.value.origin === 'LIVE') {
-    try { await api.createSensingWorkOrder(ev.value.id, store.loginUser?.name); ev.value.status = 'ORDER_CREATED'; ElMessage.success('已建单') } catch (e) { ElMessage.error(e?.response?.data?.detail?.message || '建单失败') }
+    try { await api.createSensingWorkOrder(ev.value.id); ev.value.status = 'ORDER_CREATED'; ElMessage.success('已建单') } catch (e) { ElMessage.error(e?.response?.data?.detail?.message || '建单失败') }
   } else {
     ev.value.status = 'WORKORDER_CREATED'
     ElMessage.success('演示模式：已模拟建单，进入物业审核与派单流程')
@@ -286,7 +303,7 @@ const isolation = computed(() => (card.value?.house ? isolationPoints(card.value
 const relatedEvents = computed(() => {
   const code = card.value?.code
   if (!code || !isLive.value) return []
-  return store.openEvents.filter(e => { const t = eventTargets(e); return t.primary === code || t.secondary.includes(code) || t.sensors.includes(code) })
+  return store.visibleEvents.filter(e => { const t = store.targetsOf(e); return t.primary === code || t.secondary.includes(code) || t.sensors.includes(code) })
 })
 const houseCard = computed(() => (store.level.level === 'house' ? houseById(store.level.houseId) : null))
 </script>

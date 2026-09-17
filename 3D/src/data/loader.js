@@ -1,28 +1,26 @@
 // 数据加载：楼栋拓扑、演示样例事件、联机事件
+// 楼栋与演示事件含全部住户档案，由后端 /api/twin/* 按登录账号裁剪后下发（需要登录）：
+// 无权访问的住户只有户型外壳，户内设备、传感器、管线为空。
+import api from '@app/api/index.js'
 import { setBuildingData } from './resolver'
 import { normalize } from './events'
 
 export async function loadBuilding() {
-  const res = await fetch('/twin/building.json')
-  const data = await res.json()
+  const { data } = await api.getTwinBuilding()
   setBuildingData(data)
   return data
 }
 
 export async function loadDemo() {
-  const res = await fetch('/twin/demo_events.json')
-  const data = await res.json()
+  const { data } = await api.getTwinDemoEvents()
   return { events: data.events.map(normalize), orders: data.work_orders || [] }
 }
 
-/** 探测后端是否可用（不依赖数据库的根路径） */
+/** 探测后端是否可用（健康检查接口，无需登录） */
 export async function probeBackend() {
   try {
-    const ctrl = new AbortController()
-    const t = setTimeout(() => ctrl.abort(), 2500)
-    const res = await fetch('/api/houses', { signal: ctrl.signal })
-    clearTimeout(t)
-    return res.ok
+    await api.health()
+    return true
   } catch {
     return false
   }

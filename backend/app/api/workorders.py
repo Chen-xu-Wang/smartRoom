@@ -18,11 +18,11 @@
 """
 import json
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from ..database import query_one, query_all, execute, execute_return_id, parse_json_field
-from ..services.archive import get_house_by_id
+from ..security import CurrentUser, current_user, ensure_order_access, require_roles, require_staff
 from ..services.fault_memory import get_fault_memory as get_fault_memory_service
 from ..services.sensing_service import on_workorder_completed
 from ..services.dispatch_service import (
@@ -77,56 +77,6 @@ STATUS_CN2EN = {
 # ------------------------------------------------------------------
 # 内部工具函数
 # ------------------------------------------------------------------
-def _resolve_user_id(name: str, role: str = "REPAIRER") -> int | None:
-    """按姓名查找用户 id；找不到时自动创建（仅用于审核人兼容旧数据）.
-
-    【使用范围（已收窄到只剩审核人）】
-        - review 的审核人（reviewed_by → role="PROPERTY"）
-        （派单 assign / 开始维修 start / 完成维修 complete 均已改用
-         只读的 _find_user_id，禁止输入一个名字就自动建号）
-    """
-    if not name:
-        return None
-    row = query_one(
-        "SELECT id FROM `user` WHERE real_name = %s ORDER BY id LIMIT 1", (name,)
-    )
-    if row:
-        return row["id"]
-    # 没找到 → 自动创建一个该角色的账号（用户名 = 姓名拼音随机后缀）
-    username = f"{role.lower()}_{name}_{datetime.now().strftime('%H%M%S')}"
-    return execute_return_id(
-        "INSERT INTO `user` (username, password, real_name, role, status)"
-        " VALUES (%s, %s, %s, %s, 1)",
-        (username, "", name, role),
-    )
-
-
-def _find_user_id(name: str, role: str = "REPAIRER") -> int | None:
-    """只读查找用户 id，找不到（或角色不匹配）返回 None（绝不自动创建）.
-
-    【与 _resolve_user_id 的区别】
-        - _resolve_user_id：找不到就 INSERT 一个新账号
-        - _find_user_id：只 SELECT，不写库
-
-    【阶段5.6起的使用范围】
-        - 派单（assign / review 带 assigned_to）：校验维修人必须是在册 REPAIRER
-        - 开始维修（start）：校验发起人 = 派单维修人
-        一律不允许「输入一个名字就自动建号」。
-
-    【Java 类比】
-        相当于 Repository 层的 findByRealNameAndRole 只读查询，
-        调用方决定查不到时怎么处理（抛 400 或拒绝）。
-    """
-    if not name:
-        return None
-    row = query_one(
-        "SELECT id FROM `user` WHERE real_name = %s AND role = %s"
-        " ORDER BY id LIMIT 1",
-        (name, role),
-    )
-    return row["id"] if row else None
-
-
 def _get_ai_extras(order_ids: list) -> dict:
     """批量获取工单的 AI 扩展信息（置信度、建议工种）.
 
@@ -265,7 +215,7 @@ def _get_complete_results(order_db_ids: list) -> dict:
 # ------------------------------------------------------------------
 class ReviewRequest(BaseModel):
     """物业审核请求."""
-    reviewed_by: str                 # 审核人姓名
+    reviewed_by: str = None          # 旧客户端兼容字段，已忽略：审核人取登录账号
     urgency: str = None              # 修改后的优先级（中文：紧急/高/中/低）
     suggested_trade: str = None      # 修改后的建议工种
     assigned_to: str = None          # 旧客户端兼容字段；审核阶段传值会被拒绝
@@ -276,7 +226,7 @@ class ReviewRequest(BaseModel):
 
 class CompleteRequest(BaseModel):
     """维修完成请求."""
-    repair_person: str               # 维修人姓名
+    repair_person: str = None        # 旧客户端兼容字段，已忽略：维修人取登录账号
     actual_fault: str                # 实际故障原因
     actual_action: str               # 实际处理措施
     used_parts: str = ""             # 使用配件
@@ -298,7 +248,7 @@ class AssignRequest(BaseModel):
         而不是把 assign 逻辑塞在 ApproveController 里。
     """
     assigned_to: str                 # 维修人员姓名（必须是在册 REPAIRER，否则 400）
-    assigned_by: str = None          # 操作人姓名（记流水用，可选）
+    assigned_by: str = None          # 旧客户端兼容字段，已忽略：操作人取登录账号
     force: bool = False              # 管理员是否强制越过疲劳保护（默认禁止）
     override_reason: str = None      # 强制派单时必填，写入审计流水
 
@@ -320,16 +270,14 @@ class StartRepairRequest(BaseModel):
     【设计说明】
         开始维修是维修师傅在接到派单后发起的动作：
         - 工单必须先派单（assigned_to 非空），否则不能开始维修；
-        - repair_person 可选：传了则校验「发起人 = 派单维修人」，
-          防止工单派给 A 却由 B 开始维修；
-        - 本接口只做只读校验，绝不自动创建维修人账号
-          （与派单/审核一样，统一使用只读的 _find_user_id）。
+        - 发起人取登录账号，必须就是派单维修人，
+          防止工单派给 A 却由 B 开始维修。
 
     【Java 类比】
         相当于 Service 层校验 @NotNull(assigned_to) + 身份比对，
         不引入额外依赖。
     """
-    repair_person: str = None        # 可选：发起开始维修的维修人姓名（只校验，不建号）
+    repair_person: str = None        # 旧客户端兼容字段，已忽略：维修人取登录账号
 
 
 # ------------------------------------------------------------------
@@ -343,9 +291,24 @@ async def list_workorders(
     reporter_id: str = Query(None),  # 报修人筛选：支持 user.id
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
+    user: CurrentUser = Depends(current_user),
 ):
-    """工单列表（支持按状态、房屋过滤 + 分页）."""
+    """工单列表（支持按状态、房屋过滤 + 分页）.
+
+    数据范围：物业/管理员全部；维修人员只看派给自己的；住户只看名下房屋的。
+    """
     where, params = ["1=1"], []
+    if user.is_repairer:
+        assigned_to = str(user.id)   # 忽略前端传入的维修工筛选，只能看自己
+    elif user.is_resident:
+        codes = user.house_codes
+        if codes:
+            where.append(f"h.house_code IN ({', '.join(['%s'] * len(codes))})")
+            params.extend(codes)
+        else:
+            where.append("1=0")
+    elif not user.is_staff:
+        where.append("1=0")
     # 【阶段5.11：B2 已驳回筛选查不到数据】
     # rejected 不是一个数据库状态，而是「组合条件」：
     #   当前状态为 DRAFT（被退回后仍未重新提交） 且
@@ -424,22 +387,22 @@ def _raise_dispatch_http(exc: DispatchError):
     ) from exc
 
 
-@router.get("/dispatch/overview")
+@router.get("/dispatch/overview", dependencies=[Depends(require_staff)])
 async def dispatch_overview():
     """物业智能调度台：人员负载、疲劳保护、未派单与 SLA 风险。"""
     return get_dispatch_overview()
 
 
 @router.post("/dispatch/auto-assign-batch")
-async def batch_auto_assign(req: BatchAutoAssignRequest):
+async def batch_auto_assign(req: BatchAutoAssignRequest, user: CurrentUser = Depends(require_staff)):
     """一键为所有安全可分配的待派工单做负载均衡派单。"""
     try:
-        return auto_assign_batch(req.assigned_by, req.limit)
+        return auto_assign_batch(user.real_name, req.limit)
     except DispatchError as exc:
         _raise_dispatch_http(exc)
 
 
-@router.get("/repairers")
+@router.get("/repairers", dependencies=[Depends(require_staff)])
 async def list_repairers():
     """维修人员列表（派单下拉用）.
 
@@ -461,8 +424,9 @@ async def list_repairers():
 
 
 @router.get("/{order_id}")
-async def get_workorder(order_id: str):
+async def get_workorder(order_id: str, user: CurrentUser = Depends(current_user)):
     """工单详情（order_id 为工单号 order_no）."""
+    ensure_order_access(user, order_id)
     row = query_one(_BASE_SELECT + " WHERE o.order_no = %s", (order_id,))
     if not row:
         raise HTTPException(status_code=404, detail="Work order not found")
@@ -489,7 +453,7 @@ async def get_workorder(order_id: str):
 
 
 @router.get("/{order_id}/fault-memory")
-async def get_workorder_fault_memory(order_id: str):
+async def get_workorder_fault_memory(order_id: str, user: CurrentUser = Depends(current_user)):
     """故障记忆：查询当前工单所关联设备的历史维修记录（快速开发阶段2）.
 
     【用途】工单详情页展示「这台设备过去 180 天修过几次、上次怎么修的」，
@@ -504,13 +468,14 @@ async def get_workorder_fault_memory(order_id: str):
     【为什么独立接口而不是塞进工单详情响应】故障记忆属于「按需加载」的扩展
     信息（查询较重），详情页默认接口保持轻量；前端进入详情页后再单独请求。
     """
+    ensure_order_access(user, order_id)
     result = get_fault_memory_service(order_id)
     if result is None:
         raise HTTPException(status_code=404, detail="Work order not found")
     return result
 
 
-@router.get("/{order_id}/dispatch-plan")
+@router.get("/{order_id}/dispatch-plan", dependencies=[Depends(require_staff)])
 async def get_workorder_dispatch_plan(order_id: str):
     """预览 AI 派单候选排名，不写数据库。"""
     try:
@@ -520,16 +485,16 @@ async def get_workorder_dispatch_plan(order_id: str):
 
 
 @router.post("/{order_id}/auto-assign")
-async def auto_assign_workorder(order_id: str, req: AutoAssignRequest):
+async def auto_assign_workorder(order_id: str, req: AutoAssignRequest, user: CurrentUser = Depends(require_staff)):
     """采用调度方案中的安全首选维修人员，并写入可追溯决策流水。"""
     try:
-        return auto_assign(order_id, req.assigned_by)
+        return auto_assign(order_id, user.real_name)
     except DispatchError as exc:
         _raise_dispatch_http(exc)
 
 
 @router.put("/{order_id}/review")
-async def review_workorder(order_id: str, req: ReviewRequest):
+async def review_workorder(order_id: str, req: ReviewRequest, user: CurrentUser = Depends(require_staff)):
     """物业审核：通过后默认智能派单，或退回要求补充信息.
 
     【状态前置校验】只有 PENDING_REVIEW（待物业审核）的工单允许审核。
@@ -556,7 +521,9 @@ async def review_workorder(order_id: str, req: ReviewRequest):
             detail="审核与派单已分离：请先通过审核，再使用 AI 自动派单或受疲劳保护的独立派单接口",
         )
 
-    reviewer_id = _resolve_user_id(req.reviewed_by, role="PROPERTY")
+    # 审核人以登录账号为准（原先按请求里的姓名查找，查不到还会自动建号）
+    req.reviewed_by = user.real_name
+    reviewer_id = user.id
     now = datetime.now()
 
     dispatch_result = None
@@ -626,7 +593,7 @@ async def review_workorder(order_id: str, req: ReviewRequest):
 
 
 @router.put("/{order_id}/assign")
-async def assign_workorder(order_id: str, req: AssignRequest):
+async def assign_workorder(order_id: str, req: AssignRequest, user: CurrentUser = Depends(require_staff)):
     """独立派单：为已审核通过但尚未派单的工单指定维修人员.
 
     【业务规则】
@@ -654,7 +621,7 @@ async def assign_workorder(order_id: str, req: AssignRequest):
         return manual_assign(
             order_id,
             req.assigned_to,
-            assigned_by=req.assigned_by,
+            assigned_by=user.real_name,
             force=req.force,
             override_reason=req.override_reason,
         )
@@ -663,7 +630,7 @@ async def assign_workorder(order_id: str, req: AssignRequest):
 
 
 @router.put("/{order_id}/start")
-async def start_workorder(order_id: str, req: StartRepairRequest):
+async def start_workorder(order_id: str, req: StartRepairRequest, user: CurrentUser = Depends(require_roles("REPAIRER"))):
     """开始维修：维修师傅接到派单后开工，状态 PENDING_ASSIGN → PROCESSING.
 
     【业务规则】
@@ -703,26 +670,10 @@ async def start_workorder(order_id: str, req: StartRepairRequest):
             detail="该工单尚未派单（assigned_to 为空），请先完成派单再开始维修",
         )
 
-    # ---- 规则3：维修人身份校验（可选，只读不建号）----
-    assigned_name = None
-    if req.repair_person:
-        person_id = _find_user_id(req.repair_person)
-        if person_id is None:
-            raise HTTPException(
-                status_code=400,
-                detail=f"维修人「{req.repair_person}」不存在于维修人员名单中，"
-                       f"无法开始维修（请确认姓名与派单人一致）",
-            )
-        if person_id != row["assigned_to"]:
-            raise HTTPException(
-                status_code=400,
-                detail=f"该工单已指派给其他维修人，不能由「{req.repair_person}」开始维修",
-            )
-        assigned_name = req.repair_person
-    else:
-        # 未传姓名 → 取派单人姓名用于流水展示（联表查一次）
-        u = query_one("SELECT real_name FROM `user` WHERE id = %s", (row["assigned_to"],))
-        assigned_name = u["real_name"] if u else str(row["assigned_to"])
+    # ---- 规则3：只有被派单的维修人员本人能开工（身份取登录账号）----
+    if row["assigned_to"] != user.id:
+        raise HTTPException(status_code=403, detail="该工单未派给您，不能开始维修")
+    assigned_name = user.real_name
 
     # ---- 规则4：状态流转 PENDING_ASSIGN → PROCESSING ----
     execute(
@@ -746,7 +697,7 @@ async def start_workorder(order_id: str, req: StartRepairRequest):
 
 
 @router.put("/{order_id}/complete")
-async def complete_workorder(order_id: str, req: CompleteRequest):
+async def complete_workorder(order_id: str, req: CompleteRequest, user: CurrentUser = Depends(require_roles("REPAIRER"))):
     """维修完成：更新工单状态 + 记录实际维修详情.
 
     【数据回写说明】旧版本维修完成后要把记录回写到 houses.json；
@@ -771,24 +722,10 @@ async def complete_workorder(order_id: str, req: CompleteRequest):
                    f"状态才能完成维修，请先派单并开始维修",
         )
 
-    # ---- 维修人校验（阶段5.9收口：只读校验，禁止自动建号）----
-    # 1) 必须是 user 表 role='REPAIRER' 的在册维修人员：查不到 → 400，绝不 INSERT。
-    #    （改前这里用 _resolve_user_id，输入任意姓名会自动创建一个新账号）
-    repairer_id = _find_user_id(req.repair_person, role="REPAIRER")
-    if repairer_id is None:
-        raise HTTPException(
-            status_code=400,
-            detail=f"维修人员「{req.repair_person}」不存在于维修人员名单中，"
-                   f"无法完成维修（请确认姓名与派单人一致）",
-        )
-    # 2) 优先校验：完成人必须就是本工单已指派的维修人。
-    #    （PROCESSING 状态必然已派单，assigned_to 非空；
-    #      空值分支仅作防御，防止状态机未来变化时漏校验）
-    if row["assigned_to"] and repairer_id != row["assigned_to"]:
-        raise HTTPException(
-            status_code=400,
-            detail=f"该工单已指派给其他维修人，不能由「{req.repair_person}」完成维修",
-        )
+    # ---- 维修人校验：只有被派单的维修人员本人能完工（身份取登录账号）----
+    if row["assigned_to"] != user.id:
+        raise HTTPException(status_code=403, detail="该工单未派给您，不能完成维修")
+    repairer_id = user.id
 
     now = datetime.now()
 
@@ -804,7 +741,7 @@ async def complete_workorder(order_id: str, req: CompleteRequest):
             "实际故障": req.actual_fault,
             "处理措施": req.actual_action,
             "使用配件": req.used_parts,
-            "维修人": req.repair_person,
+            "维修人": user.real_name,
             "结果": req.result,
         }, ensure_ascii=False),
     )
@@ -822,7 +759,7 @@ async def complete_workorder(order_id: str, req: CompleteRequest):
     }
 
 
-@router.get("/stats/summary")
+@router.get("/stats/summary", dependencies=[Depends(require_staff)])
 async def get_stats():
     """工单统计（物业看板用）."""
     rows = query_all("SELECT status, priority FROM repair_order")

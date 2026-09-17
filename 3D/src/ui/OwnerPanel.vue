@@ -1,11 +1,14 @@
 <template>
   <div class="role-panel">
     <h3>我的家</h3>
-    <div class="row">
+    <el-empty v-if="!store.ownerHouse" :image-size="60" description="账号尚未绑定房屋，请联系物业办理绑定" />
+    <div v-else class="row">
       <span class="sub">住户</span>
-      <el-select v-model="house" size="small" filterable style="width: 150px" :disabled="store.roleLocked">
+      <!-- 已登录：只能在名下的房子之间切换；未登录演示：可选任意住户 -->
+      <el-select v-if="houses.length > 1" v-model="house" size="small" filterable style="width: 150px">
         <el-option v-for="h in houses" :key="h" :label="`1栋 ${h}室`" :value="h" />
       </el-select>
+      <b v-else>1栋 {{ store.ownerHouse }}室</b>
       <el-button size="small" icon="Aim" @click="goHome">回到我家</el-button>
     </div>
     <div v-if="info" class="home-card">
@@ -41,7 +44,7 @@
         <span class="sub">{{ d.warn ? '需关注' : '正常' }}</span>
       </div>
     </div>
-    <el-button class="chat" icon="ChatDotRound" @click="openChat">AI 报修对话（打开现有系统）</el-button>
+    <el-button v-if="store.ownerHouse" class="chat" icon="ChatDotRound" @click="openChat">AI 报修对话（打开现有系统）</el-button>
     <p class="sub">隐私保护：业主视角只能进入自己的住宅，其他住户只显示建筑外壳。</p>
   </div>
 </template>
@@ -54,9 +57,9 @@ import { SEVERITY_META, TYPE_META } from '../data/events'
 import { buildingData, houseById } from '../data/resolver'
 
 const store = useTwinStore()
-const houses = computed(() => (buildingData()?.houses || []).map(h => h.house_id).sort((a, b) => Number(a) - Number(b)))
+const houses = computed(() => (store.loginUser ? store.loginUser.houseIds : (buildingData()?.houses || []).map(h => h.house_id)).slice().sort((a, b) => Number(a) - Number(b)))
 const house = computed({ get: () => store.ownerHouse, set: (v) => store.setOwnerHouse(v) })
-const info = computed(() => houseById(store.ownerHouse))
+const info = computed(() => (store.ownerHouse ? houseById(store.ownerHouse) : null))
 const myEvents = computed(() => store.visibleEvents)
 
 const notices = computed(() => {
@@ -81,7 +84,7 @@ const deviceGroups = computed(() => {
   ]
 })
 
-const goHome = () => getEngine().goHouse(1, store.ownerHouse)
+const goHome = () => store.ownerHouse && getEngine().goHouse(1, store.ownerHouse)
 const repair = (n) => { const e = store.events.find(x => x.id === n.eventId); if (e) e.status = 'REPAIR_REQUESTED'; ElMessage.success(store.mode === 'demo' ? '演示模式：已模拟一键报修，工单进入物业待审核' : '已提交报修') }
 const dismiss = () => ElMessage.info('已记录：您已自行处理，系统将在复查时确认是否恢复')
 const openChat = () => window.open(`${location.protocol}//${location.hostname}:5173/chat/${store.ownerHouse}`, '_blank')
@@ -90,6 +93,7 @@ const openChat = () => window.open(`${location.protocol}//${location.hostname}:5
 <style scoped>
 .role-panel { display: flex; flex-direction: column; gap: 8px; }
 .row { display: flex; gap: 6px; align-items: center; }
+.row > .sub { white-space: nowrap; }
 .home-card { padding: 8px; border-radius: 8px; background: rgba(22, 119, 255, 0.06); }
 .section-title { font-weight: 700; font-size: 13px; margin-top: 4px; }
 .ok { display: flex; gap: 6px; align-items: center; font-size: 13px; }

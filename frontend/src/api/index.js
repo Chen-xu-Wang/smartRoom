@@ -6,9 +6,47 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' }
 })
 
+// 登录态在 localStorage（stores/auth.js 写入），3D 独立工程复用本文件时同样生效
+const AUTH_KEY = 'zw_auth'
+function savedToken() {
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null')?.token || null } catch { return null }
+}
+
+api.interceptors.request.use((config) => {
+  const token = savedToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+// 令牌失效（过期、账号被禁用）：清掉本地登录态，并通知页面回到登录
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    const url = error.config?.url || ''
+    if (error.response?.status === 401 && !url.startsWith('/auth/login')) {
+      try { localStorage.removeItem(AUTH_KEY) } catch { /* 隐私模式下忽略 */ }
+      window.dispatchEvent(new CustomEvent('auth:expired'))
+    }
+    return Promise.reject(error)
+  },
+)
+
+/** 错误提示文字：后端 detail 可能是字符串，也可能是 { code, message } */
+export function errorText(error, fallback = '操作失败') {
+  const d = error?.response?.data?.detail
+  if (typeof d === 'string') return d
+  return d?.message || fallback
+}
+
 export default {
   // Auth
   login: (username, password) => api.post('/auth/login', { username, password }),
+  me: () => api.get('/auth/me'),
+  health: () => api.get('/health', { timeout: 2500 }),
+
+  // 3D 数字孪生数据（后端按登录账号裁剪）
+  getTwinBuilding: () => api.get('/twin/building', { timeout: 60000 }),
+  getTwinDemoEvents: () => api.get('/twin/demo-events'),
 
   // Houses
   getHouses: () => api.get('/houses'),
@@ -19,7 +57,7 @@ export default {
   getHouseHistory: (id) => api.get(`/houses/${id}/history`),
 
   // Chat
-  initChat: (houseId, reporterId = null) => api.post('/chat/init', { house_id: houseId, reporter_id: reporterId }),
+  initChat: (houseId) => api.post('/chat/init', { house_id: houseId }),
   sendMessage: (sessionId, message) => api.post('/chat/message', { session_id: sessionId, message }),
   chatAction: (sessionId, action) => api.post('/chat/action', { session_id: sessionId, action }),
   uploadAttachment: (orderNo, file, attachmentType = 'file', aiDescription = '') => {
@@ -28,11 +66,7 @@ export default {
     fd.append('file', file)
     fd.append('attachment_type', attachmentType)
     fd.append('ai_description', aiDescription)
-    // uploader_id 从本地登录态带上
-    try {
-      const saved = JSON.parse(localStorage.getItem('zw_auth') || 'null')
-      if (saved?.id) fd.append('uploader_id', saved.id)
-    } catch {}
+    // 上传人由后端按登录令牌确定
     return api.post('/chat/attachment', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
   transcribeAudio: (file) => {
@@ -77,6 +111,9 @@ export default {
   adminCreateUser: (data) => api.post('/admin/users', data),
   adminUpdateUser: (id, data) => api.put(`/admin/users/${id}`, data),
   adminDeleteUser: (id) => api.delete(`/admin/users/${id}`),
+  // 住户房屋绑定
+  adminHouseCodes: () => api.get('/admin/house-codes'),
+  adminSetUserHouses: (id, houses) => api.put(`/admin/users/${id}/houses`, { houses }),
 
   // Maintenance
   getMaintenanceHistory: (houseId) => api.get(`/maintenance/history/${houseId}`),
@@ -90,9 +127,9 @@ export default {
   getSensingEvents: (params) => api.get('/sensing/events', { params }),
   getSensingEvent: (eventId) => api.get(`/sensing/events/${eventId}`),
   recheckSensingEvent: (eventId) => api.post(`/sensing/events/${eventId}/recheck`, null, { timeout: 120000 }),
-  createSensingWorkOrder: (eventId, operator) => api.post(`/sensing/events/${eventId}/workorder`, { operator }),
+  createSensingWorkOrder: (eventId) => api.post(`/sensing/events/${eventId}/workorder`, {}),
   getSensingNotices: (params) => api.get('/sensing/notices', { params }),
   readSensingNotice: (id) => api.post(`/sensing/notices/${id}/read`),
-  repairFromNotice: (id, reporterId) => api.post(`/sensing/notices/${id}/repair`, { reporter_id: reporterId ?? null }),
+  repairFromNotice: (id) => api.post(`/sensing/notices/${id}/repair`, {}),
   dismissNotice: (id) => api.post(`/sensing/notices/${id}/dismiss`),
 }

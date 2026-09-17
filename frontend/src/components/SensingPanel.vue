@@ -290,7 +290,7 @@ const createOrder = async (ev) => {
   }
   acting.value = `order-${ev.event_id}`
   try {
-    const res = await api.createSensingWorkOrder(ev.event_id, '物业管理员')
+    const res = await api.createSensingWorkOrder(ev.event_id)
     ElMessage.success(`已生成工单 ${res.data.work_order_id}，进入待审核`)
     emit('workorder-created')
     await loadEvents()

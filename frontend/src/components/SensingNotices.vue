@@ -33,10 +33,8 @@ import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import api from '../api'
-import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
-const auth = useAuthStore()
 const notices = ref([])
 const acting = ref(null)
 
@@ -73,9 +71,15 @@ const load = async () => {
 const repair = async (g) => {
   acting.value = g.key
   try {
-    const res = await api.repairFromNotice(g.ids[0], auth.user?.id)
-    ElMessage.success(`已提交报修，工单 ${res.data.work_order_id} 等待物业审核`)
-    router.push(`/workorder/${res.data.work_order_id}`)
+    const res = await api.repairFromNotice(g.ids[0])
+    if (res.data.work_order_id) {
+      ElMessage.success(`已提交报修，工单 ${res.data.work_order_id} 等待物业审核`)
+      router.push(`/workorder/${res.data.work_order_id}`)
+    } else {
+      // 邻居家的问题：工单建在发生户，本户只收到处理确认
+      ElMessage.success(res.data.message || '已通知物业处理')
+      await load()
+    }
   } catch (e) {
     ElMessage.error(errMsg(e, '报修失败'))
   } finally {

@@ -1,12 +1,14 @@
 <template>
   <div class="role-panel">
-    <h3>我的维修任务</h3>
+    <h3>{{ isAccount ? '我的维修任务' : '维修任务' }}</h3>
     <div class="row">
       <span class="sub">维修人员</span>
-      <el-segmented v-if="!store.roleLocked" v-model="name" :options="['王工', '李工', '张工']" size="small" />
-      <b v-else>{{ store.repairerName }}</b>
+      <!-- 维修人员账号只看自己的任务；物业（只读）和未登录演示可以切换查看 -->
+      <b v-if="isAccount">{{ store.loginUser.name }}</b>
+      <el-segmented v-else v-model="name" :options="['王工', '李工', '张工']" size="small" />
     </div>
-    <div v-if="!orders.length" class="sub empty">暂无派给你的任务</div>
+    <el-alert v-if="store.readOnly" type="info" :closable="false" show-icon title="只读查看：开始/完成维修由维修人员本人操作" />
+    <div v-if="!orders.length" class="sub empty">{{ isAccount ? '暂无派给您的工单' : '暂无派给该维修人员的任务' }}</div>
     <div v-else-if="unassigned" class="sub">联机工单尚未派单，下面显示的是待派单的主动感知工单</div>
     <div v-for="o in orders" :key="o.order_no" class="task" :class="{ active: o.order_no === store.activeOrderNo }" @click="open(o)">
       <div class="task-top">
@@ -32,8 +34,8 @@
       <div class="actions">
         <el-button type="primary" size="small" icon="Guide" @click="store.navigateToOrder(active)">导航到现场</el-button>
         <el-button size="small" icon="Aim" @click="locate">定位故障部位</el-button>
-        <el-button v-if="active.status === 'ASSIGNED'" size="small" type="warning" @click="start">开始维修</el-button>
-        <el-button v-if="active.status === 'PROCESSING'" size="small" type="success" @click="complete">完成维修</el-button>
+        <el-button v-if="canOperate && active.status === 'ASSIGNED'" size="small" type="warning" @click="start">开始维修</el-button>
+        <el-button v-if="canOperate && active.status === 'PROCESSING'" size="small" type="success" @click="complete">完成维修</el-button>
       </div>
       <p class="sub">导航路线：小区大门 → 1栋北侧大堂 → 电梯 → {{ floorOf(active.house_id) }} 层 → {{ active.house_id }} 户门 → 故障部位</p>
     </template>
@@ -49,6 +51,8 @@ import { houseById } from '../data/resolver'
 
 const store = useTwinStore()
 const STATUS = { ASSIGNED: '已派单', PROCESSING: '维修中', COMPLETED: '已完成', PENDING_REVIEW: '待审核', PENDING_ASSIGN: '待派单' }
+const isAccount = computed(() => store.scopeKind === 'repairer')
+const canOperate = computed(() => !store.readOnly)
 const name = computed({ get: () => store.repairerName, set: (v) => { store.repairerName = v; store.activeOrderNo = null } })
 const orders = computed(() => store.myOrders)
 const unassigned = computed(() => orders.value.length && orders.value.every(o => !o.repairer))

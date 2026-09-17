@@ -19,13 +19,14 @@ import os
 import uuid
 import mimetypes
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
 
 from ..services.agent import MaintenanceAgent
 from ..services.archive import get_house_by_id
 from ..config import BACKEND_DIR, LLM_API_KEY, LLM_BASE_URL
 from ..database import query_one, execute, execute_return_id
+from ..security import CurrentUser, current_user, ensure_house_access, ensure_order_access
 
 # 附件上传目录：backend/uploads/（已在 .gitignore 忽略，不会进仓库）
 UPLOAD_DIR = os.path.join(BACKEND_DIR, "uploads")
@@ -39,30 +40,14 @@ sessions = {}
 # ------------------------------------------------------------------
 # 辅助函数
 # ------------------------------------------------------------------
-_default_reporter_cache = None
-
-
-def _resolve_reporter_id(requested: int | None) -> int:
-    """解析报修人 ID：优先使用前端传入的登录用户 ID，否则回退到初始住户.
-
-    前端登录后会在 init 时传入 reporter_id（来自 /api/auth/login 返回的 id），
-    确保工单真实关联到当前登录人，支持审计与「我的工单」按人过滤。
-    未登录或旧客户端未传参时，为兼容仍回退到 resident1。
-    """
-    if requested:
-        row = query_one("SELECT id FROM `user` WHERE id = %s", (requested,))
-        if row:
-            return row["id"]
-    global _default_reporter_cache
-    if _default_reporter_cache is None:
-        row = query_one("SELECT id FROM `user` WHERE username = 'resident1'")
-        _default_reporter_cache = row["id"] if row else 1
-    return _default_reporter_cache
-
-
-def get_default_reporter_id() -> int:
-    """兼容旧调用：回退到初始住户."""
-    return _resolve_reporter_id(None)
+def _own_session(session_id: str, user: CurrentUser) -> dict:
+    """取会话并校验归属：只有发起报修的本人能继续对话."""
+    session = sessions.get(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if session.get("user_id") != user.id:
+        raise HTTPException(status_code=403, detail="无权访问该报修会话")
+    return session
 
 
 # 优先级中文 ↔ 英文对照（数据库存英文，界面显示中文）
@@ -159,7 +144,7 @@ def _update_order_with_ai_result(session: dict, response: dict):
 # ------------------------------------------------------------------
 class ChatInitRequest(BaseModel):
     house_id: str  # 房屋编号（house_code，如 "1302"）
-    reporter_id: int | None = None  # 真实报修人 user.id（前端登录后传入）
+    reporter_id: int | None = None  # 旧客户端兼容字段，已忽略：报修人一律取登录账号
 
 
 class ChatMessageRequest(BaseModel):
@@ -176,8 +161,14 @@ class ChatActionRequest(BaseModel):
 # 接口
 # ------------------------------------------------------------------
 @router.post("/init")
-async def init_chat(req: ChatInitRequest):
-    """初始化报修对话：建草稿工单 + 启动 AI Agent."""
+async def init_chat(req: ChatInitRequest, user: CurrentUser = Depends(current_user)):
+    """初始化报修对话：建草稿工单 + 启动 AI Agent.
+
+    住户只能为名下房屋报修；物业可代为报修；维修人员不发起报修。
+    """
+    if user.is_repairer:
+        raise HTTPException(status_code=403, detail="维修人员账号不能发起报修")
+    ensure_house_access(user, req.house_id)
     house = get_house_by_id(req.house_id)
     if not house:
         raise HTTPException(status_code=404, detail="House not found")
@@ -187,7 +178,7 @@ async def init_chat(req: ChatInitRequest):
     agent.init(req.house_id)
 
     # 2. 创建草稿工单（状态 DRAFT，信息状态 INCOMPLETE）
-    reporter_id = _resolve_reporter_id(req.reporter_id)
+    reporter_id = user.id
     order_no = f"WO-{req.house_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
     order_db_id = execute_return_id(
         "INSERT INTO repair_order (order_no, reporter_id, house_id,"
@@ -209,6 +200,7 @@ async def init_chat(req: ChatInitRequest):
         "house_id": req.house_id,
         "order_db_id": order_db_id,
         "order_no": order_no,
+        "user_id": user.id,
         "created_at": datetime.now().isoformat(),
     }
 
@@ -228,18 +220,16 @@ async def init_chat(req: ChatInitRequest):
 
 
 @router.post("/message")
-async def send_message(req: ChatMessageRequest):
+async def send_message(req: ChatMessageRequest, user: CurrentUser = Depends(current_user)):
     """发送消息给 AI Agent，并把对话内容存库。信息齐全时自动提交工单。"""
-    session = sessions.get(req.session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+    session = _own_session(req.session_id, user)
 
     agent: MaintenanceAgent = session["agent"]
     response = agent.process(req.message)
 
     # 1. 存用户消息（sender 取工单的 reporter_id，保证真实归属）
     order_row = query_one("SELECT reporter_id, status FROM repair_order WHERE id = %s", (session["order_db_id"],))
-    sender_id = order_row["reporter_id"] if order_row else get_default_reporter_id()
+    sender_id = order_row["reporter_id"] if order_row else user.id
     _save_message(session["order_db_id"], "USER", "TEXT",
                   req.message, sender_id=sender_id)
 
@@ -287,11 +277,9 @@ async def send_message(req: ChatMessageRequest):
 
 
 @router.post("/action")
-async def chat_action(req: ChatActionRequest):
+async def chat_action(req: ChatActionRequest, user: CurrentUser = Depends(current_user)):
     """用户对 AI 生成的工单做确认或修改."""
-    session = sessions.get(req.session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+    session = _own_session(req.session_id, user)
 
     agent: MaintenanceAgent = session["agent"]
 
@@ -356,10 +344,11 @@ async def chat_action(req: ChatActionRequest):
 @router.post("/attachment")
 async def upload_attachment(
     repair_order_id: str = Form(...),   # 关联工单号（order_no）
-    uploader_id: int = Form(None),     # 上传人 user.id（可选）
+    uploader_id: int = Form(None),     # 旧客户端兼容字段，已忽略：上传人取登录账号
     file: UploadFile = File(...),      # 任意文件（图片/视频/文档/音频等均支持）
     attachment_type: str = Form("photo"),  # photo / video / audio / doc / file（自动推断也可）
     ai_description: str = Form(""),    # 多模态模型对文件的理解（可选）
+    user: CurrentUser = Depends(current_user),
 ):
     """上传报修附件（支持任意文件类型），落库到 repair_attachment 表.
 
@@ -373,6 +362,9 @@ async def upload_attachment(
     【联调注意】本接口为 A 端补齐，文档第 8 节「图片附件」项依赖它；
         若联调不需要附件能力，可暂不调用，不影响核心报修流程。
     """
+    # 0. 只能给自己有权访问的工单上传附件（先校验再落盘）
+    order = ensure_order_access(user, repair_order_id)
+
     # 1. 保存文件（防止文件名冲突 + 路径穿越，统一加时间戳前缀）
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     safe_name = f"{int(datetime.now().timestamp())}_{os.path.basename(file.filename or 'file')}"
@@ -382,11 +374,8 @@ async def upload_attachment(
         f.write(content)
     file_url = f"/uploads/{safe_name}"
 
-    # 2. 关联工单（order_no → repair_order.id）
-    order = query_one(
-        "SELECT id FROM repair_order WHERE order_no = %s", (repair_order_id,)
-    )
-    order_db_id = order["id"] if order else None
+    # 2. 关联工单（order_no → repair_order.id，已在第 0 步查出）
+    order_db_id = order["id"]
 
     # 3. 写入 repair_attachment 表
     aid = execute_return_id(
@@ -395,7 +384,7 @@ async def upload_attachment(
         " VALUES (%s, %s, %s, %s, %s, %s, %s)",
         (
             order_db_id,
-            uploader_id,
+            user.id,
             file.filename or safe_name,
             file_url,
             file.content_type or "",
@@ -474,9 +463,7 @@ async def transcribe_audio(file: UploadFile = File(...)):
 
 
 @router.get("/state/{session_id}")
-async def get_state(session_id: str):
+async def get_state(session_id: str, user: CurrentUser = Depends(current_user)):
     """查询当前 Agent 状态（调试用）."""
-    session = sessions.get(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+    session = _own_session(session_id, user)
     return session["agent"].get_state()

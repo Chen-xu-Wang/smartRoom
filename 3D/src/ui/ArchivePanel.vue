@@ -6,6 +6,8 @@
       <el-switch :model-value="store.xray" size="small" active-text="结构透视（X 光）" @change="store.setXray" />
       <el-switch v-for="l in LAYERS" :key="l.key" :model-value="store.layers[l.key]" size="small" :active-text="l.label" @change="v => store.setLayer(l.key, v)" />
     </div>
+    <!-- 批次、供水分区、整栋统计是全楼信息，只对不受限账号（物业）开放 -->
+    <template v-if="!scoped">
     <div class="section-title">楼层着色</div>
     <el-radio-group :model-value="store.colorMode" size="small" @change="store.setColorMode">
       <el-radio-button value="none">无</el-radio-button>
@@ -34,14 +36,19 @@
         <b>{{ ZONE_NAME[z.zone_id] }}</b><span class="sub">{{ z.floors[0] }}–{{ z.floors[1] }} 层 · {{ z.source === 'MUNICIPAL' ? '市政直供' : '变频泵' }} {{ z.source_pressure_mpa }} MPa</span>
       </div>
     </div>
+    </template>
     <div class="section-title">快速进入</div>
     <div class="row">
-      <el-input-number v-model="floor" :min="1" :max="18" size="small" style="width: 110px" />
-      <el-button size="small" @click="goFloor">进入楼层</el-button>
+      <template v-if="!scoped">
+        <el-input-number v-model="floor" :min="1" :max="18" size="small" style="width: 110px" />
+        <el-button size="small" @click="goFloor">进入楼层</el-button>
+      </template>
       <el-select v-model="houseId" size="small" filterable placeholder="户号" style="width: 100px" @change="goHouse">
         <el-option v-for="h in houses" :key="h" :label="h" :value="h" />
       </el-select>
     </div>
+    <p v-if="scoped" class="sub">{{ store.scopeKind === 'owner' ? '仅可查看您名下住宅的档案。' : '仅可查看您工单涉及住户的档案。' }}</p>
+    <template v-if="!scoped">
     <div class="section-title">本栋档案统计</div>
     <div class="kv">
       <span>住户</span><span>108 户（正式档案 3 户 + 模拟扩展 105 户）</span>
@@ -52,6 +59,7 @@
       <span>传感器</span><span>{{ stat.sensors }} 个（方案 3 布点）</span>
       <span>设备档案</span><span>{{ stat.devices }} 件</span>
     </div>
+    </template>
     <p class="sub">点击任意构件查看档案卡：型号、厂家、安装日期、配件批号、档案原文与监测传感器。</p>
   </div>
 </template>
@@ -71,7 +79,8 @@ const ZONE_COLOR = { LOW: '#13c2c2', MID: '#2f54eb', HIGH: '#722ed1' }
 const ZONE_NAME = { LOW: '低区', MID: '中区', HIGH: '高区' }
 const batches = computed(() => buildingData()?.batches || [])
 const zones = computed(() => buildingData()?.supply_zones || [])
-const houses = computed(() => (buildingData()?.houses || []).map(h => h.house_id).sort((a, b) => Number(a) - Number(b)))
+const scoped = computed(() => !!store.houseScope)
+const houses = computed(() => (store.houseScope || (buildingData()?.houses || []).map(h => h.house_id)).slice().sort((a, b) => Number(a) - Number(b)))
 const lotRows = computed(() => {
   const rows = {}
   for (const b of batches.value) for (const l of b.component_lots) { rows[l.component] ||= { component: l.component }; rows[l.component][b.batch_id] = l.lot }

@@ -17,7 +17,7 @@
       <p class="login-tip">{{ role === 'admin' ? '全小区态势 · 问题定位 · 建单派单' : '我的家 · 健康提醒 · 一键报修' }}</p>
 
       <el-alert v-if="!store.backendOnline" type="warning" :closable="false" show-icon class="offline"
-                title="后端未连接，无法登录；演示模式下可在顶部自由切换视角" />
+                title="后端未连接，无法登录；小区数字孪生需要登录后按账号加载数据" />
 
       <el-form @submit.prevent="submit">
         <el-form-item>
@@ -28,11 +28,6 @@
         <el-form-item>
           <el-input v-model="password" type="password" placeholder="密码" size="large" show-password @keyup.enter="submit">
             <template #prefix><el-icon><Lock /></el-icon></template>
-          </el-input>
-        </el-form-item>
-        <el-form-item v-if="role === 'resident'">
-          <el-input v-model="house" placeholder="我家房号，如 1302" size="large">
-            <template #prefix><el-icon><HomeFilled /></el-icon></template>
           </el-input>
         </el-form-item>
         <el-button type="primary" size="large" class="login-btn" :loading="loading" :disabled="!store.backendOnline" native-type="submit">
@@ -50,7 +45,7 @@
       </div>
 
       <button class="back-home" @click="$emit('update:modelValue', false)">
-        <el-icon><ArrowLeft /></el-icon> 返回演示模式
+        <el-icon><ArrowLeft /></el-icon> 暂不登录
       </button>
     </div>
   </el-dialog>
@@ -59,10 +54,9 @@
 <script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { User, Lock, OfficeBuilding, ArrowLeft, HomeFilled } from '@element-plus/icons-vue'
+import { User, Lock, OfficeBuilding, ArrowLeft } from '@element-plus/icons-vue'
 import { useAuthStore } from '@app/stores/auth.js'
 import { useTwinStore } from '../stores/twin'
-import { houseById } from '../data/resolver'
 
 defineProps({ modelValue: Boolean })
 const emit = defineEmits(['update:modelValue'])
@@ -72,7 +66,6 @@ const store = useTwinStore()
 const role = ref('resident')
 const username = ref('')
 const password = ref('')
-const house = ref('1302')
 const loading = ref(false)
 
 function switchRole(r) {
@@ -92,14 +85,9 @@ async function submit() {
   const res = await auth.login({ username: username.value.trim(), password: password.value, role: role.value })
   loading.value = false
   if (!res.ok) { ElMessage.error(res.msg); return }
-  if (res.user.backendRole === 'RESIDENT' && !houseById(house.value)) {
-    ElMessage.error('房号不在 1栋模拟档案中，请填写如 1302')
-    auth.logout()
-    return
-  }
-  store.adoptAuth({ ...res.user, houseId: house.value }, house.value)
-  await store.setRoleForced(store.loginUser.role)
-  ElMessage.success(`欢迎回来，${res.user.name}，视角已锁定为「${store.loginUser.roleLabel}」`)
+  // 小区模型与事件按账号裁剪后下发：登录后整页刷新，重新加载该账号可见的数据
+  ElMessage.success(`欢迎回来，${res.user.name}`)
+  location.reload()
   emit('update:modelValue', false)
 }
 </script>

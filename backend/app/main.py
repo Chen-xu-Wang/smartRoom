@@ -6,14 +6,16 @@
     3. 注册 5 组 API 路由
 """
 import os
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from .api import houses, chat, workorders, maintenance, auth, admin, sensing
+from .api import houses, chat, workorders, maintenance, auth, admin, sensing, twin
 from .config import BACKEND_DIR
 from .database import query_one
 from .services.dispatch_schema import ensure_dispatch_schema, seed_default_profiles
 from .services.sensing_schema import ensure_sensing_schema
+from .services.user_house import ensure_user_house_schema, seed_default_bindings
+from .security import current_user, require_staff
 
 app = FastAPI(
     title="筑维AI - 一房一码住宅智能运维助手",
@@ -44,6 +46,8 @@ async def startup():
         row = query_one("SELECT COUNT(*) AS c FROM house")
         # 主动感知：事件表、提醒表，工单来源字段（幂等）
         ensure_sensing_schema()
+        # 住户与房屋绑定表（幂等）
+        ensure_user_house_schema()
         if row and row["c"] == 0:
             # house 表为空说明是全新数据库 → 自动执行种子脚本
             # 注意：init_database.py 位于 backend 目录（不在 app 包内），
@@ -60,6 +64,8 @@ async def startup():
             print("[启动] 数据库连接正常，基础数据已就绪")
         # 按 username 幂等补齐维修工画像，不覆盖已有的自定义容量/技能配置。
         seed_default_profiles()
+        # 演示住户默认绑定房屋（已有绑定时不覆盖）
+        seed_default_bindings()
     except Exception as e:
         # 数据库连不上时打印错误但不阻止启动（方便排查配置问题）
         print(f"[启动警告] 数据库初始化检查失败：{e}")
@@ -91,11 +97,20 @@ _upload_dir = os.path.join(BACKEND_DIR, "uploads")
 os.makedirs(_upload_dir, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=_upload_dir), name="uploads")
 
+@app.get("/api/health")
+async def health():
+    """健康检查（无需登录），前端据此判断后端是否在线."""
+    return {"ok": True}
+
+
 # ---------- 注册 API 路由（相当于 @RestController 扫描）----------
-app.include_router(auth.router)          # 认证（真实校验）
-app.include_router(admin.router)         # 管理后台（房屋/用户）
-app.include_router(houses.router)        # 房屋档案
-app.include_router(chat.router)          # AI 报修对话
-app.include_router(workorders.router)    # 工单管理
-app.include_router(maintenance.router)   # 维修历史
-app.include_router(sensing.router)       # 主动感知：检测事件、住户提醒、复查建单
+# 除登录接口外全部要求登录；各接口内部再按角色和数据范围校验（见 app/security.py）
+_login_required = [Depends(current_user)]
+app.include_router(auth.router)                                           # 认证：登录签发令牌、当前用户
+app.include_router(admin.router, dependencies=[Depends(require_staff)])   # 管理后台（仅物业/管理员）
+app.include_router(houses.router, dependencies=_login_required)           # 房屋档案
+app.include_router(chat.router, dependencies=_login_required)             # AI 报修对话
+app.include_router(workorders.router, dependencies=_login_required)       # 工单管理
+app.include_router(maintenance.router, dependencies=_login_required)      # 维修历史
+app.include_router(sensing.router, dependencies=_login_required)          # 主动感知：检测事件、住户提醒、复查建单
+app.include_router(twin.router, dependencies=_login_required)             # 3D 数字孪生数据（按账号裁剪）

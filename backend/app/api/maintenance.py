@@ -1,20 +1,22 @@
 """Maintenance API - 维修记录与预测性维护风险接口."""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from ..security import CurrentUser, current_user, ensure_house_access, require_staff
 from ..services.archive import get_maintenance_history, get_house_by_id
 from ..services.predictive_maintenance import get_maintenance_risks
 
 router = APIRouter(prefix="/api/maintenance", tags=["maintenance"])
 
 
-@router.get("/risks")
+@router.get("/risks", dependencies=[Depends(require_staff)])
 async def get_predictive_maintenance_risks(house_id: str | None = None):
     """聚合设备与位置健康风险；可用 house_id（房屋编号）筛选。"""
     return get_maintenance_risks(house_code=house_id)
 
 
 @router.get("/history/{house_id}")
-async def get_maintenance_history_api(house_id: str):
+async def get_maintenance_history_api(house_id: str, user: CurrentUser = Depends(current_user)):
     """Get maintenance history for a house."""
+    ensure_house_access(user, house_id)
     house = get_house_by_id(house_id)
     if not house:
         raise HTTPException(status_code=404, detail="House not found")

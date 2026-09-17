@@ -52,12 +52,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { HomeFilled, Avatar } from '@element-plus/icons-vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from './stores/auth'
-import { twinRoleOf, adoptAuthFromUrl } from './utils/twin'
+import { twinRoleOf } from './utils/twin'
 
 const router = useRouter()
 const route = useRoute()
@@ -71,16 +71,15 @@ const twinQuery = computed(() => {
   return q
 })
 
-// 从 3D 页面跳回控制台时，接收它带回来的登录态，保持两边登录用户一致
-onMounted(() => {
-  const user = adoptAuthFromUrl()
-  if (!user) return
-  auth.user = user
-  // 清掉地址栏上的 auth 参数（用路由替换，避免被路由初始化又写回去）
-  const query = { ...route.query }
-  delete query.auth
-  router.replace({ path: route.path, query })
-})
+// 令牌失效（过期、账号被禁用、后端更换密钥）：回到登录页，登录后回到原页面
+function onAuthExpired() {
+  if (!auth.user) return
+  auth.logout()
+  ElMessage.warning('登录已失效，请重新登录')
+  router.push({ path: '/login', query: { redirect: route.fullPath } })
+}
+onMounted(() => window.addEventListener('auth:expired', onAuthExpired))
+onBeforeUnmount(() => window.removeEventListener('auth:expired', onAuthExpired))
 
 function onUserCommand(cmd) {
   if (cmd === 'logout') {

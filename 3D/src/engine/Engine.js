@@ -49,12 +49,13 @@ export class Engine {
     this.level = { level: 'site', buildingNo: null, floor: null, houseId: null }
     this.layers = { supply: false, drain: false, circuit: false, sensor: false, furn: true, labels: true }
     this.autoLayers = new Set()
-    this.restrictHouse = null
+    // 可见住户范围：null 不限；Set 时只能进入这些户，其他户只显示建筑外壳（权限见 data/access.js）
+    this.scope = null
     this.xray = false
     this.lowWalls = false
     this.route = null
     this.theme = 'day'
-    this.callbacks = { pick: null, hover: null, level: null }
+    this.callbacks = { pick: null, hover: null, level: null, denied: null }
     this.highlighter = new Highlighter(this)
     this.focusTargets = null
     this.clock = new THREE.Clock()
@@ -146,8 +147,14 @@ export class Engine {
 
   async goFloor(no, floor) {
     const b = this.buildings.get(no)
-    if (!b) return
+    if (!b) return false
     floor = Math.max(1, Math.min(FLOORS, floor))
+    if (this.scope) {
+      // 受限账号不能浏览整层：本层有自己可见的住户就直接进入该户，否则拒绝
+      const own = no === 1 ? [...this.scope].find(h => parseHouseId(h).floor === floor) : null
+      if (!own) { this.emit('denied', { floor }); return false }
+      return this.goHouse(no, own)
+    }
     this._ensureStacks(no)
     this._setCutaway(no, floor)
     this.partZoom = false
@@ -161,7 +168,8 @@ export class Engine {
   async goHouse(no, houseId) {
     const b = this.buildings.get(no)
     const { floor, slot } = parseHouseId(houseId)
-    if (!b || !SLOTS[slot]) return
+    if (!b || !SLOTS[slot]) return false
+    if (!this.canEnterHouse(no, houseId)) { this.emit('denied', { houseId: String(houseId) }); return false }
     this._ensureStacks(no)
     this._setCutaway(no, floor)
     this.partZoom = false
@@ -185,7 +193,7 @@ export class Engine {
       return r
     }
     if (r.kind === 'stack') {
-      await this.goFloor(no, r.floorB || r.floor)
+      if ((await this.goFloor(no, r.floorB || r.floor)) === false) return null
       const [x, y, z] = r.world
       this.partZoom = true
       this._applyLayers()
@@ -193,6 +201,7 @@ export class Engine {
       return r
     }
     if (!r.houseId) return r
+    if (!this.canEnterHouse(no, r.houseId)) { this.emit('denied', { houseId: r.houseId }); return null }
     if (this.level.level !== 'house' || this.level.houseId !== r.houseId || this.level.buildingNo !== no) await this.goHouse(no, r.houseId)
     const [x, y, z] = r.world
     this.partZoom = true
@@ -324,7 +333,13 @@ export class Engine {
 
   // ------------------------------------------------------------------ 图层
   setLayers(layers) { Object.assign(this.layers, layers); this._applyLayers() }
-  setRestrictHouse(id) { this.restrictHouse = id ? String(id) : null; this._applyLayers() }
+  /** 设置可见住户范围（null 不限）；数据只接入了 1栋，受限账号不能进入其它楼栋的户内 */
+  setScope(houses) {
+    this.scope = houses ? new Set(houses.map(String)) : null
+    if (this.scope && this.level.houseId && !this.scope.has(this.level.houseId)) this.goSite()
+    this._applyLayers()
+  }
+  canEnterHouse(no, houseId) { return !this.scope || (no === 1 && this.scope.has(String(houseId))) }
   setXray(on) {
     this.xray = on
     setStructureOpacity(on ? 0.22 : 1)
@@ -332,14 +347,18 @@ export class Engine {
     this._applyLayers()
   }
   setLowWalls(on) { this.lowWalls = on; this._applyLayers() }
-  setFloorHeat(no, colorByFloor) { this.highlighter.setFloorHeat(no, colorByFloor); this.highlighter.cutHeat(this.level.floor) }
+  setFloorHeat(no, colorByFloor) {
+    if (this.scope && colorByFloor) return
+    this.highlighter.setFloorHeat(no, colorByFloor)
+    this.highlighter.cutHeat(this.level.floor)
+  }
 
   _applyLayers() {
     if (!this.interior) return
     this.interior.group.children.forEach(c => { if (c.userData.coreLabels) c.children.forEach(l => { if (l.isSprite) l.visible = !this.level.houseId && !this.partZoom }) })
     const focusHouse = this.level.houseId
     for (const [hid, u] of this.interior.units) {
-      const hidden = this.restrictHouse && hid !== this.restrictHouse
+      const hidden = !!this.scope && !this.scope.has(hid)
       const isFocus = hid === focusHouse
       const auto = isFocus || !!(this.focusTargets && this.focusTargets.houseId === hid)
       const L = u.layers

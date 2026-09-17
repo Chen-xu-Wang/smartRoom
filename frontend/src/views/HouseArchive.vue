@@ -117,7 +117,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { House, Lightning, SetUp, WindPower, Tools, Guide, Clock, ChatLineRound, CircleCheck, Box } from '@element-plus/icons-vue'
-import api from '../api'
+import api, { errorText } from '../api'
+import { ElMessage } from 'element-plus'
 
 const route = useRoute()
 const houseId = route.params.houseId
@@ -161,8 +162,14 @@ const warrantyPercent = computed(()=>{
 })
 
 onMounted(async () => {
-  // 1. 房屋基础档案
-  const res = await api.getHouse(houseId)
+  // 1. 房屋基础档案（住户只能看名下房屋，维修人员只能看工单涉及的房屋，后端返回 403）
+  let res
+  try {
+    res = await api.getHouse(houseId)
+  } catch (e) {
+    ElMessage.error(e?.response?.status === 403 ? errorText(e) : '加载房屋档案失败')
+    return
+  }
   house.value = res.data
 
   // 2. 设备清单：独立接口（文档第9节 Bug#2 —— 详情接口不含 components 字段）

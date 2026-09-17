@@ -97,7 +97,7 @@ import { ElMessage } from 'element-plus'
 import { Iphone, Camera, Upload } from '@element-plus/icons-vue'
 import QRCode from 'qrcode'
 import { Html5Qrcode } from 'html5-qrcode'
-import api from '../api'
+import api, { errorText } from '../api'
 import SensingNotices from '../components/SensingNotices.vue'
 
 const router = useRouter()
@@ -118,7 +118,7 @@ const scanByCode = async () => {
       router.push(`/chat/${res.data.houseId}`)
     }
   } catch (e) {
-    ElMessage.error('未找到该编码对应的房屋，请检查一房一码是否正确')
+    ElMessage.error(e?.response?.status === 403 ? errorText(e) : '未找到该编码对应的房屋，请检查一房一码是否正确')
   }
 }
 
@@ -166,8 +166,8 @@ const handleDecoded = async (text) => {
     } else {
       ElMessage.warning(`识别到 ${code}，但未找到对应房屋`)
     }
-  } catch {
-    ElMessage.error(`识别到 ${code}，但未找到对应房屋`)
+  } catch (e) {
+    ElMessage.error(e?.response?.status === 403 ? `识别到 ${code}：${errorText(e)}` : `识别到 ${code}，但未找到对应房屋`)
   }
 }
 

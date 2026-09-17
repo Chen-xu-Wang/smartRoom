@@ -22,6 +22,17 @@ CREATE TABLE IF NOT EXISTS house (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 住户与房屋绑定：按房号关联（模拟楼栋的房屋不一定在 house 表里），见 app/services/user_house.py
+CREATE TABLE IF NOT EXISTS user_house (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  house_code VARCHAR(30) NOT NULL,
+  relation VARCHAR(20) NOT NULL DEFAULT 'OWNER' COMMENT 'OWNER / TENANT',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user_house (user_id, house_code),
+  INDEX idx_user_house_code (house_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS house_device (
   id INT AUTO_INCREMENT PRIMARY KEY,
   house_id INT NOT NULL,

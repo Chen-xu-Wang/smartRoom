@@ -1,13 +1,13 @@
-"""导出 3D 数字孪生所需数据到 3D/public/twin/。
+"""导出 3D 数字孪生所需数据到 backend/app/data/twin/。
 
 输入（只读）：
   data/processed/sim_config/sim_building.json        楼栋拓扑与扩展档案（公开部分）
   data/processed/samples/supply_blockage_1302/fault/  检测算法产出的样例事件、决策、诊断
   data/processed/bailian_kit/events + expected/       契约样例事件与参考决策
 
-输出（前端 public 下，3D 独立工程通过 publicDir 复用同一目录）：
-  frontend/public/twin/building.json      精简后的楼栋拓扑（去掉模拟器内部参数名）
-  frontend/public/twin/demo_events.json   演示事件：来源分为 DETECTION_SAMPLE / CONTRACT_SAMPLE / DEMO_SCRIPT
+输出（放在后端，不放前端 public：含全部住户档案，由 /api/twin/* 按登录账号裁剪后下发）：
+  backend/app/data/twin/building.json      精简后的楼栋拓扑（去掉模拟器内部参数名）
+  backend/app/data/twin/demo_events.json   演示事件：来源分为 DETECTION_SAMPLE / CONTRACT_SAMPLE / DEMO_SCRIPT
 
 演示样例事件（DEMO_SCRIPT）为人工构造，用于覆盖全部 13 类 P0 事件的定位演示，
 不是检测算法的输出；导出时校验其中引用的编码都存在于楼栋拓扑中。
@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data" / "processed"
-OUT = ROOT / "frontend" / "public" / "twin"
+OUT = ROOT / "backend" / "app" / "data" / "twin"
 
 HOUSE_KEEP = [
     "house_id", "floor", "position", "layout_id", "layout", "area_m2", "batch_id", "mic_module_id",

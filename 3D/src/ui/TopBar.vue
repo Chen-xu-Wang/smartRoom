@@ -5,10 +5,12 @@
       <span class="name">小区数字孪生</span>
     </div>
     <div class="roles">
-      <button v-for="r in ROLES" :key="r.id" class="role" :class="{ on: store.role === r.id, locked: store.roleLocked && store.role !== r.id }" @click="store.setRole(r.id)">
+      <!-- 只显示当前账号有权使用的视角 -->
+      <button v-for="r in roles" :key="r.id" class="role" :class="{ on: store.role === r.id }" @click="store.setRole(r.id)">
         <el-icon><component :is="r.icon" /></el-icon>{{ r.label }}
       </button>
     </div>
+    <el-tag v-if="store.readOnly" size="small" type="info" effect="plain">只读</el-tag>
     <div class="tools">
       <el-button type="danger" size="small" icon="Aim" :loading="store.locating" @click="store.locateTop()">一键定位</el-button>
       <el-segmented :model-value="store.mode" :options="modeOptions" size="small" @change="v => store.setMode(v, api)" />
@@ -36,19 +38,20 @@ import api from '@app/api/index.js'
 import { useAuthStore } from '@app/stores/auth.js'
 import { useTwinStore, ROLES } from '../stores/twin'
 import { Avatar } from '@element-plus/icons-vue'
-import { withAuthParam } from '@app/utils/twin.js'
 
 defineProps({ embedded: { type: Boolean, default: false } })
 defineEmits(['login'])
 const store = useTwinStore()
 const auth = useAuthStore()
+const roles = computed(() => ROLES.filter(r => store.allowedRoles.includes(r.id)))
 const modeOptions = computed(() => [{ label: '演示样例', value: 'demo' }, { label: '联机数据', value: 'live', disabled: !store.backendOnline }])
 const toggleTheme = () => store.applyTheme(store.theme === 'day' ? 'night' : 'day')
 const userTag = computed(() => ({ repairer: 'info', property: 'warning', owner: 'success' }[store.loginUser?.role] || 'info'))
-// 回到控制台时把登录态带回去（独立运行时两个端口的 localStorage 不互通）
+// 回到控制台（现有系统，端口 5173）
 const backToApp = () => {
   const base = import.meta.env.VITE_APP_URL || `${location.protocol}//${location.hostname}:5173/`
-  window.open(withAuthParam(base), 'zhuwei-app')
+  // 登录态含访问令牌，不放进 URL；控制台（5173）需要单独登录
+  window.open(base, 'zhuwei-app')
 }
 const logout = () => store.signOut()
 </script>
@@ -68,7 +71,6 @@ const logout = () => store.signOut()
 .roles { display: flex; gap: 4px; margin: 0 auto; background: rgba(120, 140, 160, 0.12); padding: 3px; border-radius: 10px; }
 .role { border: 0; background: transparent; color: var(--panel-fg); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 4px; font-family: inherit; }
 .role.on { background: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.35); }
-.role.locked { opacity: 0.45; }
 .tools { display: flex; align-items: center; gap: 8px; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: #bfbfbf; display: inline-block; }
 .dot.on { background: #52c41a; box-shadow: 0 0 6px #52c41a; }
