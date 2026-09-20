@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartroom.example/contracts/v2/common.schema.json",
+  "title": "筑维AI 数据契约公共定义 v2.0",
+  "$defs": {
+    "schemaVersion": {
+      "description": "契约版本。2.x 内只允许新增可选字段，不允许修改或删除已有字段。",
+      "type": "string",
+      "pattern": "^2\\.\\d+$"
+    },
+    "dateTime": {
+      "description": "ISO 8601，精确到秒，固定东八区。",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\+08:00$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "month": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}$"
+    },
+    "houseId": {
+      "description": "模拟楼栋 1栋1单元 18层×6户：楼层(1-18) + 户位(01-06)，如 503、1302。",
+      "type": "string",
+      "pattern": "^([1-9]|1[0-8])0[1-6]$"
+    },
+    "houseIdList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/houseId" },
+      "uniqueItems": true
+    },
+    "batchId": {
+      "description": "MiC 生产批次。A=1-6层，B=7-12层，C=13-18层。",
+      "type": "string",
+      "enum": ["A", "B", "C"]
+    },
+    "eventId": {
+      "description": "EVT-日期-范围键-序号。范围键：户号 / ST+户位(立管) / BATCH+批次 / BLDG。",
+      "type": "string",
+      "pattern": "^EVT-\\d{8}-(([1-9]|1[0-8])0[1-6]|ST0[1-6]|BATCH[ABC]|BLDG)-\\d{4}$"
+    },
+    "archiveDeviceCode": {
+      "description": "一房一码档案中的设备编码（houses.json / sim_building.json），如 EQ-1302-B-02；档案门窗编码无区域段，如 DW-1302-01。",
+      "type": "string",
+      "pattern": "^((EQ|PL|EL|DW)-\\d{3,4}-[A-Z]-\\d{2}|DW-\\d{3,4}-\\d{2})$"
+    },
+    "segmentCode": {
+      "description": "模拟拓扑编码。WS=给水 WD=排水 CB=电气回路 ST0n=立管（如 ST02-F11-F12），详见 contracts/README.md。",
+      "type": "string",
+      "pattern": "^((WS|WD|CB|ST)-[A-Z0-9]+(-[A-Z0-9]+)*|ST0[1-6](-F\\d{1,2}){0,2})$"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["HOUSE", "STACK", "BUILDING", "BATCH"]
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["WATER", "POWER", "JOINT", "CARE"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    },
+    "priority": {
+      "description": "与 repair_order.priority 一致。",
+      "type": "string",
+      "enum": ["URGENT", "HIGH", "NORMAL", "LOW"]
+    },
+    "eventTypeP0": {
+      "type": "string",
+      "enum": [
+        "SUPPLY_BLOCKAGE", "DRAIN_BLOCKAGE", "STACK_BLOCKAGE", "HIDDEN_LEAK", "PIPE_BURST",
+        "WATER_INTRUSION", "LEAKAGE_CURRENT", "TERMINAL_OVERHEAT", "AC_EFFICIENCY_DROP",
+        "WATER_HEATER_SCALING", "CARE_ABNORMAL", "BATCH_QUALITY_ALERT", "METER_OFFLINE"
+      ]
+    },
+    "eventTypeReserved": {
+      "description": "P1/P2 预留，本阶段不产生。",
+      "type": "string",
+      "enum": [
+        "CONTINUOUS_FLOW", "PRESSURE_ABNORMAL", "TRAP_SEAL_DRY", "NETWORK_LEAK",
+        "CIRCUIT_OVERLOAD", "VOLTAGE_ABNORMAL", "NEUTRAL_BROKEN", "EBIKE_INDOOR_CHARGING",
+        "ARC_FAULT", "STANDBY_WASTE", "POWER_ANOMALY"
+      ]
+    },
+    "eventType": {
+      "anyOf": [
+        { "$ref": "#/$defs/eventTypeP0" },
+        { "$ref": "#/$defs/eventTypeReserved" }
+      ]
+    },
+    "controlAction": {
+      "type": "string",
+      "enum": ["CLOSE_MAIN_VALVE", "CLOSE_BRANCH_VALVE", "TRIP_CIRCUIT", "SWITCH_OFF_PLUG", "SPEAKER_INQUIRY"]
+    },
+    "faultType": {
+      "description": "与 agent.py 的 fault_type 取值一致。",
+      "type": "string",
+      "enum": ["给排水故障", "电气故障", "空调故障", "门窗故障", "墙面裂缝", "其他故障"]
+    },
+    "suggestedTrade": {
+      "description": "与 agent.py 的 suggested_trade 取值一致。",
+      "type": "string",
+      "enum": ["水电维修", "电工维修", "空调维修", "门窗维修", "油漆维修", "综合维修"]
+    },
+    "dataSource": {
+      "type": "string",
+      "const": "SIMULATED"
+    }
+  }
+}

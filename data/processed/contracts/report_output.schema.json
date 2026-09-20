@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartroom.example/contracts/v2/report_output.schema.json",
+  "title": "契约③-输出 报告（百炼应用② 输出 → 前端渲染）",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "subject", "title", "summary", "sections", "actions"],
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "report_type": { "type": "string", "enum": ["RESIDENT_MONTHLY", "BATCH_BRIEF"] },
+    "subject": {
+      "description": "报告对象：住户月报为户号+月份；批次简报为批次+统计区间。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["house_id", "batch_id", "period_label"],
+      "properties": {
+        "house_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/houseId" }, { "type": "null" }] },
+        "batch_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/batchId" }, { "type": "null" }] },
+        "period_label": { "type": "string", "minLength": 1, "maxLength": 30 }
+      }
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 30 },
+    "summary": {
+      "description": "3 句话以内的核心结论。",
+      "type": "string", "minLength": 1, "maxLength": 150
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["heading", "content", "highlights"],
+        "properties": {
+          "heading": { "type": "string", "minLength": 1, "maxLength": 20 },
+          "content": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "highlights": {
+            "description": "卡片上的关键数字。value 必须来自输入数据或其直接计算。",
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["label", "value"],
+              "properties": {
+                "label": { "type": "string", "minLength": 1, "maxLength": 12 },
+                "value": { "type": "string", "minLength": 1, "maxLength": 16 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "label", "payload"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["CREATE_AUTOMATION_RULE", "BOOK_SERVICE", "VIEW_EVENT", "CREATE_BATCH_INSPECTION"]
+          },
+          "label": { "type": "string", "minLength": 1, "maxLength": 16 },
+          "payload": { "type": "object" }
+        }
+      }
+    }
+  }
+}

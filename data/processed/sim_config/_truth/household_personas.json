@@ -1,0 +1,832 @@
+{
+ "meta": {
+  "schema": "household_personas v1.0",
+  "generator": "data/scripts/build_building.py",
+  "building_seed": 20260915,
+  "visibility": "TRUTH_ONLY：检测算法、处理链路与百炼均不得读取"
+ },
+ "households": {
+  "101": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "102": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "103": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "104": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "105": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "106": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "201": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "202": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "203": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "204": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "205": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "206": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "301": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "302": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "303": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "304": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "305": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "306": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "401": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "402": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "403": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "404": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "405": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "406": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "501": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "502": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "503": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "504": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "505": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "506": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "601": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "602": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "603": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "604": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "605": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "606": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "701": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "702": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "703": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "704": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "705": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "706": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "801": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "802": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "803": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "804": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "805": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "806": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "901": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "902": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "903": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "904": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "905": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "906": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1001": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1002": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "1003": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1004": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1005": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1006": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1101": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1102": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1103": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1104": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1105": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "1106": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1201": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1202": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1203": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1204": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1205": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1206": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1301": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1302": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1303": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "1304": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1305": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1306": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1401": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1402": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "1403": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1404": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1405": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1406": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1501": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1502": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1503": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1504": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1505": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1506": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1601": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1602": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1603": {
+   "persona": "TRAVELER",
+   "persona_label": "长期出差",
+   "members": [
+    "TRAVELER"
+   ]
+  },
+  "1604": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1605": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1606": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "1701": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1702": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1703": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "1704": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1705": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1706": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1801": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1802": {
+   "persona": "FAMILY",
+   "persona_label": "双职工带孩子",
+   "members": [
+    "WORKER",
+    "WORKER",
+    "CHILD"
+   ]
+  },
+  "1803": {
+   "persona": "ELDER",
+   "persona_label": "独居老人",
+   "members": [
+    "ELDER"
+   ]
+  },
+  "1804": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  },
+  "1805": {
+   "persona": "VACANT",
+   "persona_label": "空置房",
+   "members": []
+  },
+  "1806": {
+   "persona": "COUPLE",
+   "persona_label": "年轻情侣",
+   "members": [
+    "WORKER",
+    "WORKER"
+   ]
+  }
+ }
+}

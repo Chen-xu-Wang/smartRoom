@@ -5,9 +5,10 @@
         <div class="header-left">
           <h2>维修工单 {{ order.id }}</h2>
           <el-tag :type="statusTag.type">{{ statusTag.label }}</el-tag>
+          <el-tag v-if="order.source === 'AUTO_SENSOR'" type="success" effect="plain">系统主动感知</el-tag>
         </div>
         <div class="header-right">
-          <el-button v-if="order.status === 'pending_review'" type="primary" @click="showReviewDialog = true">
+          <el-button v-if="order.status === 'pending_review' && auth.isProperty" type="primary" @click="showReviewDialog = true">
             审核
           </el-button>
           <!-- 智能派单先展示可解释候选方案，手工派单作为受疲劳保护的补充入口。 -->
@@ -21,7 +22,7 @@
           <el-button v-if="showStartRepairBtn" type="success" :loading="starting" @click="startRepair">
             开始维修
           </el-button>
-          <el-button v-if="order.status === 'processing'" type="success" @click="openCompleteDialog">
+          <el-button v-if="order.status === 'processing' && isAssignedRepairer" type="success" @click="openCompleteDialog">
             完成维修
           </el-button>
         </div>
@@ -43,6 +44,11 @@
           <el-descriptions-item label="创建时间" :span="2">{{ formatTime(order.created_at) }}</el-descriptions-item>
           <el-descriptions-item label="用户描述" :span="2">{{ order.user_description }}</el-descriptions-item>
           <el-descriptions-item label="AI分析" :span="2">{{ order.ai_analysis }}</el-descriptions-item>
+          <el-descriptions-item label="触发事件" :span="2" v-if="order.trigger_event_id">{{ order.trigger_event_id }}</el-descriptions-item>
+          <el-descriptions-item label="建议携带" :span="2" v-if="order.materials?.length">{{ order.materials.join('、') }}</el-descriptions-item>
+          <el-descriptions-item label="作业安全提示" :span="2" v-if="order.worker_safety_notice?.length">
+            <span class="safety-notice">⚠ {{ order.worker_safety_notice.join('；') }}</span>
+          </el-descriptions-item>
           <el-descriptions-item label="审核人" v-if="order.reviewed_by">{{ order.reviewed_by }}</el-descriptions-item>
           <el-descriptions-item label="审核时间" v-if="order.reviewed_at">{{ formatTime(order.reviewed_at) }}</el-descriptions-item>
           <el-descriptions-item label="审核备注" :span="2" v-if="order.review_notes">{{ order.review_notes }}</el-descriptions-item>
@@ -154,6 +160,10 @@
       <div class="card" style="text-align: center">
         <el-button @click="$router.push(`/archive/${order.house_id}`)">
           <el-icon><Document /></el-icon> 查看房屋完整档案
+        </el-button>
+        <!-- 主动感知工单带 trigger_event_id，可直接在 3D 里定位到故障部位 -->
+        <el-button @click="$router.push({ path: '/twin', query: { role: 'repairer', house: order.house_id, event: order.trigger_event_id || undefined, live: 1 } })">
+          <el-icon><Box /></el-icon> {{ order.trigger_event_id ? '在 3D 中定位故障部位' : '在 3D 中查看本户' }}
         </el-button>
       </div>
     </div>
@@ -316,12 +326,16 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Document } from '@element-plus/icons-vue'
-import api from '../api'
+import { Document, Box } from '@element-plus/icons-vue'
+import api, { errorText } from '../api'
+import { useAuthStore } from '../stores/auth'
 import WorkOrderCard from '../components/WorkOrderCard.vue'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
+// 审核、派单只有物业；开始/完成维修只有被派单的维修人员本人（后端同样校验）
+const isAssignedRepairer = computed(() => auth.isRepairer && !!order.value?.assigned_to && order.value.assigned_to === auth.user?.name)
 const order = ref(null)
 // 阶段5.10：房屋设备清单（GET /houses/{id}/components 返回的按分类分组对象，
 // 如 {"plumbing":[...], "electrical":[...]}）。不再依赖 getHouse()——它不带 components 字段。
@@ -413,13 +427,13 @@ const statusTag = computed(() => {
 // 阶段5.7：仅在「待派单（审核通过且未派单）」时显示派单按钮
 // pending_assign + assigned_to 有值 → 已派单，不再显示派单入口
 const showAssignBtn = computed(() => {
-  return order.value?.status === 'pending_assign' && !order.value?.assigned_to
+  return auth.isProperty && order.value?.status === 'pending_assign' && !order.value?.assigned_to
 })
 
 // 阶段5.8：仅在「已派单待开始维修」时显示开始维修按钮
 // （pending_assign + assigned_to 有值；未派单 / 维修中 / 已完成均不显示）
 const showStartRepairBtn = computed(() => {
-  return order.value?.status === 'pending_assign' && !!order.value?.assigned_to
+  return isAssignedRepairer.value && order.value?.status === 'pending_assign'
 })
 // 阶段5.8：开始维修请求中的 loading 标记（防重复点击）
 const starting = ref(false)
@@ -595,11 +609,17 @@ const loadOrder = async () => {
 }
 
 onMounted(async () => {
-  await loadOrder()
+  try {
+    await loadOrder()
+  } catch (e) {
+    // 403：住户只能看名下房屋的工单，维修人员只能看派给自己的
+    ElMessage.error(errorText(e, '工单加载失败'))
+  }
 })
 </script>
 
 <style scoped>
+.safety-notice { color: #b91c1c; font-weight: 600; }
 .order-header {
   display: flex;
   justify-content: space-between;

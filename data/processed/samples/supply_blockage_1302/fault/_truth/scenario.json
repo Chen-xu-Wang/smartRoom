@@ -1,0 +1,17 @@
+{
+  "scenario": "fault",
+  "description": "WF3 花洒头渐进结垢：06-20 起通流能力线性下降，07-12 降到 50%",
+  "faults": [
+    {
+      "fault_id": "WF3",
+      "fault_type": "SHOWER_HEAD_SCALING",
+      "target": "WS-1302-B-SH",
+      "mode": "cv_factor",
+      "start": "2026-06-20",
+      "end": "2026-07-12",
+      "factor_end": 0.5,
+      "profile": "LINEAR"
+    }
+  ],
+  "pressure_events": []
+}

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from ..config import HOUSE_PROFILES_FILE
 from ..database import query_all, query_one, execute, execute_return_id
 from ..services.archive import get_all_houses
+from ..services import user_house
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -99,6 +100,7 @@ async def admin_delete_house(house_code: str):
         with open(HOUSE_PROFILES_FILE,"w",encoding="utf-8") as f: json.dump(profiles,f,ensure_ascii=False,indent=2)
         import app.services.archive as arch; arch._profiles_cache=None
     except: pass
+    user_house.delete_house_bindings_if_invalid(house_code)
     return {"success": True}
 
 # ---------- Users / Repairers ----------
@@ -139,6 +141,10 @@ async def admin_list_users(role: str = Query(None)):
         else:
             r["skills"]=[]; r["max_active_orders"]=3; r["daily_capacity"]=5; r["on_duty"]=1
         r["created_at"]=str(r["created_at"]) if r["created_at"] else None
+    # 住户附带名下房屋
+    houses = user_house.bindings_by_user([r["id"] for r in rows if r["role"] == "RESIDENT"])
+    for r in rows:
+        r["houses"] = houses.get(r["id"], [])
     return {"users": rows}
 
 @router.post("/users")
@@ -162,7 +168,10 @@ async def admin_update_user(user_id: int, req: UserUpdate):
     if not row: raise HTTPException(404, "用户不存在")
     if req.real_name is not None: execute("UPDATE `user` SET real_name=%s WHERE id=%s", (req.real_name, user_id))
     if req.phone is not None: execute("UPDATE `user` SET phone=%s WHERE id=%s", (req.phone, user_id))
-    if req.role is not None: execute("UPDATE `user` SET role=%s WHERE id=%s", (req.role.upper(), user_id))
+    if req.role is not None:
+        execute("UPDATE `user` SET role=%s WHERE id=%s", (req.role.upper(), user_id))
+        # 不再是住户时清掉房屋绑定，避免改回住户后沿用过期的绑定
+        if req.role.upper() != "RESIDENT": user_house.delete_user_bindings(user_id)
     if req.status is not None: execute("UPDATE `user` SET status=%s WHERE id=%s", (req.status, user_id))
     if req.password: execute("UPDATE `user` SET password=%s WHERE id=%s", (_hash(req.password), user_id))
     # 画像
@@ -187,5 +196,35 @@ async def admin_delete_user(user_id: int):
         cnt = query_one("SELECT COUNT(*) c FROM repair_order WHERE assigned_to=%s AND status IN ('PENDING_ASSIGN','PROCESSING')", (user_id,))
         if cnt and cnt["c"]>0: raise HTTPException(400, "该维修工存在在途工单，无法删除")
     execute("DELETE FROM repairer_profile WHERE user_id=%s", (user_id,))
+    user_house.delete_user_bindings(user_id)
     execute("DELETE FROM `user` WHERE id=%s", (user_id,))
     return {"success": True}
+
+# ---------- 住户房屋绑定 ----------
+class HouseBinding(BaseModel):
+    house_code: str
+    relation: str = "OWNER"  # OWNER 业主 / TENANT 租户
+
+class HouseBindingsUpdate(BaseModel):
+    houses: list[HouseBinding]
+
+@router.get("/house-codes")
+async def admin_bindable_house_codes():
+    """可绑定的房号：正式档案（house 表）+ 模拟楼栋."""
+    return {"houses": user_house.bindable_house_codes()}
+
+@router.get("/users/{user_id}/houses")
+async def admin_get_user_houses(user_id: int):
+    if not query_one("SELECT id FROM `user` WHERE id=%s", (user_id,)): raise HTTPException(404, "用户不存在")
+    return {"houses": user_house.list_bindings(user_id)}
+
+@router.put("/users/{user_id}/houses")
+async def admin_set_user_houses(user_id: int, req: HouseBindingsUpdate):
+    """整体替换住户的房屋绑定（提交空列表即全部解绑）."""
+    try:
+        houses = user_house.set_bindings(user_id, [h.model_dump() for h in req.houses])
+    except LookupError as e:
+        raise HTTPException(404, str(e))
+    except user_house.BindingError as e:
+        raise HTTPException(400, str(e))
+    return {"success": True, "houses": houses}

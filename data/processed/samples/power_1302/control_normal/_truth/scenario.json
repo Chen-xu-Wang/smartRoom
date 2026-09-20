@@ -1,0 +1,9 @@
+{
+  "scenario": "control_normal",
+  "description": "无故障对照：漏电与电压检测都不应报出",
+  "name": "control_normal",
+  "leakage_faults": [],
+  "wiring_faults": [],
+  "phase_events": [],
+  "humidity_events": []
+}

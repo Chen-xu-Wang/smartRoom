@@ -22,6 +22,17 @@ CREATE TABLE IF NOT EXISTS house (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 住户与房屋绑定：按房号关联（模拟楼栋的房屋不一定在 house 表里），见 app/services/user_house.py
+CREATE TABLE IF NOT EXISTS user_house (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  house_code VARCHAR(30) NOT NULL,
+  relation VARCHAR(20) NOT NULL DEFAULT 'OWNER' COMMENT 'OWNER / TENANT',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user_house (user_id, house_code),
+  INDEX idx_user_house_code (house_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS house_device (
   id INT AUTO_INCREMENT PRIMARY KEY,
   house_id INT NOT NULL,
@@ -56,6 +67,8 @@ CREATE TABLE IF NOT EXISTS repair_order (
   reviewer_id INT DEFAULT NULL,
   reviewed_at DATETIME DEFAULT NULL,
   completed_at DATETIME DEFAULT NULL,
+  source VARCHAR(20) NOT NULL DEFAULT 'RESIDENT_CHAT' COMMENT 'RESIDENT_CHAT / AUTO_SENSOR',
+  trigger_event_id VARCHAR(40) DEFAULT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_house (house_id),
   INDEX idx_status (status)
@@ -111,4 +124,49 @@ CREATE TABLE IF NOT EXISTS repairer_profile (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_profile_duty (on_duty)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 主动感知：检测事件（契约① 事件 + 契约② 决策）与住户提醒。
+-- 运行中的旧数据库由 app.services.sensing_schema 幂等创建，并为 repair_order 补齐 source / trigger_event_id。
+CREATE TABLE IF NOT EXISTS device_event (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  event_id VARCHAR(40) NOT NULL UNIQUE,
+  house_id INT DEFAULT NULL,
+  house_code VARCHAR(30) DEFAULT NULL,
+  scope VARCHAR(20) NOT NULL,
+  domain VARCHAR(20) NOT NULL,
+  event_type VARCHAR(40) NOT NULL,
+  severity VARCHAR(20) NOT NULL,
+  priority VARCHAR(20) DEFAULT NULL,
+  detected_at DATETIME NOT NULL,
+  fault_summary VARCHAR(120) DEFAULT '',
+  payload MEDIUMTEXT NOT NULL,
+  decision MEDIUMTEXT DEFAULT NULL,
+  diagnostics MEDIUMTEXT DEFAULT NULL,
+  generated_by VARCHAR(20) DEFAULT 'RULE_ENGINE',
+  source_ref VARCHAR(160) DEFAULT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'NOTIFIED' COMMENT 'NOTIFIED / ORDER_CREATED / RESOLVED / ARCHIVED',
+  repair_order_id INT DEFAULT NULL,
+  recheck_due DATE DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_event_house (house_code),
+  INDEX idx_event_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS resident_notice (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  event_id VARCHAR(40) NOT NULL,
+  house_code VARCHAR(30) NOT NULL,
+  audience VARCHAR(20) NOT NULL,
+  title VARCHAR(60) NOT NULL,
+  content VARCHAR(400) NOT NULL,
+  self_check_steps TEXT,
+  show_repair_button TINYINT NOT NULL DEFAULT 1,
+  status VARCHAR(20) NOT NULL DEFAULT 'UNREAD' COMMENT 'UNREAD / READ / REPAIR_REQUESTED / DISMISSED / ARCHIVED',
+  repair_order_id INT DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_notice (event_id, audience, house_code),
+  INDEX idx_notice_house (house_code, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

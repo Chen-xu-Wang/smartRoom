@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "answer": "7月电费245.82元，比6月的160.56元多了85.26元，主要是空调。7月空调用电231度，比6月多139度，占全部增量168度的八成多；两台空调运行时长从165小时增加到390小时，同期平均气温从27.1℃升到31.4℃。其它电器用电基本持平，近期也没有空调故障提醒，属于天热多开空调带来的正常上涨。如果想省一点，可以把热水器改到夜间谷时加热，每月约省21.6元。",
+  "evidence": [
+    { "label": "7月电费", "value": "245.82元", "source_path": "monthly[1].power.cost_yuan" },
+    { "label": "6月电费", "value": "160.56元", "source_path": "monthly[0].power.cost_yuan" },
+    { "label": "7月空调用电", "value": "231度", "source_path": "monthly[1].power.by_circuit_kwh.空调" },
+    { "label": "6月空调用电", "value": "92度", "source_path": "monthly[0].power.by_circuit_kwh.空调" },
+    { "label": "7月平均气温", "value": "31.4℃", "source_path": "monthly[1].weather.outdoor_avg_temp_c" },
+    { "label": "谷时可省", "value": "21.6元", "source_path": "monthly[1].power.est_saving_yuan" }
+  ],
+  "suggested_actions": [
+    {
+      "type": "CREATE_AUTOMATION_RULE",
+      "label": "热水器改谷时加热",
+      "payload": { "house_id": "1302", "circuit": "热水器", "schedule": "VALLEY_ONLY" }
+    },
+    {
+      "type": "VIEW_REPORT",
+      "label": "查看7月账单",
+      "payload": { "house_id": "1302", "month": "2026-07" }
+    }
+  ],
+  "out_of_scope": false
+}

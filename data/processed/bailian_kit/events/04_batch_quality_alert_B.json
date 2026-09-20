@@ -1,0 +1,50 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260715-BATCHB-0001",
+  "scope": "BATCH",
+  "house_id": null,
+  "related_houses": [
+    "701", "703", "704", "705", "706",
+    "802", "804", "805", "806",
+    "901", "902", "903", "905",
+    "1003", "1004", "1005", "1006",
+    "1101", "1102", "1104", "1106",
+    "1201", "1202", "1203", "1205"
+  ],
+  "batch_id": "B",
+  "domain": "JOINT",
+  "event_type": "BATCH_QUALITY_ALERT",
+  "severity": "HIGH",
+  "detected_at": "2026-07-15T09:00:00+08:00",
+  "location_candidates": [],
+  "evidence": {
+    "observation_days": 45,
+    "batch_house_count": 36,
+    "other_house_count": 72,
+    "defects": [
+      {
+        "event_type": "HIDDEN_LEAK",
+        "batch_count": 7,
+        "other_count": 4,
+        "rate_ratio": 3.5,
+        "p_value": 0.031,
+        "common_location": "卫生间-马桶进水阀",
+        "common_location_share": 0.86
+      },
+      {
+        "event_type": "TERMINAL_OVERHEAT",
+        "batch_count": 4,
+        "other_count": 2,
+        "rate_ratio": 4.0,
+        "p_value": 0.094,
+        "common_location": "配电箱-厨房回路断路器端子",
+        "common_location_share": 1.0
+      }
+    ],
+    "faulted_houses": ["702", "803", "904", "906", "1001", "1103", "1206", "801", "1002", "1105", "1204"]
+  },
+  "evidence_text": "B批次(7-12层，36户)45天内暗漏7户，发生率是A/C批次的3.5倍且统计显著，86%集中在马桶进水阀；端子发热4户，是其它批次的4倍，但样本少、尚不显著",
+  "control_actions_taken": [],
+  "archive_context": null,
+  "data_source": "SIMULATED"
+}

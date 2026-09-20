@@ -11,13 +11,22 @@ function mapRole(backendRole) {
   return 'admin'
 }
 
+/** 本地登录态是否可用：必须带未过期的令牌（旧版本登录态没有令牌，要求重新登录） */
+function usable(saved) {
+  return !!(saved?.username && saved.token && (!saved.expiresAt || saved.expiresAt * 1000 > Date.now()))
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => {
     let saved = null
     try {
       saved = JSON.parse(localStorage.getItem(STORAGE_KEY))
     } catch { saved = null }
-    return { user: saved && saved.username ? saved : null }
+    if (saved && !usable(saved)) {
+      saved = null
+      try { localStorage.removeItem(STORAGE_KEY) } catch { /* 隐私模式下忽略 */ }
+    }
+    return { user: saved }
   },
   getters: {
     isLoggedIn: (s) => !!s.user,
@@ -48,7 +57,12 @@ export const useAuthStore = defineStore('auth', {
           role: frontendRole,
           backendRole: u.role,
           name: u.real_name || u.username,
-          houseId: null,
+          // 名下房屋（后端 user_house 绑定）；houseId 为默认房屋，兼容只用单个房号的页面
+          houseIds: u.house_ids || [],
+          houseId: (u.house_ids || [])[0] || null,
+          // 访问令牌：api/index.js 从本地登录态读取并放进 Authorization 请求头
+          token: u.token,
+          expiresAt: u.expires_at,
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(this.user))
         return { ok: true, user: this.user }

@@ -1,0 +1,2496 @@
+{
+  "leakage": {
+    "events": [
+      {
+        "schema_version": "2.0",
+        "event_id": "EVT-20260625-1302-0001",
+        "scope": "HOUSE",
+        "house_id": "1302",
+        "related_houses": [],
+        "batch_id": "C",
+        "domain": "POWER",
+        "event_type": "LEAKAGE_CURRENT",
+        "severity": "MEDIUM",
+        "detected_at": "2026-06-25T23:59:59+08:00",
+        "fault_started_est": "2026-06-21",
+        "location_candidates": [
+          {
+            "segment_code": "CB-1302-BT",
+            "segment_name": "卫生间洗手台旁卫生间插座",
+            "device_code": "EL-1302-B-01",
+            "in_archive": false,
+            "confidence": 0.45
+          },
+          {
+            "segment_code": "CB-1302-BT",
+            "segment_name": "卫生间插座回路线缆",
+            "device_code": null,
+            "in_archive": false,
+            "confidence": 0.2
+          }
+        ],
+        "evidence": {
+          "circuit_code": "CB-1302-BT",
+          "residual_ma_baseline": 0.77,
+          "residual_ma_recent": 6.8,
+          "trip_threshold_ma": 30,
+          "trend_days": 4,
+          "pattern": "GRADUAL",
+          "trip_count": 0,
+          "near_trip": false,
+          "excess_ma": 6.28,
+          "humidity_adjusted": true,
+          "rh_mean_pct": 68.5
+        },
+        "evidence_text": "卫生间插座回路漏电流近4天持续升高，扣除湿度和用电影响后仍比入住初期高6.3 mA，目前约6.8 mA，保护动作值30 mA",
+        "control_actions_taken": [],
+        "archive_context": {
+          "building": "1栋",
+          "unit": "1单元",
+          "floor": "13层",
+          "layout": "三室两厅一卫",
+          "in_archive": true,
+          "recent_repairs_180d": 0,
+          "device_name": "卫生间插座",
+          "install_date": "2026-03-15"
+        },
+        "data_source": "SIMULATED"
+      }
+    ],
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "leakage_humidity_adjusted",
+      "config": {
+        "baseline_days": 14,
+        "humidity_ref_pct": 60.0,
+        "daily_quantile": 0.95,
+        "excess_warn_ma": 5.0,
+        "trend_start_ma": 2.0,
+        "persist_days": 2,
+        "min_closed_minutes": 360,
+        "trip_residual_ma": 15.0,
+        "near_trip_fraction": 0.5,
+        "repeat_window_h": 3
+      },
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "circuits": {
+        "CB-1302-SK": {
+          "baseline_p95_ma": 1.02,
+          "model": {
+            "intercept": 0.83,
+            "per_10pct_rh": -0.001,
+            "per_amp": 0.047
+          },
+          "daily": [
+            {
+              "date": "2026-06-01",
+              "p95_ma": 1.01,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 79.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-02",
+              "p95_ma": 1.01,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-03",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 69.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-04",
+              "p95_ma": 1.04,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 74.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-05",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-06",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 75.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-07",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 71.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-08",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-09",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 65.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-10",
+              "p95_ma": 1.01,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 67.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-11",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 72.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-12",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 78.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-13",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 77.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-14",
+              "p95_ma": 1.0,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 77.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-15",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-16",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-17",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-18",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 72.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-19",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 75.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-20",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-21",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 73.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-22",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-23",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 73.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-24",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-25",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-26",
+              "p95_ma": 1.01,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-27",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 65.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-28",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 71.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-29",
+              "p95_ma": 1.0,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 72.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-30",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 74.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-01",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-02",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-03",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-04",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-05",
+              "p95_ma": 1.04,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-06",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 67.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-07",
+              "p95_ma": 1.04,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 65.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-08",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-09",
+              "p95_ma": 1.01,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-10",
+              "p95_ma": 1.01,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-11",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 69.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-12",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            }
+          ]
+        },
+        "CB-1302-KT": {
+          "baseline_p95_ma": 1.83,
+          "model": {
+            "intercept": 1.389,
+            "per_10pct_rh": 0.15,
+            "per_amp": 0.043
+          },
+          "daily": [
+            {
+              "date": "2026-06-01",
+              "p95_ma": 1.9,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 79.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-02",
+              "p95_ma": 1.76,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-03",
+              "p95_ma": 1.75,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 69.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-04",
+              "p95_ma": 1.83,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 74.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-05",
+              "p95_ma": 1.74,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-06",
+              "p95_ma": 1.84,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-07",
+              "p95_ma": 1.8,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 71.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-08",
+              "p95_ma": 1.77,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-09",
+              "p95_ma": 1.71,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 65.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-10",
+              "p95_ma": 1.73,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 67.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-11",
+              "p95_ma": 1.83,
+              "excess_p95_ma": 0.2,
+              "trips": 0,
+              "rh_mean": 72.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-12",
+              "p95_ma": 1.87,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 78.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-13",
+              "p95_ma": 1.9,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 77.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-14",
+              "p95_ma": 1.88,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 77.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-15",
+              "p95_ma": 1.83,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-16",
+              "p95_ma": 1.79,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-17",
+              "p95_ma": 1.79,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-18",
+              "p95_ma": 1.78,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 72.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-19",
+              "p95_ma": 1.86,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 75.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-20",
+              "p95_ma": 1.78,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-21",
+              "p95_ma": 1.81,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-22",
+              "p95_ma": 1.79,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-23",
+              "p95_ma": 1.81,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-24",
+              "p95_ma": 1.73,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-25",
+              "p95_ma": 1.75,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-26",
+              "p95_ma": 1.71,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-27",
+              "p95_ma": 1.69,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 65.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-28",
+              "p95_ma": 1.78,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-29",
+              "p95_ma": 1.79,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 72.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-30",
+              "p95_ma": 1.83,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 74.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-01",
+              "p95_ma": 1.82,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-02",
+              "p95_ma": 1.86,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-03",
+              "p95_ma": 1.76,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-04",
+              "p95_ma": 1.8,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 73.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-05",
+              "p95_ma": 1.78,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-06",
+              "p95_ma": 1.72,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 67.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-07",
+              "p95_ma": 1.69,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 65.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-08",
+              "p95_ma": 1.71,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-09",
+              "p95_ma": 1.77,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-10",
+              "p95_ma": 1.74,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-11",
+              "p95_ma": 1.75,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 69.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-12",
+              "p95_ma": 1.76,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            }
+          ]
+        },
+        "CB-1302-BT": {
+          "baseline_p95_ma": 0.77,
+          "model": {
+            "intercept": 0.339,
+            "per_10pct_rh": 0.148,
+            "per_amp": 0.044
+          },
+          "daily": [
+            {
+              "date": "2026-06-01",
+              "p95_ma": 0.85,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 79.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-02",
+              "p95_ma": 0.7,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-03",
+              "p95_ma": 0.73,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 69.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-04",
+              "p95_ma": 0.76,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 74.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-05",
+              "p95_ma": 0.66,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-06",
+              "p95_ma": 0.79,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-07",
+              "p95_ma": 0.73,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 71.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-08",
+              "p95_ma": 0.71,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-09",
+              "p95_ma": 0.66,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 65.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-10",
+              "p95_ma": 0.67,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 67.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-11",
+              "p95_ma": 0.75,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 72.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-12",
+              "p95_ma": 0.83,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 78.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-13",
+              "p95_ma": 0.85,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 77.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-14",
+              "p95_ma": 0.81,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 77.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-15",
+              "p95_ma": 0.77,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 73.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-16",
+              "p95_ma": 0.84,
+              "excess_p95_ma": 0.3,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-17",
+              "p95_ma": 1.04,
+              "excess_p95_ma": 0.54,
+              "trips": 0,
+              "rh_mean": 70.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-18",
+              "p95_ma": 1.4,
+              "excess_p95_ma": 0.87,
+              "trips": 0,
+              "rh_mean": 72.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-19",
+              "p95_ma": 1.91,
+              "excess_p95_ma": 1.36,
+              "trips": 0,
+              "rh_mean": 75.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-20",
+              "p95_ma": 2.38,
+              "excess_p95_ma": 1.9,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-21",
+              "p95_ma": 3.11,
+              "excess_p95_ma": 2.6,
+              "trips": 0,
+              "rh_mean": 73.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-22",
+              "p95_ma": 3.83,
+              "excess_p95_ma": 3.35,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-23",
+              "p95_ma": 4.82,
+              "excess_p95_ma": 4.27,
+              "trips": 0,
+              "rh_mean": 73.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-24",
+              "p95_ma": 5.66,
+              "excess_p95_ma": 5.19,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": true
+            },
+            {
+              "date": "2026-06-25",
+              "p95_ma": 6.75,
+              "excess_p95_ma": 6.28,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": true
+            },
+            {
+              "date": "2026-06-26",
+              "p95_ma": 7.87,
+              "excess_p95_ma": 7.43,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": true
+            },
+            {
+              "date": "2026-06-27",
+              "p95_ma": 9.15,
+              "excess_p95_ma": 8.73,
+              "trips": 0,
+              "rh_mean": 65.5,
+              "flagged": true
+            },
+            {
+              "date": "2026-06-28",
+              "p95_ma": 10.75,
+              "excess_p95_ma": 10.26,
+              "trips": 0,
+              "rh_mean": 71.0,
+              "flagged": true
+            },
+            {
+              "date": "2026-06-29",
+              "p95_ma": 12.38,
+              "excess_p95_ma": 11.87,
+              "trips": 0,
+              "rh_mean": 72.3,
+              "flagged": true
+            },
+            {
+              "date": "2026-06-30",
+              "p95_ma": 14.09,
+              "excess_p95_ma": 13.55,
+              "trips": 0,
+              "rh_mean": 74.3,
+              "flagged": true
+            },
+            {
+              "date": "2026-07-01",
+              "p95_ma": 15.83,
+              "excess_p95_ma": 15.29,
+              "trips": 0,
+              "rh_mean": 73.8,
+              "flagged": true
+            },
+            {
+              "date": "2026-07-02",
+              "p95_ma": 17.81,
+              "excess_p95_ma": 17.25,
+              "trips": 0,
+              "rh_mean": 75.2,
+              "flagged": true
+            },
+            {
+              "date": "2026-07-03",
+              "p95_ma": 19.42,
+              "excess_p95_ma": 18.91,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": true
+            },
+            {
+              "date": "2026-07-04",
+              "p95_ma": 21.71,
+              "excess_p95_ma": 21.17,
+              "trips": 0,
+              "rh_mean": 73.1,
+              "flagged": true
+            },
+            {
+              "date": "2026-07-05",
+              "p95_ma": 23.47,
+              "excess_p95_ma": 22.97,
+              "trips": 1,
+              "rh_mean": 70.4,
+              "flagged": true
+            },
+            {
+              "date": "2026-07-06",
+              "p95_ma": null,
+              "excess_p95_ma": null,
+              "trips": 1,
+              "rh_mean": null,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-07",
+              "p95_ma": null,
+              "excess_p95_ma": null,
+              "trips": 1,
+              "rh_mean": null,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-08",
+              "p95_ma": null,
+              "excess_p95_ma": null,
+              "trips": 1,
+              "rh_mean": null,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-09",
+              "p95_ma": null,
+              "excess_p95_ma": null,
+              "trips": 1,
+              "rh_mean": null,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-10",
+              "p95_ma": null,
+              "excess_p95_ma": null,
+              "trips": 1,
+              "rh_mean": null,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-11",
+              "p95_ma": null,
+              "excess_p95_ma": null,
+              "trips": 1,
+              "rh_mean": null,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-12",
+              "p95_ma": null,
+              "excess_p95_ma": null,
+              "trips": 1,
+              "rh_mean": null,
+              "flagged": false
+            }
+          ]
+        },
+        "CB-1302-WH": {
+          "baseline_p95_ma": 1.46,
+          "model": {
+            "intercept": 0.89,
+            "per_10pct_rh": 0.15,
+            "per_amp": 0.045
+          },
+          "daily": [
+            {
+              "date": "2026-06-01",
+              "p95_ma": 1.6,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 79.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-02",
+              "p95_ma": 1.37,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-03",
+              "p95_ma": 1.43,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 69.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-04",
+              "p95_ma": 1.51,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 74.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-05",
+              "p95_ma": 1.34,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-06",
+              "p95_ma": 1.47,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-07",
+              "p95_ma": 1.38,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 71.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-08",
+              "p95_ma": 1.37,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-09",
+              "p95_ma": 1.3,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 65.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-10",
+              "p95_ma": 1.41,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 67.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-11",
+              "p95_ma": 1.42,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 72.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-12",
+              "p95_ma": 1.61,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 78.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-13",
+              "p95_ma": 1.5,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 77.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-14",
+              "p95_ma": 1.5,
+              "excess_p95_ma": 0.15,
+              "trips": 0,
+              "rh_mean": 77.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-15",
+              "p95_ma": 1.5,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 73.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-16",
+              "p95_ma": 1.4,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-17",
+              "p95_ma": 1.35,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-18",
+              "p95_ma": 1.42,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 72.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-19",
+              "p95_ma": 1.46,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-20",
+              "p95_ma": 1.46,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-21",
+              "p95_ma": 1.45,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 73.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-22",
+              "p95_ma": 1.38,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-23",
+              "p95_ma": 1.46,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-24",
+              "p95_ma": 1.37,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-25",
+              "p95_ma": 1.37,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-26",
+              "p95_ma": 1.32,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-27",
+              "p95_ma": 1.31,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 65.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-28",
+              "p95_ma": 1.39,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-29",
+              "p95_ma": 1.41,
+              "excess_p95_ma": 0.2,
+              "trips": 0,
+              "rh_mean": 72.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-30",
+              "p95_ma": 1.44,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 74.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-01",
+              "p95_ma": 1.45,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-02",
+              "p95_ma": 1.43,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-03",
+              "p95_ma": 1.37,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-04",
+              "p95_ma": 1.42,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 73.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-05",
+              "p95_ma": 1.41,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-06",
+              "p95_ma": 1.38,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 67.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-07",
+              "p95_ma": 1.28,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 65.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-08",
+              "p95_ma": 1.33,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-09",
+              "p95_ma": 1.34,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-10",
+              "p95_ma": 1.33,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-11",
+              "p95_ma": 1.36,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 69.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-12",
+              "p95_ma": 1.38,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            }
+          ]
+        },
+        "CB-1302-AC1": {
+          "baseline_p95_ma": 1.12,
+          "model": {
+            "intercept": 0.907,
+            "per_10pct_rh": 0.001,
+            "per_amp": 0.045
+          },
+          "daily": [
+            {
+              "date": "2026-06-01",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 79.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-02",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-03",
+              "p95_ma": 1.1,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 69.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-04",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 74.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-05",
+              "p95_ma": 1.1,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-06",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-07",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-08",
+              "p95_ma": 1.1,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-09",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 65.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-10",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 67.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-11",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 72.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-12",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 78.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-13",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 77.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-14",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 77.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-15",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 73.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-16",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-17",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 70.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-18",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 72.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-19",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-20",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-21",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-22",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-23",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 73.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-24",
+              "p95_ma": 1.1,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-25",
+              "p95_ma": 1.1,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-26",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-27",
+              "p95_ma": 1.1,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 65.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-28",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-29",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 72.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-30",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 74.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-01",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-02",
+              "p95_ma": 1.14,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 75.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-03",
+              "p95_ma": 1.14,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-04",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-05",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-06",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 67.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-07",
+              "p95_ma": 1.11,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 65.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-08",
+              "p95_ma": 1.13,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-09",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-10",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-11",
+              "p95_ma": 1.14,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 69.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-12",
+              "p95_ma": 1.12,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            }
+          ]
+        },
+        "CB-1302-AC2": {
+          "baseline_p95_ma": 0.95,
+          "model": {
+            "intercept": 0.691,
+            "per_10pct_rh": -0.001,
+            "per_amp": 0.045
+          },
+          "daily": [
+            {
+              "date": "2026-06-01",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 79.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-02",
+              "p95_ma": 0.97,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-03",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 69.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-04",
+              "p95_ma": 0.94,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 74.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-05",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-06",
+              "p95_ma": 0.94,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 75.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-07",
+              "p95_ma": 0.92,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-08",
+              "p95_ma": 0.93,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-09",
+              "p95_ma": 0.94,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 65.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-10",
+              "p95_ma": 0.93,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 67.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-11",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 72.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-12",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 78.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-13",
+              "p95_ma": 1.0,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 77.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-14",
+              "p95_ma": 0.98,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 77.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-15",
+              "p95_ma": 0.96,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 73.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-16",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-17",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-18",
+              "p95_ma": 0.94,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 72.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-19",
+              "p95_ma": 0.98,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-20",
+              "p95_ma": 0.93,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-21",
+              "p95_ma": 0.98,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 73.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-22",
+              "p95_ma": 0.93,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 71.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-23",
+              "p95_ma": 0.99,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 73.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-24",
+              "p95_ma": 0.91,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-25",
+              "p95_ma": 0.96,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-26",
+              "p95_ma": 0.93,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-27",
+              "p95_ma": 0.92,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 65.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-28",
+              "p95_ma": 0.99,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 71.0,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-29",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.19,
+              "trips": 0,
+              "rh_mean": 72.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-06-30",
+              "p95_ma": 0.96,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 74.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-01",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 73.8,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-02",
+              "p95_ma": 0.98,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 75.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-03",
+              "p95_ma": 0.98,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-04",
+              "p95_ma": 1.0,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 73.1,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-05",
+              "p95_ma": 1.01,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 70.5,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-06",
+              "p95_ma": 0.96,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 67.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-07",
+              "p95_ma": 0.98,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 65.3,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-08",
+              "p95_ma": 0.95,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 66.9,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-09",
+              "p95_ma": 0.93,
+              "excess_p95_ma": 0.16,
+              "trips": 0,
+              "rh_mean": 70.2,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-10",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.17,
+              "trips": 0,
+              "rh_mean": 68.7,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-11",
+              "p95_ma": 1.03,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 69.4,
+              "flagged": false
+            },
+            {
+              "date": "2026-07-12",
+              "p95_ma": 1.02,
+              "excess_p95_ma": 0.18,
+              "trips": 0,
+              "rh_mean": 70.6,
+              "flagged": false
+            }
+          ]
+        }
+      },
+      "status": "EVENT"
+    }
+  },
+  "voltage": {
+    "event": null,
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "voltage_gb12325_appliance_neighbors",
+      "config": {
+        "nominal_v": 220.0,
+        "upper_ratio": 0.07,
+        "lower_ratio": -0.1,
+        "window_days": 3,
+        "window_minutes": 20,
+        "min_days_in_window": 2,
+        "same_phase_ratio": 0.6,
+        "baseline_days": 14,
+        "wiring_ohm_warn": 0.5,
+        "wiring_ratio_warn": 3.0,
+        "risk_minutes": 10
+      },
+      "limits_v": [
+        198.0,
+        235.4
+      ],
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "daily": [
+        {
+          "date": "2026-06-01",
+          "vmin": 220.3,
+          "vmax": 230.8,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-02",
+          "vmin": 218.6,
+          "vmax": 230.8,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-03",
+          "vmin": 220.1,
+          "vmax": 231.0,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-04",
+          "vmin": 218.8,
+          "vmax": 230.6,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-05",
+          "vmin": 221.3,
+          "vmax": 231.3,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-06",
+          "vmin": 218.8,
+          "vmax": 231.0,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-07",
+          "vmin": 220.1,
+          "vmax": 230.6,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-08",
+          "vmin": 219.3,
+          "vmax": 232.3,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-09",
+          "vmin": 220.1,
+          "vmax": 231.3,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-10",
+          "vmin": 217.6,
+          "vmax": 231.5,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-11",
+          "vmin": 220.8,
+          "vmax": 231.3,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-12",
+          "vmin": 220.4,
+          "vmax": 231.6,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-13",
+          "vmin": 219.5,
+          "vmax": 231.2,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-14",
+          "vmin": 219.9,
+          "vmax": 231.2,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-15",
+          "vmin": 219.0,
+          "vmax": 231.0,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-16",
+          "vmin": 218.4,
+          "vmax": 231.1,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-17",
+          "vmin": 219.9,
+          "vmax": 230.7,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-18",
+          "vmin": 220.8,
+          "vmax": 230.8,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-19",
+          "vmin": 221.4,
+          "vmax": 231.4,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-20",
+          "vmin": 217.9,
+          "vmax": 231.4,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-21",
+          "vmin": 221.7,
+          "vmax": 230.9,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-22",
+          "vmin": 221.4,
+          "vmax": 231.6,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-23",
+          "vmin": 220.2,
+          "vmax": 230.7,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-24",
+          "vmin": 218.1,
+          "vmax": 231.7,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-25",
+          "vmin": 220.5,
+          "vmax": 231.8,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-26",
+          "vmin": 219.6,
+          "vmax": 231.1,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-27",
+          "vmin": 219.0,
+          "vmax": 231.9,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-28",
+          "vmin": 220.3,
+          "vmax": 230.9,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-29",
+          "vmin": 220.1,
+          "vmax": 232.0,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-06-30",
+          "vmin": 218.4,
+          "vmax": 231.3,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-01",
+          "vmin": 220.3,
+          "vmax": 231.6,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-02",
+          "vmin": 219.7,
+          "vmax": 230.6,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-03",
+          "vmin": 220.2,
+          "vmax": 231.7,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-04",
+          "vmin": 219.2,
+          "vmax": 230.9,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-05",
+          "vmin": 219.5,
+          "vmax": 232.2,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-06",
+          "vmin": 220.3,
+          "vmax": 230.6,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-07",
+          "vmin": 221.1,
+          "vmax": 230.7,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-08",
+          "vmin": 222.0,
+          "vmax": 230.9,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-09",
+          "vmin": 220.1,
+          "vmax": 231.5,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-10",
+          "vmin": 219.7,
+          "vmax": 230.1,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-11",
+          "vmin": 221.2,
+          "vmax": 231.0,
+          "minutes_out": 0,
+          "flagged": false
+        },
+        {
+          "date": "2026-07-12",
+          "vmin": 220.4,
+          "vmax": 230.6,
+          "minutes_out": 0,
+          "flagged": false
+        }
+      ],
+      "status": "NO_EVENT",
+      "same_phase_neighbors": [
+        "1105",
+        "1202",
+        "1305",
+        "1402",
+        "1505"
+      ],
+      "other_phase_neighbors": [
+        "1301",
+        "1303"
+      ]
+    }
+  }
+}

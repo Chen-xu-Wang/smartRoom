@@ -1,0 +1,37 @@
+# ============================================================
+# 数据侧依赖清单（物理模拟器、检测样例脚本、契约校验）
+# ------------------------------------------------------------
+# 与 backend/requirements.txt 分开的原因：
+#   后端服务本身只用标准库 + FastAPI，不依赖科学计算栈；
+#   这里的包只在离线生成模拟数据、跑样例和校验契约时才需要。
+#
+# 安装方法（在项目根目录）：
+#   pip install -r data/scripts/requirements.txt
+#
+# 用法示例（均在项目根目录执行）：
+#   python data/scripts/build_building.py          生成 108 户楼栋拓扑
+#   python data/scripts/run_behavior.py            生成住户行为与 dev/test 真值
+#   python data/scripts/run_sample_blockage.py     进水堵塞样例与评估报告
+#   python data/scripts/run_sample_water_leak.py   暗漏、爆管样例
+#   python data/scripts/run_sample_power.py        漏电、电压安全样例
+#   python data/scripts/validate_contracts.py      契约与样例校验
+#
+# 版本说明：以下为本项目实际验证通过的版本（Python 3.12）。
+# 与后端保持一致，写死版本号（==）保证团队成员生成的模拟数据可复现。
+# ============================================================
+
+# ---------- 数值与时序处理 ----------
+# NumPy：随机数发生器（固定种子保证可复现）、水力与电气模型的向量运算
+numpy==2.4.6
+# pandas：分钟级时序的重采样、聚合与样例数据读写（.csv.gz）
+pandas==3.0.3
+# SciPy：行为模型自检中的统计显著性检验（验证画像之间差异显著）
+scipy==1.18.1
+
+# ---------- 配置与契约 ----------
+# PyYAML：读取 sim_params.yaml / price_tables.yaml 参数库
+PyYAML==6.0.3
+# jsonschema：按 data/processed/contracts/ 下的 Schema 校验事件与报告样例
+jsonschema==4.26.0
+# referencing：jsonschema 的 $ref 解析（多个 Schema 互相引用 common.schema.json）
+referencing==0.37.0

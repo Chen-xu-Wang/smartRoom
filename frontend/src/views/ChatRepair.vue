@@ -141,7 +141,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { House, Document, Loading, Check, RefreshLeft, Paperclip, Microphone } from '@element-plus/icons-vue'
 import { useChatStore } from '../stores/chat'
-import api from '../api'
+import api, { errorText } from '../api'
 import ChatMessage from '../components/ChatMessage.vue'
 
 const route = useRoute()
@@ -353,7 +353,7 @@ onMounted(async () => {
     await chatStore.init(houseId)
     await scrollToBottom()
   } catch (e) {
-    ElMessage.error('加载房屋信息失败')
+    ElMessage.error(e?.response?.status === 403 ? errorText(e) : '加载房屋信息失败')
   }
 })
 </script>

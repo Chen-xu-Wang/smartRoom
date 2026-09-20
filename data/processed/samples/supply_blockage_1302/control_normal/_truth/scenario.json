@@ -1,0 +1,6 @@
+{
+  "scenario": "control_normal",
+  "description": "无故障对照：检测不应报出",
+  "faults": [],
+  "pressure_events": []
+}

@@ -41,6 +41,19 @@ HOUSE_PROFILES_FILE = os.path.join(DATA_DIR, "house_profiles.json")
 HOUSES_FILE = os.path.join(DATA_DIR, "houses.json")
 
 # ------------------------------------------------------------------
+# 主动感知（模拟数据）配置
+# ------------------------------------------------------------------
+# 扩展的一房一码档案（给水拓扑、传感器布点）与模拟传感器数据，由 data/scripts 生成。
+# 路径可在 .env 中覆盖；默认指向仓库内 data/processed。
+PROJECT_DIR = BACKEND_DIR.parent
+SIM_BUILDING_FILE = os.getenv(
+    "SIM_BUILDING_FILE", str(PROJECT_DIR / "data" / "processed" / "sim_config" / "sim_building.json")
+)
+SENSING_SAMPLE_DIR = os.getenv(
+    "SENSING_SAMPLE_DIR", str(PROJECT_DIR / "data" / "processed" / "samples")
+)
+
+# ------------------------------------------------------------------
 # MySQL 数据库配置
 # ------------------------------------------------------------------
 # 各项含义：
@@ -67,6 +80,15 @@ DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "5"))
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")
+
+# ------------------------------------------------------------------
+# 登录鉴权（见 app/security.py）
+# ------------------------------------------------------------------
+# JWT_SECRET：令牌签名密钥，务必设置为足够长的随机串且不要提交到仓库；
+#             未设置时每次启动随机生成（重启后所有人需要重新登录）
+# JWT_EXPIRE_HOURS：登录有效期（小时）
+JWT_SECRET = os.getenv("JWT_SECRET", "")
+JWT_EXPIRE_HOURS = float(os.getenv("JWT_EXPIRE_HOURS", "12"))
 
 # ------------------------------------------------------------------
 # 后端服务配置

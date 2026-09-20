@@ -1,0 +1,19 @@
+{
+  "scenario": "voltage_supply_high",
+  "description": "供电侧：06-24 起 L2 相每晚 23:00–06:00 轻载过电压 +17 V",
+  "name": "voltage_supply_high",
+  "leakage_faults": [],
+  "wiring_faults": [],
+  "phase_events": [
+    {
+      "phase": "L2",
+      "start": "2026-06-24",
+      "end": "2026-07-13",
+      "hour_from": 23,
+      "hour_to": 6,
+      "delta_v": 17.0,
+      "note": "变压器挡位偏高、夜间轻载"
+    }
+  ],
+  "humidity_events": []
+}

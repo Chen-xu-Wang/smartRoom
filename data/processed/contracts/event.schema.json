@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartroom.example/contracts/v2/event.schema.json",
+  "title": "契约① 异常事件（检测模块输出 → 百炼应用① 输入）",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "event_id", "scope", "house_id", "related_houses", "batch_id",
+    "domain", "event_type", "severity", "detected_at", "location_candidates",
+    "evidence", "evidence_text", "control_actions_taken", "archive_context", "data_source"
+  ],
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+    "scope": { "$ref": "common.schema.json#/$defs/scope" },
+    "house_id": {
+      "description": "scope=HOUSE 时必填；其它范围为 null。",
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/houseId" }, { "type": "null" }]
+    },
+    "related_houses": {
+      "description": "HOUSE：可能受影响的相邻住户；STACK：同立管需通知的住户；BUILDING：受影响住户（空=全楼）；BATCH：建议巡检住户。",
+      "$ref": "common.schema.json#/$defs/houseIdList"
+    },
+    "batch_id": {
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/batchId" }, { "type": "null" }]
+    },
+    "domain": { "$ref": "common.schema.json#/$defs/domain" },
+    "event_type": { "$ref": "common.schema.json#/$defs/eventType" },
+    "severity": { "$ref": "common.schema.json#/$defs/severity" },
+    "detected_at": { "$ref": "common.schema.json#/$defs/dateTime" },
+    "fault_started_est": {
+      "description": "估计的故障开始日期（渐进型故障有意义，可选）。",
+      "$ref": "common.schema.json#/$defs/date"
+    },
+    "location_candidates": {
+      "description": "定位候选，按置信度降序，最多 3 个，置信度之和 ≤ 1。无定位意义的事件（关怀、批次、离线）为空数组。",
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["segment_code", "segment_name", "device_code", "in_archive", "confidence"],
+        "properties": {
+          "segment_code": { "$ref": "common.schema.json#/$defs/segmentCode" },
+          "segment_name": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "device_code": {
+            "anyOf": [{ "$ref": "common.schema.json#/$defs/archiveDeviceCode" }, { "type": "null" }]
+          },
+          "in_archive": {
+            "description": "该部件是否已登记在一房一码档案中；false 表示仅存在于模拟拓扑。",
+            "type": "boolean"
+          },
+          "confidence": { "$ref": "common.schema.json#/$defs/confidence" }
+        }
+      }
+    },
+    "evidence": {
+      "description": "按 event_type 约定的结构化证据，见下方 allOf 与 README。只允许事件级数值，不含原始曲线和具体作息时间。",
+      "type": "object"
+    },
+    "evidence_text": {
+      "description": "一句话证据摘要，供大模型直接引用。",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "control_actions_taken": {
+      "description": "检测时已自动执行的控制动作。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "target", "executed_at", "result"],
+        "properties": {
+          "action": { "$ref": "common.schema.json#/$defs/controlAction" },
+          "target": { "type": "string", "minLength": 1 },
+          "executed_at": { "$ref": "common.schema.json#/$defs/dateTime" },
+          "result": { "type": "string", "enum": ["SUCCESS", "FAILED", "NO_RESPONSE"] }
+        }
+      }
+    },
+    "archive_context": {
+      "description": "scope=HOUSE 时为该户档案摘要；其它范围为 null。",
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["building", "unit", "floor", "layout", "in_archive"],
+          "properties": {
+            "building": { "type": "string" },
+            "unit": { "type": "string" },
+            "floor": { "type": "string" },
+            "layout": { "type": "string" },
+            "in_archive": {
+              "description": "该户是否在现有 MySQL 档案中（1302/805/503 为 true，其余模拟住户为 false）。",
+              "type": "boolean"
+            },
+            "persona_hint": {
+              "description": "仅在关怀类事件中出现，且只允许粗粒度标签。",
+              "type": "string",
+              "enum": ["独居老人"]
+            },
+            "device_name": { "type": "string" },
+            "device_model": { "type": "string" },
+            "install_date": { "$ref": "common.schema.json#/$defs/date" },
+            "recent_repairs_180d": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "data_source": { "$ref": "common.schema.json#/$defs/dataSource" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "scope": { "const": "HOUSE" } } },
+      "then": {
+        "properties": {
+          "house_id": { "$ref": "common.schema.json#/$defs/houseId" },
+          "archive_context": { "type": "object" }
+        }
+      },
+      "else": {
+        "properties": {
+          "house_id": { "type": "null" },
+          "archive_context": { "type": "null" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "SUPPLY_BLOCKAGE" } } },
+      "then": { "properties": { "domain": { "const": "WATER" }, "evidence": {
+        "required": ["metric", "baseline", "recent", "change_ratio", "duration_days", "inlet_pressure_change", "same_branch_other_fixtures", "hot_cold"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "DRAIN_BLOCKAGE" } } },
+      "then": { "properties": { "domain": { "const": "WATER" }, "evidence": {
+        "required": ["tau_baseline_s", "tau_recent_s", "tau_ratio", "standing_water", "same_room_other_drains"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "STACK_BLOCKAGE" } } },
+      "then": { "properties": { "scope": { "const": "STACK" }, "domain": { "const": "WATER" }, "evidence": {
+        "required": ["stack_id", "floor_range", "abnormal_houses", "upstream_correlation"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "HIDDEN_LEAK" } } },
+      "then": { "properties": { "domain": { "const": "WATER" }, "evidence": {
+        "required": ["night_min_flow_lpm", "consecutive_nights", "est_daily_loss_l"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "PIPE_BURST" } } },
+      "then": { "properties": { "domain": { "const": "WATER" }, "severity": { "const": "CRITICAL" }, "evidence": {
+        "required": ["peak_flow_lpm", "duration_s", "rated_max_lpm", "matched_fixture", "est_loss_l", "occupancy"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "WATER_INTRUSION" } } },
+      "then": { "properties": { "domain": { "const": "JOINT" }, "evidence": {
+        "required": ["sensor_codes", "source_inference", "flow_anomaly"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "LEAKAGE_CURRENT" } } },
+      "then": { "properties": { "domain": { "const": "POWER" }, "evidence": {
+        "required": ["circuit_code", "residual_ma_baseline", "residual_ma_recent", "trip_threshold_ma", "trend_days"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "TERMINAL_OVERHEAT" } } },
+      "then": { "properties": { "domain": { "const": "POWER" }, "severity": { "const": "CRITICAL" }, "evidence": {
+        "required": ["circuit_code", "terminal_temp_c", "ambient_temp_c", "current_a", "rated_current_a", "rise_per_a2_baseline", "rise_per_a2_recent"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "AC_EFFICIENCY_DROP" } } },
+      "then": { "properties": { "domain": { "const": "POWER" }, "evidence": {
+        "required": ["efficiency_index_baseline", "efficiency_index_recent", "change_ratio", "comparable_hours", "suspected_cause"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "WATER_HEATER_SCALING" } } },
+      "then": { "properties": { "domain": { "const": "JOINT" }, "evidence": {
+        "required": ["thermal_efficiency_baseline", "thermal_efficiency_recent", "diagnosis"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "CARE_ABNORMAL" } } },
+      "then": { "properties": { "domain": { "const": "CARE" }, "location_candidates": { "maxItems": 0 }, "evidence": {
+        "required": ["care_level", "signals", "delay_vs_baseline_min"],
+        "properties": {
+          "care_level": { "type": "integer", "minimum": 1, "maximum": 3 },
+          "signals": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["water", "power", "presence"],
+            "properties": {
+              "water": { "enum": ["NORMAL", "ABSENT"] },
+              "power": { "enum": ["NORMAL", "ABSENT"] },
+              "presence": { "enum": ["NORMAL", "ABSENT", "STATIONARY_LONG"] }
+            }
+          },
+          "delay_vs_baseline_min": { "type": "integer", "minimum": 0 }
+        } } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "BATCH_QUALITY_ALERT" } } },
+      "then": { "properties": { "scope": { "const": "BATCH" }, "batch_id": { "$ref": "common.schema.json#/$defs/batchId" }, "location_candidates": { "maxItems": 0 }, "evidence": {
+        "required": ["observation_days", "batch_house_count", "other_house_count", "defects", "faulted_houses"] } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "VOLTAGE_ABNORMAL" } } },
+      "then": { "properties": { "domain": { "const": "POWER" }, "evidence": {
+        "required": ["voltage_min_v", "voltage_max_v", "limits_v", "minutes_out_of_range", "days_affected", "source_inference", "appliances_at_risk"],
+        "properties": {
+          "source_inference": { "enum": ["SUPPLY", "HOUSE_WIRING", "UNKNOWN"] },
+          "limits_v": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } },
+          "appliances_at_risk": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["appliance", "name", "range_v", "minutes_outside"],
+              "properties": {
+                "appliance": { "type": "string" },
+                "name": { "type": "string" },
+                "range_v": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } },
+                "minutes_outside": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
+        } } } }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "METER_OFFLINE" } } },
+      "then": { "properties": { "location_candidates": { "maxItems": 0 }, "evidence": {
+        "required": ["meter_code", "offline_minutes", "last_seen_at"] } } }
+    }
+  ]
+}

@@ -20,6 +20,8 @@
           </template>
           <!-- 维修工：仅看自己工单 -->
           <router-link v-if="auth.isRepairer" to="/repair" class="nav-item">我的工单</router-link>
+          <!-- 3D 数字孪生：登录后才出现，和其它导航一样在当前页面内切换 -->
+          <router-link v-if="auth.isLoggedIn" :to="{ path: '/twin', query: twinQuery }" class="nav-item">3D 数字孪生</router-link>
           <template v-if="auth.isLoggedIn">
             <el-dropdown @command="onUserCommand">
               <span class="user-chip">
@@ -50,13 +52,34 @@
 </template>
 
 <script setup>
+import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { HomeFilled, Avatar } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from './stores/auth'
+import { twinRoleOf } from './utils/twin'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
+
+// 进入 3D 时带上角色；居民在扫码/报修/档案页时把当前房号一并带上，直接落到自己家
+const twinQuery = computed(() => {
+  const q = { role: twinRoleOf(auth) }
+  const house = auth.isResident ? (route.params.houseId || auth.user?.houseId || '') : ''
+  if (house) q.house = house
+  return q
+})
+
+// 令牌失效（过期、账号被禁用、后端更换密钥）：回到登录页，登录后回到原页面
+function onAuthExpired() {
+  if (!auth.user) return
+  auth.logout()
+  ElMessage.warning('登录已失效，请重新登录')
+  router.push({ path: '/login', query: { redirect: route.fullPath } })
+}
+onMounted(() => window.addEventListener('auth:expired', onAuthExpired))
+onBeforeUnmount(() => window.removeEventListener('auth:expired', onAuthExpired))
 
 function onUserCommand(cmd) {
   if (cmd === 'logout') {

@@ -3,7 +3,7 @@
     <div class="page-heading">
       <div>
         <h2 class="section-title"><el-icon><User /></el-icon> 人员管理</h2>
-        <p>管理维修工、物业与住户账号，维修工可配置技能、负荷与在岗状态。</p>
+        <p>管理维修工、物业与住户账号，维修工可配置技能、负荷与在岗状态，住户可绑定名下房屋。</p>
       </div>
       <el-button type="primary" :icon="Plus" @click="openAdd">新增人员</el-button>
     </div>
@@ -27,12 +27,16 @@
           <template #default="{row}"><el-tag :type="roleTag(row.role)" size="small">{{ roleLabel(row.role) }}</el-tag></template>
         </el-table-column>
         <el-table-column prop="phone" label="手机" width="130" />
-        <el-table-column label="技能/状态" min-width="200">
+        <el-table-column label="技能/状态/房屋" min-width="220">
           <template #default="{row}">
             <template v-if="row.role==='REPAIRER'">
               <el-tag v-for="s in row.skills" :key="s" size="small" effect="plain" style="margin-right:4px">{{ s }}</el-tag>
               <el-tag size="small" :type="row.on_duty? 'success':'info'">{{ row.on_duty? '在岗':'休息' }}</el-tag>
               <span style="margin-left:6px; font-size:11px; color:#64748b">{{ row.active_orders ?? row.max_active_orders }}/{{ row.max_active_orders }} · 今日{{ row.daily_capacity }}</span>
+            </template>
+            <template v-else-if="row.role==='RESIDENT'">
+              <el-tag v-for="h in row.houses" :key="h.house_code" size="small" :type="h.relation==='OWNER'?'success':'info'" effect="plain" style="margin-right:4px">{{ h.house_code }} · {{ relationLabel(h.relation) }}</el-tag>
+              <span v-if="!row.houses?.length" style="font-size:12px; color:#f59e0b">未绑定房屋</span>
             </template>
             <span v-else style="font-size:12px; color:#64748b">—</span>
           </template>
@@ -73,6 +77,21 @@
           <el-form-item label="日容量"><el-input-number v-model="form.daily_capacity" :min="1" :max="20" /></el-form-item>
           <el-form-item label="在岗"><el-switch v-model="form.on_duty" :active-value="1" :inactive-value="0" /></el-form-item>
         </template>
+        <el-form-item v-if="form.role==='RESIDENT'" label="名下房屋">
+          <div class="houses-editor">
+            <div v-for="(h, i) in form.houses" :key="i" class="house-row">
+              <el-select v-model="h.house_code" filterable placeholder="房号，如 1302" style="width:180px">
+                <el-option v-for="c in houseCodes" :key="c.house_code" :label="c.house_code + (c.source==='ARCHIVE' ? '（正式档案）' : '')" :value="c.house_code" />
+              </el-select>
+              <el-select v-model="h.relation" style="width:100px">
+                <el-option label="业主" value="OWNER" /><el-option label="租户" value="TENANT" />
+              </el-select>
+              <el-button :icon="Delete" circle size="small" @click="form.houses.splice(i, 1)" />
+            </div>
+            <el-button size="small" :icon="Plus" @click="form.houses.push({ house_code:'', relation:'OWNER' })">添加房屋</el-button>
+            <div class="hint">住户在 APP 与 3D 数字孪生中只能查看名下房屋。</div>
+          </div>
+        </el-form-item>
         <el-form-item v-if="isEdit" label="启用"><el-switch v-model="form.status" :active-value="1" :inactive-value="0" /></el-form-item>
       </el-form>
       <template #footer>
@@ -85,7 +104,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { User, Plus } from '@element-plus/icons-vue'
+import { User, Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import api from '../api'
 
@@ -99,8 +118,10 @@ const users = ref([])
 const filtered = ref([])
 const form = ref({ username:'', real_name:'', phone:'', role:'REPAIRER', password:'', skills:['综合维修'], max_active_orders:3, daily_capacity:5, on_duty:1, status:1 })
 const editingId = ref(null)
+const houseCodes = ref([])
 
 const roleLabel = r=> ({REPAIRER:'维修工',PROPERTY:'物业',RESIDENT:'住户',ADMIN:'管理员'}[r]||r)
+const relationLabel = r=> ({OWNER:'业主',TENANT:'租户'}[r]||r)
 const roleTag = r=> ({REPAIRER:'info',PROPERTY:'warning',RESIDENT:'success',ADMIN:'danger'}[r]||'info')
 
 const applyFilter=()=>{
@@ -115,17 +136,19 @@ const load=async()=>{
 }
 const openAdd=()=>{
   isEdit.value=false; editingId.value=null
-  form.value={ username:'', real_name:'', phone:'', role:'REPAIRER', password:'123456', skills:['综合维修'], max_active_orders:3, daily_capacity:5, on_duty:1, status:1 }
+  form.value={ username:'', real_name:'', phone:'', role:filterRole.value||'REPAIRER', password:'123456', skills:['综合维修'], max_active_orders:3, daily_capacity:5, on_duty:1, status:1, houses:[] }
   dialogVisible.value=true
 }
 const openEdit=(row)=>{
   isEdit.value=true; editingId.value=row.id
-  form.value={ username:row.username, real_name:row.real_name, phone:row.phone, role:row.role, password:'', skills:row.skills||['综合维修'], max_active_orders:row.max_active_orders||3, daily_capacity:row.daily_capacity||5, on_duty:row.on_duty??1, status:row.status??1 }
+  form.value={ username:row.username, real_name:row.real_name, phone:row.phone, role:row.role, password:'', skills:row.skills||['综合维修'], max_active_orders:row.max_active_orders||3, daily_capacity:row.daily_capacity||5, on_duty:row.on_duty??1, status:row.status??1, houses:(row.houses||[]).map(h=>({ ...h })) }
   dialogVisible.value=true
 }
 const save=async()=>{
   if(!form.value.username||!form.value.real_name){ ElMessage.warning('请填写用户名/姓名'); return }
   if(!isEdit.value && !form.value.password){ ElMessage.warning('请填写密码'); return }
+  const houses = form.value.role==='RESIDENT' ? form.value.houses.filter(h=>h.house_code) : []
+  if(new Set(houses.map(h=>h.house_code)).size !== houses.length){ ElMessage.warning('同一房屋不能重复绑定'); return }
   saving.value=true
   try{
     if(isEdit.value){
@@ -133,8 +156,11 @@ const save=async()=>{
       if(form.value.password) payload.password=form.value.password
       if(form.value.role==='REPAIRER'){ payload.skills=form.value.skills; payload.max_active_orders=form.value.max_active_orders; payload.daily_capacity=form.value.daily_capacity; payload.on_duty=form.value.on_duty }
       await api.adminUpdateUser(editingId.value, payload)
+      if(form.value.role==='RESIDENT') await api.adminSetUserHouses(editingId.value, houses)
     } else {
-      await api.adminCreateUser(form.value)
+      const { houses: _, ...data } = form.value
+      const r = await api.adminCreateUser(data)
+      if(form.value.role==='RESIDENT' && houses.length) await api.adminSetUserHouses(r.data.id, houses)
     }
     ElMessage.success(isEdit.value?'已更新':'已新增'); dialogVisible.value=false; await load()
   }catch(e){ ElMessage.error(e.response?.data?.detail||'保存失败') } finally{ saving.value=false }
@@ -142,10 +168,16 @@ const save=async()=>{
 const remove=async(row)=>{
   try{ await api.adminDeleteUser(row.id); ElMessage.success('已删除'); await load() }catch(e){ ElMessage.error(e.response?.data?.detail||'删除失败') }
 }
-onMounted(load)
+onMounted(()=>{
+  load()
+  api.adminHouseCodes().then(r=>{ houseCodes.value=r.data.houses||[] }).catch(()=>{ houseCodes.value=[] })
+})
 </script>
 
 <style scoped>
 .page-heading{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:16px; }
 .page-heading p{ color:var(--text-secondary); font-size:13px; }
+.houses-editor{ display:flex; flex-direction:column; gap:8px; width:100%; }
+.house-row{ display:flex; gap:8px; align-items:center; }
+.houses-editor .hint{ font-size:12px; color:var(--text-secondary); line-height:1.4; }
 </style>

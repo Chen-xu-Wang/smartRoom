@@ -24,6 +24,7 @@ from datetime import datetime
 from app.config import HOUSES_FILE, HOUSE_PROFILES_FILE
 from app.database import query_one, query_all, execute, execute_return_id
 from app.services.dispatch_schema import ensure_dispatch_schema, seed_default_profiles
+from app.services.user_house import ensure_user_house_schema, seed_default_bindings
 
 
 def hash_password(plain: str) -> str:
@@ -216,10 +217,12 @@ def main():
     print("=" * 50)
 
     ensure_dispatch_schema()
+    ensure_user_house_schema()
 
-    print("\n[1/3] 创建系统账号与维修能力画像：")
+    print("\n[1/3] 创建系统账号、维修能力画像与住户房屋绑定：")
     seed_users()
     seed_default_profiles()
+    seed_default_bindings()
 
     print("\n[2/3] 导入房屋与设备档案：")
     house_id_map = seed_houses()

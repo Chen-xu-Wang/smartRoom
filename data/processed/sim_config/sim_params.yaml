@@ -1,0 +1,456 @@
+# ============================================================
+# 筑维AI 物理模拟参数库（任务 1.3）
+# ------------------------------------------------------------
+# 约定：每个参数叶子节点都是 {value, unit, source[, note, verify]}
+#   source  取自下方 sources 的键，说明数值出处
+#   verify  true 表示数值引自标准，但尚未与标准原文逐条核对；答辩前须核对
+# 读取与校验：data/scripts/sim/params.py（缺 source 或 source 未登记会报错）
+# 所有数据均用于模拟，data_source = SIMULATED
+# ============================================================
+
+meta:
+  version: "1.0"
+  created: "2026-09-15"
+  data_source: SIMULATED
+
+sources:
+  GB50015: "GB 50015-2019《建筑给水排水设计标准》"
+  GB_T50331: "GB/T 50331-2002《城市居民生活用水量标准》"
+  GB25501: "GB 25501-2019《水嘴水效限定值及水效等级》"
+  GB25502: "GB 25502-2017《坐便器水效限定值及水效等级》"
+  GB28378: "GB 28378-2019《淋浴器水效限定值及水效等级》"
+  GB_T18742: "GB/T 18742.2《冷热水用聚丙烯管道系统 第2部分：管材》"
+  GB_T12325: "GB/T 12325-2008《电能质量 供电电压偏差》"
+  GB21455: "GB 21455-2019《房间空气调节器能效限定值及能效等级》"
+  GB_T10963: "GB/T 10963.1《电气附件 家用及类似场所用过电流保护断路器》"
+  GB50096: "GB 50096-2011《住宅设计规范》"
+  MEE_EF: "生态环境部公布的全国电网平均排放因子（2022年度 0.5703 tCO2/MWh）"
+  ARCHIVE: "一房一码档案（backend/app/data/houses.json、house_profiles.json）"
+  CONTRACT: "数据契约 v2.0（data/processed/contracts）"
+  NAMEPLATE: "同类产品铭牌 / 能效标识典型值（非特定品牌）"
+  ASSUMPTION: "模型假设：无直接标准依据，按工程经验设定，须通过自检报告验证量级"
+  EXAMPLE: "示例值：可配置，不代表特定地区现行价格或实际情况"
+  DERIVED: "由本文件其它参数推导，推导方式见 note"
+
+# ------------------------------------------------------------
+# 一、模拟时段与日历
+# ------------------------------------------------------------
+calendar:
+  timezone: {value: "+08:00", unit: "", source: CONTRACT}
+  main_window_start: {value: "2026-06-01", unit: "date", source: ASSUMPTION, note: "覆盖夏季空调高峰"}
+  main_window_end: {value: "2026-08-29", unit: "date", source: ASSUMPTION, note: "含当日，共 90 天"}
+  baseline_learning_days: {value: 14, unit: "d", source: ASSUMPTION, note: "前 14 天不注入故障，供检测算法学习基线"}
+  public_holidays: {value: ["2026-06-19", "2026-06-20", "2026-06-21"], unit: "date", source: ASSUMPTION, note: "端午节假期，按周末作息处理"}
+  school_last_day: {value: "2026-07-03", unit: "date", source: ASSUMPTION, note: "之后为中小学暑假"}
+
+# ------------------------------------------------------------
+# 二、楼栋
+# ------------------------------------------------------------
+building:
+  floors: {value: 18, unit: "层", source: ASSUMPTION}
+  positions_per_floor: {value: 6, unit: "户", source: ASSUMPTION}
+  floor_height_m: {value: 3.0, unit: "m", source: ASSUMPTION, note: "MiC 模块叠放层高；GB 50096 对住宅层高的建议值为 2.80 m，模块化建筑含结构层按 3.0 m 取"}
+  entry_height_above_floor_m: {value: 1.0, unit: "m", source: ASSUMPTION, note: "入户水表距本层地面高度"}
+  location_hint: {value: "夏热冬冷地区，北纬约 31°", unit: "", source: ASSUMPTION, note: "只用于日出日落与合成气象量级，不对应具体城市"}
+  layout_by_position:
+    value: {"01": T89, "02": T89, "03": T75, "04": T75, "05": T65, "06": T65}
+    unit: ""
+    source: DERIVED
+    note: "户位 02/03/05 分别对齐档案中 1302(89.5㎡)、503(75㎡)、805(65㎡) 的户型"
+  phase_by_position:
+    value: {"01": L1, "04": L1, "02": L2, "05": L2, "03": L3, "06": L3}
+    unit: ""
+    source: ASSUMPTION
+    note: "单相入户，三相按户位均衡分配"
+  batches:
+    value:
+      A: {floors: [1, 6], production_date: "2025-12-05", delivery_date: "2026-01-28"}
+      B: {floors: [7, 12], production_date: "2025-12-20", delivery_date: "2026-02-10"}
+      C: {floors: [13, 18], production_date: "2026-01-15", delivery_date: "2026-03-20"}
+    unit: ""
+    source: ARCHIVE
+    note: "三个批次的生产与交付日期分别取自 503、805、1302 的档案"
+
+# ------------------------------------------------------------
+# 三、给水
+# ------------------------------------------------------------
+water:
+  supply:
+    entry_pressure_max_mpa: {value: 0.35, unit: "MPa", source: GB50015, verify: true, note: "住宅入户管供水压力上限"}
+    zone_static_pressure_max_mpa: {value: 0.45, unit: "MPa", source: GB50015, verify: true, note: "分区供水时各分区静水压力上限"}
+    municipal_ground_pressure_mpa: {value: 0.30, unit: "MPa", source: ASSUMPTION, note: "市政管网在楼栋接入点的平均压力"}
+    municipal_diurnal_dip_mpa: {value: 0.03, unit: "MPa", source: ASSUMPTION, note: "早晚用水高峰市政压力下降幅度"}
+    zones:
+      value:
+        LOW: {floors: [1, 4], source: MUNICIPAL}
+        MID: {floors: [5, 11], source: BOOSTER, outlet_mpa: 0.50}
+        HIGH: {floors: [12, 18], source: BOOSTER, outlet_mpa: 0.71}
+      unit: "MPa"
+      source: DERIVED
+      note: "三区供水，使每区最低用水点静压 ≤ 0.45 MPa、最高层入户静压约 0.20 MPa。泵出口 = 0.20 + 0.0098 × 区内最高层入户高度：MID 0.20+0.0098×31≈0.50，HIGH 0.20+0.0098×52≈0.71；LOW 为市政直供，第 4 层约 0.20 MPa"
+    prv_setpoint_mpa: {value: 0.30, unit: "MPa", source: ASSUMPTION, note: "入户静压超过 0.35 MPa 的楼层加装支管减压阀"}
+    pressure_per_m_mpa: {value: 0.0098, unit: "MPa/m", source: DERIVED, note: "ρg，水 1000 kg/m³"}
+    booster_pressure_noise_mpa: {value: 0.005, unit: "MPa", source: ASSUMPTION, note: "变频泵出口压力波动标准差"}
+
+  pipes:
+    ppr_dn25_inner_mm: {value: 16.6, unit: "mm", source: GB_T18742, verify: true, note: "PN2.0 系列 dn25 × 4.2"}
+    ppr_dn20_inner_mm: {value: 13.2, unit: "mm", source: GB_T18742, verify: true, note: "PN2.0 系列 dn20 × 3.4"}
+    kitchen_cold_pipe: {value: "PPR-25", unit: "", source: ARCHIVE}
+    kitchen_hot_pipe: {value: "PPR-20", unit: "", source: ARCHIVE}
+    bath_cold_pipe: {value: "PPR-25", unit: "", source: ARCHIVE}
+    bath_hot_pipe: {value: "PPR-20", unit: "", source: ARCHIVE}
+    kitchen_drain_pipe: {value: "PVC-50", unit: "", source: ARCHIVE}
+    bath_drain_pipe: {value: "PVC-110", unit: "", source: ARCHIVE}
+    # 集总阻力模型：ΔP = K·Q²；以下为设计流量下的压降，模拟器据此推导 K
+    loss_meter_mpa_at_0p30lps: {value: 0.010, unit: "MPa", source: ASSUMPTION, note: "水表"}
+    loss_entry_filter_mpa_at_0p30lps: {value: 0.008, unit: "MPa", source: ASSUMPTION, note: "前置过滤器（洁净状态）"}
+    loss_main_mpa_at_0p30lps: {value: 0.015, unit: "MPa", source: ASSUMPTION, note: "户内主管（含弯头）"}
+    loss_branch_mpa_at_0p20lps: {value: 0.020, unit: "MPa", source: ASSUMPTION, note: "厨房/卫生间支路"}
+    loss_angle_valve_hose_mpa_at_0p15lps: {value: 0.015, unit: "MPa", source: ASSUMPTION, note: "角阀 + 连接软管"}
+    loss_heater_mpa_at_0p15lps: {value: 0.020, unit: "MPa", source: ASSUMPTION, note: "热水器进水滤网 + 罐体"}
+    loss_mixer_mpa_at_0p15lps: {value: 0.015, unit: "MPa", source: ASSUMPTION, note: "混水阀"}
+
+  fixtures:
+    # 器具额定流量（设计值）与水效流量（出水能力的参考）
+    kitchen_faucet_rated_lps: {value: 0.20, unit: "L/s", source: GB50015, verify: true, note: "洗涤盆混合水嘴 0.15–0.20，取上限"}
+    basin_faucet_rated_lps: {value: 0.15, unit: "L/s", source: GB50015, verify: true}
+    shower_rated_lps: {value: 0.15, unit: "L/s", source: GB50015, verify: true}
+    toilet_tank_fill_rated_lps: {value: 0.10, unit: "L/s", source: GB50015, verify: true, note: "冲洗水箱浮球阀"}
+    washer_tap_rated_lps: {value: 0.20, unit: "L/s", source: GB50015, verify: true}
+    fixture_min_working_pressure_mpa: {value: 0.10, unit: "MPa", source: GB50015, verify: true, note: "水嘴、淋浴器；水箱浮球阀为 0.05"}
+    faucet_efficiency_grade2_lps: {value: 0.125, unit: "L/s", source: GB25501, verify: true, note: "2 级水效最大流量"}
+    shower_efficiency_grade2_lps: {value: 0.12, unit: "L/s", source: GB28378, verify: true, note: "2 级水效最大流量"}
+    toilet_flush_grade2_l: {value: 5.0, unit: "L", source: GB25502, verify: true, note: "2 级水效平均用水量"}
+    efficiency_test_pressure_mpa: {value: 0.10, unit: "MPa", source: ASSUMPTION, note: "把水效流量视为 0.10 MPa 动压下的全开流量，据此推导器具流量系数 Cv = Q/√P"}
+    washer_water_per_cycle_l: {value: 48, unit: "L", source: NAMEPLATE, note: "8 kg 滚筒标准程序典型值"}
+    washer_fills_per_cycle: {value: 4, unit: "次", source: NAMEPLATE}
+
+  drain:
+    trap_seal_depth_min_mm: {value: 50, unit: "mm", source: GB50015, verify: true, note: "存水弯水封深度不得小于 50 mm"}
+    trap_seal_initial_mm: {value: 60, unit: "mm", source: ASSUMPTION}
+    trap_evaporation_mm_per_day: {value: 1.5, unit: "mm/d", source: ASSUMPTION, note: "室内夏季；用于 W9 地漏水封干涸（P1）"}
+    # 线性水库模型：排水点水位 h 满足 A·dh/dt = Q_in − A·h/τ
+    tau_floor_drain_s: {value: 5.0, unit: "s", source: ASSUMPTION, note: "卫生间地漏退水时间常数（洁净）"}
+    tau_basin_trap_s: {value: 3.0, unit: "s", source: ASSUMPTION}
+    tau_kitchen_trap_s: {value: 4.0, unit: "s", source: ASSUMPTION}
+    tau_balcony_drain_s: {value: 6.0, unit: "s", source: ASSUMPTION}
+    tau_household_variation: {value: 0.15, unit: "倍数标准差", source: ASSUMPTION, note: "安装差异导致的户间差异"}
+    level_sensor_full_scale_mm: {value: 120, unit: "mm", source: ASSUMPTION}
+    stack_design: {value: "每个户位一根排水立管，户内厨房、卫生间、阳台排水均接入", unit: "", source: ASSUMPTION, note: "简化假设；实际工程中厨房、阳台常为独立废水立管"}
+
+  hot_water:
+    heater_type: {value: "储水式电热水器", unit: "", source: ASSUMPTION, note: "为实现水电联合分析（J1），所有户型统一采用电热水器"}
+    heater_t89_volume_l: {value: 60, unit: "L", source: NAMEPLATE}
+    heater_small_volume_l: {value: 50, unit: "L", source: NAMEPLATE, note: "T75、T65"}
+    heater_power_w: {value: 2000, unit: "W", source: NAMEPLATE}
+    heater_standby_loss_kwh_per_day: {value: 0.9, unit: "kWh/d", source: NAMEPLATE, note: "罐温与环境温差约 35 K 时"}
+    heater_thermostat_hysteresis_c: {value: 6, unit: "℃", source: NAMEPLATE}
+    cold_water_temp_c: {value: {"06": 23.0, "07": 26.0, "08": 27.0}, unit: "℃", source: ASSUMPTION, note: "按月的自来水温度"}
+    shower_mix_temp_c: {value: {mean: 39.5, sd_person: 1.0, sd_use: 0.5}, unit: "℃", source: ASSUMPTION}
+    hot_outlet_drop_c: {value: 3.0, unit: "℃", source: ASSUMPTION, note: "热水器设定温度到混水点的管路温降；用于由混水温度反推冷热水比例（1.5 给水水力模型）"}
+    t89_heater_location: {value: "卫生间，经厨房热水管供厨房", unit: "", source: ARCHIVE, note: "1302 档案厨房、卫生间均有热水管"}
+    small_heater_location: {value: "卫生间，仅供卫生间", unit: "", source: ARCHIVE, note: "805、503 档案无热水管，按就近安装处理"}
+
+# ------------------------------------------------------------
+# 四、电气
+# ------------------------------------------------------------
+power:
+  grid:
+    nominal_voltage_v: {value: 220, unit: "V", source: GB_T12325}
+    voltage_deviation_upper: {value: 0.07, unit: "比例", source: GB_T12325, verify: true}
+    voltage_deviation_lower: {value: -0.10, unit: "比例", source: GB_T12325, verify: true}
+    normal_voltage_mean_v: {value: 228, unit: "V", source: ASSUMPTION, note: "正常运行均值；晚高峰负荷增大时下降"}
+    evening_voltage_drop_v: {value: 4, unit: "V", source: ASSUMPTION}
+    voltage_noise_v: {value: 1.2, unit: "V", source: ASSUMPTION}
+    voltage_noise_ar1: {value: 0.9, unit: "", source: ASSUMPTION, note: "逐分钟电压波动的自相关系数（1.6 用电模型）"}
+    service_resistance_ohm: {value: 0.12, unit: "Ω", source: ASSUMPTION, note: "户表到用电点的相线+零线往返电阻（含接头），满载 25 A 时压降约 3 V"}
+
+  breakers:
+    ratings_a: {value: {LT: 16, SK: 20, KT: 16, BT: 20, WH: 20, AC: 16}, unit: "A", source: ASSUMPTION, note: "住宅配电箱常见配置；厨房回路取 16 A，与契约样例 03 一致（大功率电器叠加时可能跳闸，属真实现象）"}
+    rcd_trip_ma: {value: {LT: null, SK: 30, KT: 30, BT: 30, WH: 30, AC: 30}, unit: "mA", source: GB50096, verify: true, note: "插座与潮湿场所回路设剩余电流保护，额定动作电流 30 mA；照明回路不设"}
+    rcd_non_trip_ma: {value: 15, unit: "mA", source: ASSUMPTION, note: "按额定动作电流的一半作为预警参考"}
+    residual_baseline_ma: {value: {mean: 1.2, sd: 0.6, min: 0.2}, unit: "mA", source: ASSUMPTION, note: "新装线路正常泄漏；BT、KT 回路随湿度略升"}
+    residual_humidity_coef_ma_per_10pct: {value: 0.15, unit: "mA", source: ASSUMPTION}
+    residual_load_coef_ma_per_kw: {value: 0.2, unit: "mA/kW", source: ASSUMPTION, note: "电器运行时 EMI 滤波电容与加热管的正常泄漏，随负载略增"}
+    rcd_actual_trip_fraction: {value: 0.8, unit: "额定动作电流倍数", source: ASSUMPTION, note: "剩余电流保护实际动作值在额定动作电流的 50%–100% 之间，取 80%（30 mA 回路约 24 mA 动作）"}
+    terminal_temp_rise_limit_k: {value: 60, unit: "K", source: GB_T10963, verify: true, note: "外接端子温升限值"}
+    terminal_rise_per_a2_healthy: {value: {mean: 0.10, sd: 0.02, min: 0.05}, unit: "K/A²", source: ASSUMPTION, note: "16 A 时温升约 26 K、20 A 时约 40 K，均低于 60 K 限值；户间差异来自安装力矩；契约样例 03 的基线 0.12 位于 1 个标准差内"}
+    terminal_thermal_time_constant_min: {value: 8, unit: "min", source: ASSUMPTION}
+
+  appliances:
+    ac_models:
+      value:
+        KFR-26GW: {cooling_capacity_w: 2600, rated_input_w: 720, standby_w: 2}
+        KFR-35GW: {cooling_capacity_w: 3500, rated_input_w: 960, standby_w: 2}
+        KFR-50GW: {cooling_capacity_w: 5000, rated_input_w: 1450, standby_w: 2}
+      unit: "W"
+      source: NAMEPLATE
+      note: "型号取自档案；输入功率为变频机额定制冷工况典型值"
+    ac_apf_grade1: {value: {le_4500w: 5.00, gt_4500w: 4.50}, unit: "", source: GB21455, verify: true, note: "热泵型转速可控空调 1 级能效 APF"}
+    ac_modulation_range: {value: [0.25, 1.10], unit: "额定输入倍数", source: NAMEPLATE}
+    ac_cop_outdoor_coef: {value: -0.025, unit: "1/K", source: ASSUMPTION, note: "COP ≈ COP35 × (1 + coef × (T室外 − 35))"}
+    ac_cop_at_35c: {value: 3.6, unit: "", source: NAMEPLATE}
+    fridge_daily_kwh: {value: {mean: 0.85, sd: 0.12}, unit: "kWh/d", source: NAMEPLATE, note: "对开/三门 1 级能效典型值"}
+    fridge_compressor_w: {value: 110, unit: "W", source: NAMEPLATE}
+    kettle_w: {value: 2000, unit: "W", source: NAMEPLATE}
+    microwave_w: {value: 1100, unit: "W", source: NAMEPLATE}
+    rice_cooker_avg_w: {value: 500, unit: "W", source: NAMEPLATE, note: "40 分钟程序平均功率（加热段 800 W）"}
+    range_hood_w: {value: 180, unit: "W", source: NAMEPLATE, note: "灶具按燃气灶假设，不计电"}
+    washer_wash_w: {value: 220, unit: "W", source: NAMEPLATE, note: "冷水洗，不加热"}
+    washer_spin_w: {value: 420, unit: "W", source: NAMEPLATE}
+    tv_w: {value: 95, unit: "W", source: NAMEPLATE}
+    pc_w: {value: 120, unit: "W", source: NAMEPLATE}
+    hair_dryer_w: {value: 1400, unit: "W", source: NAMEPLATE}
+    bath_fan_w: {value: 30, unit: "W", source: NAMEPLATE}
+    always_on_w: {value: {mean: 45, sd: 15, min: 15}, unit: "W", source: ASSUMPTION, note: "路由器、机顶盒、充电器与各类待机，按户抽取"}
+    lighting_w_by_room: {value: {BEDROOM_MAIN: 20, BEDROOM_2: 15, LIVING: 40, KITCHEN: 15, BATHROOM: 12, BALCONY: 8}, unit: "W", source: NAMEPLATE, note: "LED 照明"}
+    voltage_ranges_v:
+      value:
+        FRIDGE: [187, 242]
+        AC_INVERTER: [165, 265]
+        WATER_HEATER: [198, 242]
+        HEATING_SMALL: [198, 242]
+        ELECTRONICS: [90, 264]
+      unit: "V"
+      source: NAMEPLATE
+      verify: true
+      note: "电器允许工作电压范围的典型铭牌值（不同品牌不同，应以档案中的实际型号为准）。HEATING_SMALL 指电水壶、微波炉、电饭煲、吹风机；ELECTRONICS 指电视、电脑、LED 照明与路由器等开关电源（铭牌 100–240 V，通常允许 ±10%）"
+    washer_spin_min: {value: 12, unit: "min", source: NAMEPLATE, note: "每个洗衣周期末尾的脱水时长"}
+
+  circuit_loads:
+    value:
+      LT: ["照明"]
+      SK: ["电视", "电脑", "常开待机", "阳台洗衣机（T89/T75）"]
+      KT: ["冰箱", "微波炉", "电饭煲", "电水壶", "油烟机"]
+      BT: ["吹风机", "卫生间排风扇", "洗衣机（T65）"]
+      WH: ["电热水器"]
+      AC: ["每台空调独立回路"]
+    unit: ""
+    source: ASSUMPTION
+
+# ------------------------------------------------------------
+# 五、环境与热工（供 1.6 使用）
+# ------------------------------------------------------------
+environment:
+  latitude_deg: {value: 31.0, unit: "°", source: ASSUMPTION}
+  longitude_deg: {value: 121.0, unit: "°", source: ASSUMPTION}
+  outdoor_monthly_mean_c: {value: {"06": 26.0, "07": 29.5, "08": 29.0}, unit: "℃", source: ASSUMPTION, note: "夏热冬冷地区夏季典型量级，合成气象"}
+  outdoor_diurnal_amplitude_c: {value: 4.5, unit: "℃", source: ASSUMPTION, note: "日较差的一半；最高温约 14:30"}
+  outdoor_daily_anomaly: {value: {sd: 1.6, ar1: 0.7}, unit: "℃", source: ASSUMPTION}
+  outdoor_humidity_mean_pct: {value: 74, unit: "%", source: ASSUMPTION}
+  outdoor_humidity_diurnal_amplitude_pct: {value: 8, unit: "%", source: ASSUMPTION, note: "凌晨最高、午后最低"}
+  outdoor_humidity_daily_anomaly: {value: {sd: 5, ar1: 0.7}, unit: "%", source: ASSUMPTION}
+  room_ua_w_per_k_per_m2: {value: 2.0, unit: "W/(K·m²)", source: ASSUMPTION, note: "按房间地面积折算的围护结构传热"}
+  room_heat_capacity_kj_per_k_per_m2: {value: 150, unit: "kJ/(K·m²)", source: ASSUMPTION, note: "时间常数约 21 h"}
+  solar_gain_peak_w_per_m2: {value: 15, unit: "W/m²", source: ASSUMPTION}
+  person_sensible_gain_w: {value: 80, unit: "W", source: ASSUMPTION}
+  room_area_share:
+    value:
+      T89: {BEDROOM_MAIN: 0.17, BEDROOM_2: 0.12, BEDROOM_3: 0.10, LIVING: 0.30, KITCHEN: 0.08, BATHROOM: 0.06, BALCONY: 0.06}
+      T75: {BEDROOM_MAIN: 0.19, BEDROOM_2: 0.14, LIVING: 0.35, KITCHEN: 0.10, BATHROOM: 0.07, BALCONY: 0.06}
+      T65: {BEDROOM_MAIN: 0.22, BEDROOM_2: 0.16, LIVING: 0.34, KITCHEN: 0.11, BATHROOM: 0.08}
+    unit: "比例"
+    source: ASSUMPTION
+    note: "其余为走廊与墙体"
+
+# ------------------------------------------------------------
+# 六、传感器（供 1.7 使用）
+# ------------------------------------------------------------
+sensors:
+  sampling:
+    value: {minute_table_s: 60, event_snippet_s: 1, level_idle_s: 600, env_s: 300, weather_s: 600}
+    unit: "s"
+    source: CONTRACT
+    note: "与《数据利用.md》2.2 节一致"
+  flow_accuracy: {value: 0.02, unit: "相对误差", source: ASSUMPTION, note: "2 级水表量级"}
+  flow_low_cutoff_lpm: {value: 0.03, unit: "L/min", source: ASSUMPTION, note: "低于此流量读数为 0；决定暗漏检测下限"}
+  pressure_noise_mpa: {value: 0.002, unit: "MPa", source: ASSUMPTION}
+  pressure_drift_mpa_per_90d: {value: 0.002, unit: "MPa", source: ASSUMPTION}
+  level_noise_mm: {value: 0.8, unit: "mm", source: ASSUMPTION}
+  temp_noise_c: {value: 0.3, unit: "℃", source: ASSUMPTION}
+  current_accuracy: {value: 0.01, unit: "相对误差", source: ASSUMPTION}
+  residual_noise_ma: {value: 0.15, unit: "mA", source: ASSUMPTION}
+  packet_loss_rate: {value: 0.003, unit: "比例", source: ASSUMPTION}
+  offline_episodes_per_sensor_90d: {value: 0.3, unit: "次", source: ASSUMPTION}
+  offline_duration_min: {value: {median: 45, gsd: 2.5}, unit: "min", source: ASSUMPTION, note: "对数正态"}
+
+# ------------------------------------------------------------
+# 七、行为模型（任务 1.4）
+# ------------------------------------------------------------
+behavior:
+  persona_allocation:
+    value:
+      T89: {FAMILY: 30, COUPLE: 3, VACANT: 3}
+      T75: {FAMILY: 4, COUPLE: 12, ELDER: 8, TRAVELER: 6, VACANT: 6}
+      T65: {COUPLE: 15, ELDER: 8, TRAVELER: 6, VACANT: 7}
+    unit: "户"
+    source: ASSUMPTION
+    note: "合计 FAMILY 34 / COUPLE 30 / ELDER 16 / TRAVELER 12 / VACANT 16；空置率约 15%"
+  fixed_personas:
+    value: {"1302": FAMILY, "805": COUPLE, "503": ELDER}
+    unit: ""
+    source: CONTRACT
+    note: "与契约样例一致：1302 三口之家，805 双职工白天无人，503 独居老人"
+
+  personas:
+    value:
+      FAMILY:
+        label: "双职工带孩子"
+        members: [WORKER, WORKER, CHILD]
+        summer_trip_prob: 0.5
+        summer_trip_days: [4, 8]
+        weekend_outing_prob: 0.35
+        meals_at_home: {weekday: {breakfast: 0.85, lunch: 0.05, dinner: 0.85}, weekend: {breakfast: 0.9, lunch: 0.6, dinner: 0.8}}
+        laundry_per_week: {mean: 6.0, sd: 1.0}
+        visitors_per_month: 1.0
+      COUPLE:
+        label: "年轻情侣"
+        members: [WORKER, WORKER]
+        summer_trip_prob: 0.4
+        summer_trip_days: [3, 6]
+        weekend_outing_prob: 0.5
+        dinner_out_weekday_prob: 0.35
+        meals_at_home: {weekday: {breakfast: 0.5, lunch: 0.0, dinner: 0.55}, weekend: {breakfast: 0.5, lunch: 0.4, dinner: 0.5}}
+        laundry_per_week: {mean: 3.5, sd: 1.0}
+        visitors_per_month: 0.8
+      ELDER:
+        label: "独居老人"
+        members: [ELDER]
+        summer_trip_prob: 0.15
+        summer_trip_days: [2, 4]
+        weekend_outing_prob: 0.1
+        meals_at_home: {weekday: {breakfast: 0.95, lunch: 0.9, dinner: 0.9}, weekend: {breakfast: 0.95, lunch: 0.85, dinner: 0.85}}
+        laundry_per_week: {mean: 2.5, sd: 0.7}
+        visitors_per_month: 2.0
+        care_registered: true
+      TRAVELER:
+        label: "长期出差"
+        members: [TRAVELER]
+        trip_start_prob_per_home_day: 0.18
+        trip_days: [2, 7]
+        meals_at_home: {weekday: {breakfast: 0.4, lunch: 0.05, dinner: 0.35}, weekend: {breakfast: 0.5, lunch: 0.3, dinner: 0.4}}
+        laundry_per_week: {mean: 2.0, sd: 0.7}
+        visitors_per_month: 0.3
+      VACANT:
+        label: "空置房"
+        members: []
+        owner_visits_per_month: 0.7
+        owner_visit_hours: [1, 2]
+    unit: ""
+    source: ASSUMPTION
+
+  roles:
+    value:
+      WORKER:
+        wake: {weekday: [7.0, 0.45, 0.25], weekend: [8.6, 0.7, 0.5]}
+        sleep: {weekday: [23.3, 0.5, 0.35], weekend: [23.9, 0.6, 0.5]}
+        leave: [8.1, 0.3, 0.15]
+        return: [18.9, 0.5, 0.4]
+        wfh_prob: 0.08
+        showers_per_day: [1.05, 0.15]
+        evening_shower_prob: 0.8
+        shower_min: [8.0, 2.0, 1.5]
+        hair_dryer_prob: [0.35, 0.25]
+        pc_evening_prob: 0.45
+      CHILD:
+        wake: {weekday: [6.8, 0.2, 0.15], weekend: [8.3, 0.5, 0.5]}
+        sleep: {weekday: [21.8, 0.3, 0.25], weekend: [22.3, 0.4, 0.4]}
+        leave: [7.3, 0.1, 0.08]
+        return: [16.7, 0.2, 0.15]
+        vacation_camp_prob: 0.35
+        showers_per_day: [1.0, 0.1]
+        evening_shower_prob: 0.9
+        shower_min: [7.0, 1.5, 1.2]
+        hair_dryer_prob: [0.2, 0.15]
+        pc_daytime_hours_vacation: [2.5, 1.0]
+      ELDER:
+        wake: {weekday: [5.9, 0.35, 0.18], weekend: [5.9, 0.35, 0.18]}
+        sleep: {weekday: [21.6, 0.4, 0.25], weekend: [21.6, 0.4, 0.25]}
+        morning_outing_prob: 0.8
+        morning_outing: [6.5, 0.25, 0.2]
+        morning_outing_min: [70, 15]
+        afternoon_outing_prob: 0.35
+        nap_prob: 0.75
+        nap: [13.0, 0.3, 0.2]
+        nap_min: [60, 20]
+        showers_per_day: [0.75, 0.15]
+        evening_shower_prob: 0.45
+        shower_min: [6.5, 1.5, 1.2]
+        hair_dryer_prob: [0.1, 0.1]
+        kettle_per_day: [2.0, 0.5]
+        tv_hours: [4.0, 1.0]
+      TRAVELER:
+        wake: {weekday: [7.4, 0.6, 0.5], weekend: [9.0, 0.8, 0.7]}
+        sleep: {weekday: [0.2, 0.6, 0.5], weekend: [0.6, 0.7, 0.6]}
+        leave: [8.4, 0.5, 0.4]
+        return: [20.0, 0.8, 0.8]
+        wfh_prob: 0.3
+        showers_per_day: [1.0, 0.15]
+        evening_shower_prob: 0.7
+        shower_min: [8.5, 2.5, 2.0]
+        hair_dryer_prob: [0.3, 0.2]
+        pc_evening_prob: 0.6
+    unit: "时刻为小时数；三元组为 [总体均值, 户间标准差, 日间标准差]；二元组为 [总体均值, 户间标准差]"
+    source: ASSUMPTION
+    note: "户间标准差体现个体差异，日间标准差体现同一住户逐日波动"
+
+  activities:
+    value:
+      toilet_per_awake_home_hour: 0.30
+      toilet_at_wake_prob: 0.9
+      toilet_at_sleep_prob: 0.7
+      night_toilet_prob: {WORKER: 0.15, CHILD: 0.05, ELDER: 0.7, TRAVELER: 0.15}
+      handwash_per_awake_home_hour: 0.18
+      handwash_s: [8, 30]
+      brush_teeth_s: [40, 100]
+      brush_teeth_flow_factor: 0.4
+      face_wash_s: [15, 45]
+      faucet_open_fraction: {mean: 0.55, sd_person: 0.10, sd_use: 0.12}
+      shower_open_fraction: {mean: 0.60, sd_person: 0.10, sd_use: 0.08}
+      full_open_prob: 0.12
+      meal_prep_draws: [2, 6]
+      meal_prep_draw_s: [10, 45]
+      dishwash_draws: [4, 8]
+      dishwash_draw_s: [15, 60]
+      meal_scale: {BREAKFAST: 0.4, LUNCH: 0.8, DINNER: 1.0}
+      meal_household_size_factor: {base: 0.6, per_member: 0.2, max: 1.2}
+      kitchen_hot_fraction_t89: 0.35
+      laundry_start_pref: {EVENING: 0.55, WEEKEND_MORNING: 0.3, VALLEY_TIMER: 0.15}
+      kettle_morning_prob: {WORKER: 0.35, CHILD: 0.0, ELDER: 0.95, TRAVELER: 0.3}
+      microwave_per_meal_prob: 0.35
+      rice_cooker_dinner_prob: 0.7
+      tv_evening_prob: {FAMILY: 0.75, COUPLE: 0.5, TRAVELER: 0.35}
+      tv_evening_hours: [2.0, 0.8]
+      room_lighting_dark_margin_min: 30
+    unit: "次数为次/人·小时或概率；秒数为 [下限, 上限] 均匀分布"
+    source: ASSUMPTION
+
+  comfort:
+    value:
+      ac_on_threshold_c: {FAMILY: [27.5, 0.8], COUPLE: [28.0, 0.9], ELDER: [29.5, 0.9], TRAVELER: [28.0, 1.0]}
+      ac_setpoint_c: {FAMILY: [26.0, 0.7], COUPLE: [25.5, 0.8], ELDER: [27.0, 0.7], TRAVELER: [25.5, 0.9]}
+      night_ac_timer_off_prob: {FAMILY: 0.2, COUPLE: 0.3, ELDER: 0.6, TRAVELER: 0.3}
+      heater_mode_prob: {ALWAYS_ON: 0.55, VALLEY_TIMER: 0.15, SMART_PREHEAT: 0.30}
+      heater_setpoint_c: {options: [50, 55, 60, 65], probs: [0.15, 0.3, 0.4, 0.15]}
+    unit: "温度为 [总体均值, 户间标准差]"
+    source: ASSUMPTION
+
+  validation_targets:
+    value:
+      per_capita_water_l_per_day: [80, 220]
+      fixture_share: {SHOWER: [0.25, 0.45], TOILET: [0.15, 0.30], KITCHEN: [0.12, 0.28], LAUNDRY: [0.08, 0.22], BASIN: [0.04, 0.15]}
+      within_persona_household_cv_min: 0.10
+      within_persona_profile_corr_max: 0.95
+      elder_wake_sd_max_h: 0.5
+    unit: ""
+    source: GB_T50331
+    verify: true
+    note: "人均日用水量范围参照 GB/T 50331 各地域分区的量级；分项占比与相关性阈值为模型假设"
+
+# ------------------------------------------------------------
+# 八、随机种子
+# ------------------------------------------------------------
+seeds:
+  building: {value: 20260915, unit: "", source: ASSUMPTION, note: "楼栋拓扑与画像分配，dev/test 共用"}
+  dev: {value: 1001, unit: "", source: ASSUMPTION, note: "sim_dev：住户习惯、逐日行为、故障计划"}
+  test: {value: 2002, unit: "", source: ASSUMPTION, note: "sim_test：与 dev 相互独立"}

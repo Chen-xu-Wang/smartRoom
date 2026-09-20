@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartroom.example/contracts/v2/event_decision.schema.json",
+  "title": "契约② 事件决策（百炼应用① 输出 → 后端）",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "event_id", "actionable", "priority", "fault_summary",
+    "notices", "workorders", "control_suggestions", "escalation", "knowledge_refs"
+  ],
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+    "actionable": {
+      "description": "false 表示无需任何动作（如低置信度干扰），此时 notices/workorders/control_suggestions 均应为空。",
+      "type": "boolean"
+    },
+    "priority": { "$ref": "common.schema.json#/$defs/priority" },
+    "fault_summary": {
+      "description": "一句话结论，含可能性百分比，面向物业与后台列表。",
+      "type": "string", "minLength": 1, "maxLength": 60
+    },
+    "notices": {
+      "description": "要发出的提醒。同一 audience 最多一条。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["audience", "house_ids", "title", "content", "self_check_steps", "show_repair_button"],
+        "properties": {
+          "audience": {
+            "description": "RESIDENT=事件户住户；NEIGHBOR=相关住户；FAMILY=住户授权的家属；PROPERTY=物业。",
+            "type": "string", "enum": ["RESIDENT", "NEIGHBOR", "FAMILY", "PROPERTY"]
+          },
+          "house_ids": { "$ref": "common.schema.json#/$defs/houseIdList" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 30 },
+          "content": {
+            "description": "住户/家属文案不得出现 Cv、τ、P90、剩余电流等术语，不得出现具体作息时间。",
+            "type": "string", "minLength": 1, "maxLength": 200
+          },
+          "self_check_steps": {
+            "type": "array", "maxItems": 4,
+            "items": { "type": "string", "minLength": 1, "maxLength": 40 }
+          },
+          "show_repair_button": { "type": "boolean" }
+        }
+      }
+    },
+    "workorders": {
+      "description": "工单草稿。一个事件可对应多个工种的多张工单；批次事件的 house_ids 为批量巡检住户。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "create_mode", "recheck_after_days", "fault_type", "suggested_trade", "house_ids",
+          "location", "device_code", "ai_summary", "materials", "worker_safety_notice"
+        ],
+        "properties": {
+          "create_mode": {
+            "description": "IMMEDIATE=立即创建；DEFERRED=住户点击一键报修，或 recheck_after_days 天后仍未恢复时创建。",
+            "type": "string", "enum": ["IMMEDIATE", "DEFERRED"]
+          },
+          "recheck_after_days": {
+            "description": "DEFERRED 时为正整数；IMMEDIATE 时为 null。",
+            "anyOf": [{ "type": "integer", "minimum": 1, "maximum": 30 }, { "type": "null" }]
+          },
+          "fault_type": { "$ref": "common.schema.json#/$defs/faultType" },
+          "suggested_trade": { "$ref": "common.schema.json#/$defs/suggestedTrade" },
+          "house_ids": {
+            "allOf": [{ "$ref": "common.schema.json#/$defs/houseIdList" }, { "minItems": 1 }]
+          },
+          "location": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "device_code": {
+            "anyOf": [{ "$ref": "common.schema.json#/$defs/archiveDeviceCode" }, { "type": "null" }]
+          },
+          "ai_summary": {
+            "description": "面向维修人员：证据、定位候选、处置思路。",
+            "type": "string", "minLength": 1, "maxLength": 300
+          },
+          "materials": {
+            "type": "array", "maxItems": 6,
+            "items": { "type": "string", "minLength": 1, "maxLength": 20 }
+          },
+          "worker_safety_notice": {
+            "description": "一线维修人员作业安全提示。电气类必须含验电与断电挂牌；水浸类必须提示插座回路风险。",
+            "type": "array", "maxItems": 5,
+            "items": { "type": "string", "minLength": 1, "maxLength": 50 }
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "create_mode": { "const": "IMMEDIATE" } } },
+            "then": { "properties": { "recheck_after_days": { "type": "null" } } },
+            "else": { "properties": { "recheck_after_days": { "type": "integer" } } }
+          }
+        ]
+      }
+    },
+    "control_suggestions": {
+      "description": "建议追加的控制动作（需后端规则或人工确认后执行）。已执行的动作不要重复建议。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "target", "reason"],
+        "properties": {
+          "action": { "$ref": "common.schema.json#/$defs/controlAction" },
+          "target": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1, "maxLength": 60 }
+        }
+      }
+    },
+    "escalation": {
+      "description": "关怀类分级响应的下一步；其它事件为 null。",
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["next_level", "after_minutes", "condition", "action"],
+          "properties": {
+            "next_level": { "type": "integer", "minimum": 2, "maximum": 3 },
+            "after_minutes": { "type": "integer", "minimum": 1, "maximum": 120 },
+            "condition": { "type": "string", "minLength": 1, "maxLength": 60 },
+            "action": { "type": "string", "enum": ["NOTIFY_FAMILY", "CREATE_ONSITE_WORKORDER"] }
+          }
+        }
+      ]
+    },
+    "knowledge_refs": {
+      "description": "引用的知识库条目，格式“手册名-章节名”。",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "actionable": { "const": false } } },
+      "then": { "properties": {
+        "notices": { "maxItems": 0 },
+        "workorders": { "maxItems": 0 },
+        "control_suggestions": { "maxItems": 0 }
+      } }
+    }
+  ]
+}

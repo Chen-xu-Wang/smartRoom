@@ -1,0 +1,674 @@
+[
+  {
+    "event": null,
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "pipe_burst_branch_overflow",
+      "config": {
+        "night_start_h": 2,
+        "night_end_h": 5,
+        "night_quantile": 0.05,
+        "min_leak_lpm": 0.05,
+        "consecutive_nights": 3,
+        "min_night_minutes": 120,
+        "unexplained_ratio": 0.3,
+        "burst_factor": 1.5,
+        "burst_min_flow_lpm": 6.0,
+        "burst_min_duration_s": 60,
+        "burst_max_gap_s": 3,
+        "valve_close_delay_s": 5
+      },
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "branch_cv_capacity": {
+        "SN-1302-B-FL01": 1.091,
+        "SN-1302-B-FL02": 0.775,
+        "SN-1302-K-FL01": 0.395,
+        "SN-1302-K-FL02": 0.395,
+        "SN-1302-Y-FL01": 0.633
+      },
+      "trace": [],
+      "status": "NO_EVENT"
+    }
+  },
+  {
+    "event": {
+      "schema_version": "2.0",
+      "event_id": "EVT-20260621-1302-0001",
+      "scope": "HOUSE",
+      "house_id": "1302",
+      "related_houses": [],
+      "batch_id": "C",
+      "domain": "WATER",
+      "event_type": "HIDDEN_LEAK",
+      "severity": "MEDIUM",
+      "detected_at": "2026-06-21T05:00:00+08:00",
+      "fault_started_est": "2026-06-19",
+      "location_candidates": [
+        {
+          "segment_code": "WS-1302-B-WC",
+          "segment_name": "卫生间-马桶进水阀",
+          "device_code": "EQ-1302-B-01",
+          "in_archive": true,
+          "confidence": 0.52
+        },
+        {
+          "segment_code": "WS-1302-B-AVB",
+          "segment_name": "卫生间-洗脸盆冷水角阀",
+          "device_code": null,
+          "in_archive": false,
+          "confidence": 0.12
+        },
+        {
+          "segment_code": "WS-1302-B-C",
+          "segment_name": "卫生间-卫生间冷水支路",
+          "device_code": "PL-1302-B-03",
+          "in_archive": false,
+          "confidence": 0.08
+        }
+      ],
+      "evidence": {
+        "night_min_flow_lpm": 0.1,
+        "consecutive_nights": 3,
+        "est_daily_loss_l": 144,
+        "night_window": "02:00-05:00",
+        "branch_night_flow_lpm": {
+          "SN-1302-B-FL01": 0.1,
+          "SN-1302-B-FL02": 0.0,
+          "SN-1302-K-FL01": 0.0,
+          "SN-1302-K-FL02": 0.0,
+          "SN-1302-Y-FL01": 0.0
+        },
+        "unexplained_lpm": 0.0
+      },
+      "evidence_text": "连续3晚凌晨2–5点总表始终有流量，最小约0.10 L/min，每天约漏144 L；持续小流量出现在卫生间冷水支路",
+      "control_actions_taken": [],
+      "archive_context": {
+        "building": "1栋",
+        "unit": "1单元",
+        "floor": "13层",
+        "layout": "三室两厅一卫",
+        "in_archive": true,
+        "recent_repairs_180d": 0,
+        "device_name": "马桶",
+        "device_model": "MT-500",
+        "install_date": "2026-03-19"
+      },
+      "data_source": "SIMULATED"
+    },
+    "diagnostics": {
+      "house_id": "1302",
+      "algorithm": "hidden_leak_min_night_flow",
+      "config": {
+        "night_start_h": 2,
+        "night_end_h": 5,
+        "night_quantile": 0.05,
+        "min_leak_lpm": 0.05,
+        "consecutive_nights": 3,
+        "min_night_minutes": 120,
+        "unexplained_ratio": 0.3,
+        "burst_factor": 1.5,
+        "burst_min_flow_lpm": 6.0,
+        "burst_min_duration_s": 60,
+        "burst_max_gap_s": 3,
+        "valve_close_delay_s": 5
+      },
+      "data_range": {
+        "start": "2026-06-01",
+        "end": "2026-07-12"
+      },
+      "as_of": "2026-07-12",
+      "nightly": [
+        {
+          "date": "2026-06-01",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-02",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-03",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-04",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-05",
+          "minutes": 178,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-06",
+          "minutes": 177,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-07",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-08",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-09",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-10",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-11",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-12",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-13",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-14",
+          "minutes": 179,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-15",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-16",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-17",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-18",
+          "minutes": 180,
+          "meter_lpm": 0.0,
+          "branches": {
+            "SN-1302-B-FL01": 0.0,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": false
+        },
+        {
+          "date": "2026-06-19",
+          "minutes": 179,
+          "meter_lpm": 0.05,
+          "branches": {
+            "SN-1302-B-FL01": 0.05,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-20",
+          "minutes": 180,
+          "meter_lpm": 0.1,
+          "branches": {
+            "SN-1302-B-FL01": 0.1,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-21",
+          "minutes": 178,
+          "meter_lpm": 0.15,
+          "branches": {
+            "SN-1302-B-FL01": 0.15,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-22",
+          "minutes": 180,
+          "meter_lpm": 0.2,
+          "branches": {
+            "SN-1302-B-FL01": 0.2,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-23",
+          "minutes": 180,
+          "meter_lpm": 0.25,
+          "branches": {
+            "SN-1302-B-FL01": 0.25,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-24",
+          "minutes": 180,
+          "meter_lpm": 0.3,
+          "branches": {
+            "SN-1302-B-FL01": 0.3,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-25",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-26",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-27",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-28",
+          "minutes": 179,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-29",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-06-30",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-01",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-02",
+          "minutes": 179,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-03",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-04",
+          "minutes": 179,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-05",
+          "minutes": 179,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-06",
+          "minutes": 179,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-07",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-08",
+          "minutes": 179,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-09",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-10",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-11",
+          "minutes": 180,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        },
+        {
+          "date": "2026-07-12",
+          "minutes": 178,
+          "meter_lpm": 0.34,
+          "branches": {
+            "SN-1302-B-FL01": 0.34,
+            "SN-1302-B-FL02": 0.0,
+            "SN-1302-K-FL01": 0.0,
+            "SN-1302-K-FL02": 0.0,
+            "SN-1302-Y-FL01": 0.0
+          },
+          "flagged": true
+        }
+      ],
+      "status": "EVENT"
+    }
+  }
+]

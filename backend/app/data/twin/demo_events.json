@@ -1,0 +1,1927 @@
+{
+ "generated_by": "3D/scripts/build_twin_data.py",
+ "data_source": "SIMULATED",
+ "events": [
+  {
+   "origin": "DETECTION_SAMPLE",
+   "source_ref": "data/processed/samples/supply_blockage_1302/fault",
+   "status": "NOTIFIED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260707-1302-0001",
+    "scope": "HOUSE",
+    "house_id": "1302",
+    "related_houses": [],
+    "batch_id": "C",
+    "domain": "WATER",
+    "event_type": "SUPPLY_BLOCKAGE",
+    "severity": "MEDIUM",
+    "detected_at": "2026-07-07T21:50:15+08:00",
+    "fault_started_est": "2026-06-29",
+    "location_candidates": [
+     {
+      "segment_code": "WS-1302-B-SH",
+      "segment_name": "卫生间-花洒头",
+      "device_code": "EQ-1302-B-02",
+      "in_archive": true,
+      "confidence": 0.64
+     },
+     {
+      "segment_code": "WS-1302-B-MV",
+      "segment_name": "卫生间-淋浴混水阀",
+      "device_code": "EQ-1302-B-04",
+      "in_archive": false,
+      "confidence": 0.1
+     }
+    ],
+    "evidence": {
+     "metric": "cv_p50",
+     "baseline": 0.177,
+     "recent": 0.119,
+     "change_ratio": -0.33,
+     "duration_days": 3,
+     "window_days": 5,
+     "trend": "GRADUAL",
+     "inlet_pressure_change": -0.003,
+     "same_branch_other_fixtures": "NORMAL",
+     "other_fixtures_change_ratio": -0.08,
+     "hot_cold": "BOTH",
+     "cold_change_ratio": -0.2,
+     "hot_change_ratio": -0.35,
+     "events_used": 14,
+     "baseline_events": 44
+    },
+    "evidence_text": "花洒近5天出水能力比入住初期下降33%；冷热水同时下降；同卫生间其它用水点正常；入户水压正常；约1周内逐渐变差",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "13层",
+     "layout": "三室两厅一卫",
+     "in_archive": true,
+     "recent_repairs_180d": 0,
+     "device_name": "花洒",
+     "device_model": "HS-200",
+     "install_date": "2026-03-19"
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260707-1302-0001",
+    "actionable": true,
+    "priority": "NORMAL",
+    "fault_summary": "1302卫生间花洒头水垢堵塞（可能性约64%）",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "1302"
+      ],
+      "title": "卫生间花洒出水变小",
+      "content": "最近5天，您家卫生间花洒的出水量比刚入住时少了约三成，洗脸盆等其它用水点和入户水压都正常，大概率是花洒头里积了水垢（可能性约64%）。可以先按下面的方法自行清理；如果您近期自己调小过阀门，请忽略本提醒。",
+      "self_check_steps": [
+       "拧下花洒头",
+       "用白醋浸泡约2小时后用清水冲洗",
+       "装回后打开冷热水试一下出水"
+      ],
+      "show_repair_button": true
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "DEFERRED",
+      "recheck_after_days": 3,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "1302"
+      ],
+      "location": "卫生间-花洒头",
+      "device_code": "EQ-1302-B-02",
+      "ai_summary": "1302卫生间-花洒头出水能力较入住初期降33%，冷热同降，渐进恶化；同支路其它器具正常，入户水压变化0%。首选花洒头水垢堵塞(0.64)，次选卫生间-淋浴混水阀(0.10)。建议先除垢，无效再更换阀芯。",
+      "materials": [
+       "花洒头",
+       "淋浴混水阀芯",
+       "生料带"
+      ],
+      "worker_safety_notice": [
+       "拆卸前关闭卫生间冷热水支路阀门",
+       "注意热水烫伤，确认热水已放凉"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": [
+     "给排水维修手册-卫生间花洒出水异常"
+    ]
+   },
+   "trend": {
+    "daily": [
+     {
+      "date": "2026-06-15",
+      "events": 3,
+      "cv_cap": null,
+      "change_ratio": null,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-16",
+      "events": 6,
+      "cv_cap": 0.1606,
+      "change_ratio": -0.095,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-17",
+      "events": 8,
+      "cv_cap": 0.1654,
+      "change_ratio": -0.068,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-18",
+      "events": 10,
+      "cv_cap": 0.2025,
+      "change_ratio": 0.141,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-19",
+      "events": 13,
+      "cv_cap": 0.2392,
+      "change_ratio": 0.348,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-20",
+      "events": 12,
+      "cv_cap": 0.2533,
+      "change_ratio": 0.427,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-21",
+      "events": 12,
+      "cv_cap": 0.2341,
+      "change_ratio": 0.319,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-22",
+      "events": 12,
+      "cv_cap": 0.2242,
+      "change_ratio": 0.263,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-23",
+      "events": 13,
+      "cv_cap": 0.1908,
+      "change_ratio": 0.075,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-24",
+      "events": 13,
+      "cv_cap": 0.1908,
+      "change_ratio": 0.075,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-25",
+      "events": 14,
+      "cv_cap": 0.1867,
+      "change_ratio": 0.052,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-26",
+      "events": 14,
+      "cv_cap": 0.1969,
+      "change_ratio": 0.109,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-27",
+      "events": 15,
+      "cv_cap": 0.2031,
+      "change_ratio": 0.144,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-28",
+      "events": 15,
+      "cv_cap": 0.2031,
+      "change_ratio": 0.144,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-29",
+      "events": 15,
+      "cv_cap": 0.1449,
+      "change_ratio": -0.184,
+      "flagged": false
+     },
+     {
+      "date": "2026-06-30",
+      "events": 15,
+      "cv_cap": 0.1821,
+      "change_ratio": 0.026,
+      "flagged": false
+     },
+     {
+      "date": "2026-07-01",
+      "events": 15,
+      "cv_cap": 0.1474,
+      "change_ratio": -0.17,
+      "flagged": false
+     },
+     {
+      "date": "2026-07-02",
+      "events": 15,
+      "cv_cap": 0.1449,
+      "change_ratio": -0.184,
+      "flagged": false
+     },
+     {
+      "date": "2026-07-03",
+      "events": 15,
+      "cv_cap": 0.1449,
+      "change_ratio": -0.184,
+      "flagged": false
+     },
+     {
+      "date": "2026-07-04",
+      "events": 16,
+      "cv_cap": 0.1315,
+      "change_ratio": -0.259,
+      "flagged": false
+     },
+     {
+      "date": "2026-07-05",
+      "events": 14,
+      "cv_cap": 0.1209,
+      "change_ratio": -0.319,
+      "flagged": true
+     },
+     {
+      "date": "2026-07-06",
+      "events": 14,
+      "cv_cap": 0.1208,
+      "change_ratio": -0.319,
+      "flagged": true
+     },
+     {
+      "date": "2026-07-07",
+      "events": 14,
+      "cv_cap": 0.119,
+      "change_ratio": -0.329,
+      "flagged": true
+     },
+     {
+      "date": "2026-07-08",
+      "events": 14,
+      "cv_cap": 0.1167,
+      "change_ratio": -0.342,
+      "flagged": true
+     },
+     {
+      "date": "2026-07-09",
+      "events": 12,
+      "cv_cap": 0.1248,
+      "change_ratio": -0.297,
+      "flagged": false
+     },
+     {
+      "date": "2026-07-10",
+      "events": 13,
+      "cv_cap": 0.1182,
+      "change_ratio": -0.334,
+      "flagged": true
+     },
+     {
+      "date": "2026-07-11",
+      "events": 13,
+      "cv_cap": 0.0972,
+      "change_ratio": -0.452,
+      "flagged": true
+     },
+     {
+      "date": "2026-07-12",
+      "events": 12,
+      "cv_cap": 0.0952,
+      "change_ratio": -0.464,
+      "flagged": true
+     }
+    ],
+    "threshold": -0.3
+   }
+  },
+  {
+   "origin": "CONTRACT_SAMPLE",
+   "source_ref": "data/processed/bailian_kit/events/02_pipe_burst_805_kitchen.json",
+   "status": "WORKORDER_CREATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260623-805-0002",
+    "scope": "HOUSE",
+    "house_id": "805",
+    "related_houses": [
+     "705"
+    ],
+    "batch_id": "B",
+    "domain": "WATER",
+    "event_type": "PIPE_BURST",
+    "severity": "CRITICAL",
+    "detected_at": "2026-06-23T14:06:10+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "WS-805-K-HS",
+      "segment_name": "厨房-水槽下连接软管",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.74
+     },
+     {
+      "segment_code": "WS-805-K-AV",
+      "segment_name": "厨房-角阀接口",
+      "device_code": "EQ-805-K-02",
+      "in_archive": true,
+      "confidence": 0.21
+     }
+    ],
+    "evidence": {
+     "peak_flow_lpm": 21.5,
+     "duration_s": 95,
+     "rated_max_lpm": 12,
+     "matched_fixture": null,
+     "est_loss_l": 34,
+     "branch": "厨房冷水支路",
+     "occupancy": "ABSENT",
+     "water_intrusion_sensor": "TRIGGERED:SN-805-K-WL01"
+    },
+    "evidence_text": "家中无人时厨房冷水支路突发21.5升/分钟大流量，超出厨房器具额定上限，持续95秒，厨柜下水浸传感器报警，已自动关闭入户总阀",
+    "control_actions_taken": [
+     {
+      "action": "CLOSE_MAIN_VALVE",
+      "target": "WS-805-IN-MV",
+      "executed_at": "2026-06-23T14:06:12+08:00",
+      "result": "SUCCESS"
+     }
+    ],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "8层",
+     "layout": "两室一厅一卫",
+     "in_archive": true,
+     "device_name": "角阀",
+     "device_model": "AF-102",
+     "install_date": "2026-02-08",
+     "recent_repairs_180d": 0
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260623-805-0002",
+    "actionable": true,
+    "priority": "URGENT",
+    "fault_summary": "805厨房水槽下连接软管爆裂（可能性约74%），总阀已自动关闭",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "805"
+      ],
+      "title": "紧急：厨房疑似爆管，已自动关水",
+      "content": "14:06 检测到您家中无人时厨房突然大量出水，厨柜下出现积水，系统已在2秒内自动关闭入户总水阀，估计漏出约34升水。维修师傅正在安排上门，请不要自行打开总水阀；回家后请先查看厨柜下方，不要触碰泡水的插座。",
+      "self_check_steps": [
+       "不要自行打开入户总水阀",
+       "回家后先查看厨柜下方积水",
+       "不要触碰被水浸到的插座和电器"
+      ],
+      "show_repair_button": false
+     },
+     {
+      "audience": "NEIGHBOR",
+      "house_ids": [
+       "705"
+      ],
+      "title": "楼上住户漏水，请留意厨房天花",
+      "content": "楼上住户厨房刚才发生漏水，水阀已关闭，漏水量不大。请您留意厨房天花板和墙角是否出现水渍或滴水，如发现请点击报修，物业会第一时间处理。",
+      "self_check_steps": [
+       "查看厨房天花板与墙角是否有水渍"
+      ],
+      "show_repair_button": true
+     },
+     {
+      "audience": "PROPERTY",
+      "house_ids": [
+       "805"
+      ],
+      "title": "805厨房爆管，已自动关总阀",
+      "content": "805厨房冷水支路突发大流量(21.5升/分钟，95秒)，住户不在家，水浸报警，总阀已自动关闭。已生成紧急工单，请尽快联系住户安排上门，并关注楼下705是否渗漏。",
+      "self_check_steps": [],
+      "show_repair_button": false
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "805"
+      ],
+      "location": "厨房-水槽下连接软管",
+      "device_code": "EQ-805-K-02",
+      "ai_summary": "805厨房冷水支路突发21.5L/min大流量持续95s，超器具额定上限12L/min且无匹配器具，水浸传感器报警，总阀已关，估计漏水34L。首选水槽下连接软管爆裂(0.74)，次选角阀AF-102接口脱落(0.21)。更换软管并检查角阀接口，清理积水后开阀试压。",
+      "materials": [
+       "不锈钢编织软管",
+       "角阀",
+       "生料带",
+       "吸水毛巾"
+      ],
+      "worker_safety_notice": [
+       "厨柜下有积水，作业前断开厨房插座回路电源",
+       "开总阀试压前确认接口已紧固，逐步开阀"
+      ]
+     }
+    ],
+    "control_suggestions": [
+     {
+      "action": "TRIP_CIRCUIT",
+      "target": "CB-805-KT",
+      "reason": "厨柜下积水靠近厨房插座，建议断开厨房插座回路直至积水清理"
+     }
+    ],
+    "escalation": null,
+    "knowledge_refs": [
+     "给排水维修手册-厨房水槽持续漏水",
+     "主动运维补充-爆管与水浸处置"
+    ]
+   }
+  },
+  {
+   "origin": "CONTRACT_SAMPLE",
+   "source_ref": "data/processed/bailian_kit/events/03_terminal_overheat_1302_kitchen_circuit.json",
+   "status": "WORKORDER_CREATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260806-1302-0011",
+    "scope": "HOUSE",
+    "house_id": "1302",
+    "related_houses": [],
+    "batch_id": "C",
+    "domain": "POWER",
+    "event_type": "TERMINAL_OVERHEAT",
+    "severity": "CRITICAL",
+    "detected_at": "2026-08-06T19:32:40+08:00",
+    "fault_started_est": "2026-07-25",
+    "location_candidates": [
+     {
+      "segment_code": "CB-1302-KT-OUT",
+      "segment_name": "配电箱-厨房回路断路器出线端子",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.86
+     },
+     {
+      "segment_code": "CB-1302-KT-IN",
+      "segment_name": "配电箱-厨房回路断路器进线端子",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.09
+     }
+    ],
+    "evidence": {
+     "circuit_code": "CB-1302-KT",
+     "circuit_name": "厨房插座回路",
+     "terminal_temp_c": 92,
+     "ambient_temp_c": 31,
+     "current_a": 11.8,
+     "rated_current_a": 16,
+     "rise_per_a2_baseline": 0.12,
+     "rise_per_a2_recent": 0.43,
+     "trend_days": 12,
+     "residual_ma_recent": 3.1
+    },
+    "evidence_text": "厨房插座回路电流11.8安（未超额定16安），断路器出线端子温度达92℃；同样电流下的温升是正常时的3.6倍，近12天持续恶化，判断为接线松动或氧化，已自动分闸",
+    "control_actions_taken": [
+     {
+      "action": "TRIP_CIRCUIT",
+      "target": "CB-1302-KT",
+      "executed_at": "2026-08-06T19:32:45+08:00",
+      "result": "SUCCESS"
+     }
+    ],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "13层",
+     "layout": "三室两厅一卫",
+     "in_archive": true,
+     "device_name": "厨房插座回路（含厨房插座-1、厨房插座-2冰箱位）",
+     "install_date": "2026-03-15",
+     "recent_repairs_180d": 0
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260806-1302-0011",
+    "actionable": true,
+    "priority": "URGENT",
+    "fault_summary": "1302厨房回路断路器端子接触不良发热（可能性约86%），已自动断电",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "1302"
+      ],
+      "title": "安全提醒：厨房插座已临时断电",
+      "content": "系统发现您家配电箱里厨房插座这一路的接线处温度异常升高，存在火灾隐患，已自动切断厨房插座电源。冰箱会暂时停电，请尽量少开冰箱门。请不要自行合闸，也不要用插线板从其它房间给厨房电器接电，电工师傅会尽快上门。",
+      "self_check_steps": [
+       "不要自行合上厨房插座的开关",
+       "不要用插线板从其它房间接电",
+       "尽量少开冰箱门"
+      ],
+      "show_repair_button": false
+     },
+     {
+      "audience": "PROPERTY",
+      "house_ids": [
+       "1302"
+      ],
+      "title": "1302厨房回路端子过热，已分闸",
+      "content": "1302厨房插座回路端子温度92℃，电流仅11.8安，同电流温升为正常的3.6倍且持续恶化12天，判断为端子松动或氧化，已自动分闸。已生成紧急电工工单；冰箱断电，请优先安排上门。",
+      "self_check_steps": [],
+      "show_repair_button": false
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "电气故障",
+      "suggested_trade": "电工维修",
+      "house_ids": [
+       "1302"
+      ],
+      "location": "配电箱-厨房回路断路器出线端子",
+      "device_code": null,
+      "ai_summary": "1302厨房插座回路(CB-1302-KT)端子温度92℃(环境31℃)，电流11.8A未超额定16A；单位电流平方温升由0.12升至0.43℃/A²，近12天持续恶化，剩余电流正常(3.1mA)，排除过载与漏电。首选断路器出线端子松动/氧化(0.86)，次选进线端子(0.09)。检查端子烧蚀情况，处理后按规定力矩紧固，必要时更换断路器，合闸后复测温升。",
+      "materials": [
+       "16A断路器",
+       "扭力螺丝刀",
+       "端子清洁剂",
+       "红外测温仪"
+      ],
+      "worker_safety_notice": [
+       "作业前验电，确认厨房回路及配电箱总开关已断开",
+       "断电后挂牌上锁，防止他人误合闸",
+       "端子可能仍有余温，戴绝缘手套操作",
+       "检查端子周边绝缘层是否碳化，碳化需更换导线"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": [
+     "电气维修手册-配电箱跳闸",
+     "主动运维补充-端子发热处置"
+    ]
+   }
+  },
+  {
+   "origin": "CONTRACT_SAMPLE",
+   "source_ref": "data/processed/bailian_kit/events/04_batch_quality_alert_B.json",
+   "status": "WORKORDER_CREATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260715-BATCHB-0001",
+    "scope": "BATCH",
+    "house_id": null,
+    "related_houses": [
+     "701",
+     "703",
+     "704",
+     "705",
+     "706",
+     "802",
+     "804",
+     "805",
+     "806",
+     "901",
+     "902",
+     "903",
+     "905",
+     "1003",
+     "1004",
+     "1005",
+     "1006",
+     "1101",
+     "1102",
+     "1104",
+     "1106",
+     "1201",
+     "1202",
+     "1203",
+     "1205"
+    ],
+    "batch_id": "B",
+    "domain": "JOINT",
+    "event_type": "BATCH_QUALITY_ALERT",
+    "severity": "HIGH",
+    "detected_at": "2026-07-15T09:00:00+08:00",
+    "location_candidates": [],
+    "evidence": {
+     "observation_days": 45,
+     "batch_house_count": 36,
+     "other_house_count": 72,
+     "defects": [
+      {
+       "event_type": "HIDDEN_LEAK",
+       "batch_count": 7,
+       "other_count": 4,
+       "rate_ratio": 3.5,
+       "p_value": 0.031,
+       "common_location": "卫生间-马桶进水阀",
+       "common_location_share": 0.86
+      },
+      {
+       "event_type": "TERMINAL_OVERHEAT",
+       "batch_count": 4,
+       "other_count": 2,
+       "rate_ratio": 4.0,
+       "p_value": 0.094,
+       "common_location": "配电箱-厨房回路断路器端子",
+       "common_location_share": 1.0
+      }
+     ],
+     "faulted_houses": [
+      "702",
+      "803",
+      "904",
+      "906",
+      "1001",
+      "1103",
+      "1206",
+      "801",
+      "1002",
+      "1105",
+      "1204"
+     ]
+    },
+    "evidence_text": "B批次(7-12层，36户)45天内暗漏7户，发生率是A/C批次的3.5倍且统计显著，86%集中在马桶进水阀；端子发热4户，是其它批次的4倍，但样本少、尚不显著",
+    "control_actions_taken": [],
+    "archive_context": null,
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260715-BATCHB-0001",
+    "actionable": true,
+    "priority": "HIGH",
+    "fault_summary": "MiC B批次马桶进水阀暗漏高发，建议同批次25户预防性巡检",
+    "notices": [
+     {
+      "audience": "PROPERTY",
+      "house_ids": [],
+      "title": "B批次质量预警：马桶暗漏高发",
+      "content": "7-12层B批次模块45天内有7户出现暗漏，发生率是其它批次的3.5倍，统计上显著，其中86%出在马桶进水阀，疑似同批部件问题。另有4户厨房回路端子发热，是其它批次的4倍，但样本少，建议巡检时一并排查。已生成25户巡检工单，建议同步反馈生产厂核查批次部件。",
+      "self_check_steps": [],
+      "show_repair_button": false
+     },
+     {
+      "audience": "NEIGHBOR",
+      "house_ids": [
+       "701",
+       "703",
+       "704",
+       "705",
+       "706",
+       "802",
+       "804",
+       "805",
+       "806",
+       "901",
+       "902",
+       "903",
+       "905",
+       "1003",
+       "1004",
+       "1005",
+       "1006",
+       "1101",
+       "1102",
+       "1104",
+       "1106",
+       "1201",
+       "1202",
+       "1203",
+       "1205"
+      ],
+      "title": "免费预防性检查预约通知",
+      "content": "为提前排除隐患，物业将为您家提供一次免费上门检查，主要检查马桶水箱配件和配电箱接线，约30分钟。您家目前没有发现故障，这是一次预防性检查。维修师傅会提前电话与您确认时间。",
+      "self_check_steps": [],
+      "show_repair_button": false
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "701",
+       "703",
+       "704",
+       "705",
+       "706",
+       "802",
+       "804",
+       "805",
+       "806",
+       "901",
+       "902",
+       "903",
+       "905",
+       "1003",
+       "1004",
+       "1005",
+       "1006",
+       "1101",
+       "1102",
+       "1104",
+       "1106",
+       "1201",
+       "1202",
+       "1203",
+       "1205"
+      ],
+      "location": "卫生间-马桶进水阀",
+      "device_code": null,
+      "ai_summary": "B批次45天暗漏7/36户，其它批次4/72户，发生率比3.5(p=0.031)，86%位于马桶进水阀。预防性巡检：关角阀观察水箱水位是否下降，检查进水阀密封与浮球高度，记录部件型号与批号并回写档案。",
+      "materials": [
+       "马桶进水阀",
+       "水箱密封圈",
+       "色素检漏片"
+      ],
+      "worker_safety_notice": [
+       "入户前与住户确认时间，佩戴工牌",
+       "关闭马桶角阀后再拆卸进水阀"
+      ]
+     },
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "电气故障",
+      "suggested_trade": "电工维修",
+      "house_ids": [
+       "701",
+       "703",
+       "704",
+       "705",
+       "706",
+       "802",
+       "804",
+       "805",
+       "806",
+       "901",
+       "902",
+       "903",
+       "905",
+       "1003",
+       "1004",
+       "1005",
+       "1006",
+       "1101",
+       "1102",
+       "1104",
+       "1106",
+       "1201",
+       "1202",
+       "1203",
+       "1205"
+      ],
+      "location": "配电箱-厨房回路断路器端子",
+      "device_code": null,
+      "ai_summary": "B批次45天端子发热4/36户，其它批次2/72户，发生率比4.0但p=0.094尚不显著，4例均位于厨房回路断路器端子。预防性巡检：红外测温各回路端子，复紧端子力矩，记录断路器型号批号并回写档案。",
+      "materials": [
+       "红外测温仪",
+       "扭力螺丝刀",
+       "16A断路器"
+      ],
+      "worker_safety_notice": [
+       "复紧端子前验电并断开对应回路，挂牌上锁",
+       "带电红外测温时保持安全距离，不触碰裸露导体"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": [
+     "主动运维补充-批次质量巡检"
+    ]
+   }
+  },
+  {
+   "origin": "CONTRACT_SAMPLE",
+   "source_ref": "data/processed/bailian_kit/events/05_care_abnormal_503_level2.json",
+   "status": "ESCALATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260818-503-0004",
+    "scope": "HOUSE",
+    "house_id": "503",
+    "related_houses": [],
+    "batch_id": "A",
+    "domain": "CARE",
+    "event_type": "CARE_ABNORMAL",
+    "severity": "HIGH",
+    "detected_at": "2026-08-18T09:35:00+08:00",
+    "location_candidates": [],
+    "evidence": {
+     "care_level": 2,
+     "signals": {
+      "water": "ABSENT",
+      "power": "ABSENT",
+      "presence": "STATIONARY_LONG"
+     },
+     "delay_vs_baseline_min": 150,
+     "baseline_days": 60,
+     "similar_deviation_last_60d": 0
+    },
+    "evidence_text": "今天上午的日常用水、用电活动比个人习惯推迟超过2.5小时仍未出现，雷达显示室内有人但长时间静止；一级语音询问未获回应",
+    "control_actions_taken": [
+     {
+      "action": "SPEAKER_INQUIRY",
+      "target": "SPK-503-L-01",
+      "executed_at": "2026-08-18T09:05:00+08:00",
+      "result": "NO_RESPONSE"
+     }
+    ],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "5层",
+     "layout": "两室两厅一卫",
+     "in_archive": true,
+     "persona_hint": "独居老人"
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260818-503-0004",
+    "actionable": true,
+    "priority": "HIGH",
+    "fault_summary": "503独居住户上午活动迟迟未出现，语音询问无回应，已通知家属",
+    "notices": [
+     {
+      "audience": "FAMILY",
+      "house_ids": [
+       "503"
+      ],
+      "title": "请尽快联系家中老人",
+      "content": "今天上午，老人家里的日常用水、用电比平时晚了很久仍未出现，室内有人但长时间没有走动，智能音箱询问也没有回应。请您尽快打电话确认老人是否安好。如果20分钟内仍无法确认，物业将安排工作人员上门查看。",
+      "self_check_steps": [
+       "立即拨打老人电话",
+       "联系不上请点击“请物业上门”"
+      ],
+      "show_repair_button": false
+     },
+     {
+      "audience": "PROPERTY",
+      "house_ids": [
+       "503"
+      ],
+      "title": "503独居守护二级预警",
+      "content": "503独居住户今日上午日常活动信号较个人习惯推迟超过2.5小时，雷达显示有人但长时间静止，一级语音询问无回应，已通知家属。请做好上门准备；若20分钟内家属未确认安全，系统将自动生成上门工单。",
+      "self_check_steps": [],
+      "show_repair_button": false
+     }
+    ],
+    "workorders": [],
+    "control_suggestions": [],
+    "escalation": {
+     "next_level": 3,
+     "after_minutes": 20,
+     "condition": "家属未确认老人安全，且期间仍无用水、用电或走动信号",
+     "action": "CREATE_ONSITE_WORKORDER"
+    },
+    "knowledge_refs": [
+     "主动运维补充-独居守护分级响应"
+    ]
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "NOTIFIED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260719-1106-0021",
+    "scope": "HOUSE",
+    "house_id": "1106",
+    "related_houses": [],
+    "batch_id": "B",
+    "domain": "WATER",
+    "event_type": "DRAIN_BLOCKAGE",
+    "severity": "MEDIUM",
+    "detected_at": "2026-07-19T21:14:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "WD-1106-B-FD",
+      "segment_name": "卫生间-地漏",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.78
+     },
+     {
+      "segment_code": "WD-1106-B-BR",
+      "segment_name": "卫生间-排水横支管",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.15
+     }
+    ],
+    "evidence": {
+     "metric": "tau_s",
+     "baseline": 6.2,
+     "recent": 19.5,
+     "change_ratio": 2.15,
+     "duration_days": 4,
+     "other_drains_in_room": "NORMAL",
+     "standing_water": false
+    },
+    "evidence_text": "淋浴后卫生间地漏的退水时间从约6秒变为约20秒，持续4天；同卫生间洗脸盆排水正常，判断为地漏滤网堵塞",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "11层",
+     "layout": "两室一厅一卫",
+     "in_archive": false
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260719-1106-0021",
+    "actionable": true,
+    "priority": "NORMAL",
+    "fault_summary": "1106卫生间地漏堵塞（可能性约78%）",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "1106"
+      ],
+      "title": "卫生间地漏排水变慢",
+      "content": "最近4天，您家淋浴后卫生间地漏退水明显变慢，洗脸盆排水正常，大概率是地漏滤网被头发杂物堵住。可以先自己清理一下地漏滤网，清理后若仍然很慢，点击报修即可。",
+      "self_check_steps": [
+       "取出地漏滤网盖",
+       "清理头发和杂物",
+       "冲水观察退水是否变快"
+      ],
+      "show_repair_button": true
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "DEFERRED",
+      "recheck_after_days": 3,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "1106"
+      ],
+      "location": "卫生间-地漏",
+      "device_code": null,
+      "ai_summary": "1106卫生间地漏退水时间常数由6.2s升至19.5s，持续4天，同房间其它排水点正常。首选地漏滤网堵塞(0.78)，次选卫生间横支管(0.15)。清理地漏，必要时疏通横支管。",
+      "materials": [
+       "地漏疏通器",
+       "新地漏芯",
+       "手套"
+      ],
+      "worker_safety_notice": [
+       "作业区域地面湿滑，注意防滑"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "WORKORDER_CREATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260728-ST04-0003",
+    "scope": "STACK",
+    "house_id": null,
+    "related_houses": [
+     "904",
+     "1004",
+     "1104",
+     "1204"
+    ],
+    "batch_id": "B",
+    "domain": "WATER",
+    "event_type": "STACK_BLOCKAGE",
+    "severity": "HIGH",
+    "detected_at": "2026-07-28T20:40:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "ST04-F8-F9",
+      "segment_name": "04号排水立管 8–9层段",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.71
+     },
+     {
+      "segment_code": "ST04-F7-F8",
+      "segment_name": "04号排水立管 7–8层段",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.18
+     }
+    ],
+    "evidence": {
+     "trigger_house": "904",
+     "backflow_correlation": 0.83,
+     "upper_drain_events": 27,
+     "lowest_normal_floor": 8,
+     "affected_floors": [
+      9,
+      10,
+      11,
+      12
+     ],
+     "standing_water_house": "904"
+    },
+    "evidence_text": "904卫生间地漏在本户未用水时水位多次上升，与10–12层同立管住户排水时间高度相关(0.83)；8层以下正常，判断04号立管在8–9层之间堵塞",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "stack_id": "ST04",
+     "in_archive": true
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260728-ST04-0003",
+    "actionable": true,
+    "priority": "HIGH",
+    "fault_summary": "04号排水立管8–9层段堵塞（可能性约71%）",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "904"
+      ],
+      "title": "卫生间地漏可能返水，请暂缓用水",
+      "content": "楼上排水时，您家卫生间地漏出现返水迹象，原因是公共排水立管堵塞，不是您家的问题。物业已安排疏通，疏通完成前请尽量少用卫生间排水，地漏附近不要放置电器。",
+      "self_check_steps": [
+       "暂缓淋浴和洗衣排水",
+       "地漏旁不要放置电器"
+      ],
+      "show_repair_button": false
+     },
+     {
+      "audience": "NEIGHBOR",
+      "house_ids": [
+       "1004",
+       "1104",
+       "1204"
+      ],
+      "title": "公共排水立管疏通中，请减少排水",
+      "content": "04号公共排水立管在8–9层之间堵塞，疏通完成前请减少淋浴、洗衣等大量排水，避免楼下住户返水。",
+      "self_check_steps": [
+       "疏通期间减少大量排水"
+      ],
+      "show_repair_button": false
+     },
+     {
+      "audience": "PROPERTY",
+      "house_ids": [
+       "904"
+      ],
+      "title": "04号立管8–9层段堵塞",
+      "content": "904地漏返水与10–12层排水高度相关，8层以下正常，判断04号立管8–9层段堵塞。已生成公共部位疏通工单，请通知同立管住户。",
+      "self_check_steps": [],
+      "show_repair_button": false
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "904"
+      ],
+      "location": "公共排水立管ST04 8–9层段",
+      "device_code": null,
+      "ai_summary": "904地漏在未用水时多次返水，与上层排水时间相关0.83，8层及以下正常。首选ST04 8–9层段堵塞(0.71)。从9层检查口进入疏通，完成后请10–12层配合放水验证。",
+      "materials": [
+       "电动管道疏通机",
+       "检查口密封垫",
+       "防水布"
+      ],
+      "worker_safety_notice": [
+       "立管疏通时上层住户必须暂停排水，派专人通知",
+       "打开检查口前做好防污水外溢措施",
+       "疏通机为电动设备，远离积水区域接电"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "NOTIFIED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260712-902-0014",
+    "scope": "HOUSE",
+    "house_id": "902",
+    "related_houses": [],
+    "batch_id": "B",
+    "domain": "WATER",
+    "event_type": "HIDDEN_LEAK",
+    "severity": "MEDIUM",
+    "detected_at": "2026-07-12T06:00:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "WS-902-B-WC",
+      "segment_name": "卫生间-马桶进水阀",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.84
+     },
+     {
+      "segment_code": "WS-902-B-AVT",
+      "segment_name": "卫生间-马桶角阀",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.09
+     }
+    ],
+    "evidence": {
+     "mnf_lpm": 0.42,
+     "nights": 5,
+     "branch": "卫生间冷水支路",
+     "est_daily_loss_l": 380,
+     "periodic_refill": true
+    },
+    "evidence_text": "连续5晚凌晨2–5点卫生间冷水支路有0.42升/分钟的持续小流量，并伴随周期性补水，判断为马桶进水阀关闭不严",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "9层",
+     "layout": "三室两厅一卫",
+     "in_archive": false,
+     "device_name": "马桶",
+     "batch_lot": "FV-2512-B"
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260712-902-0014",
+    "actionable": true,
+    "priority": "NORMAL",
+    "fault_summary": "902马桶进水阀内漏（可能性约84%）",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "902"
+      ],
+      "title": "马桶可能在悄悄漏水",
+      "content": "最近5个晚上，您家马桶在没人使用时仍在断断续续进水，估计每天浪费约380升水，大概率是马桶水箱里的进水阀关不严。可以先把马桶角阀关小观察，点击报修可安排上门更换。",
+      "self_check_steps": [
+       "打开水箱盖听是否有持续进水声",
+       "暂时把马桶角阀关小"
+      ],
+      "show_repair_button": true
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "DEFERRED",
+      "recheck_after_days": 2,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "902"
+      ],
+      "location": "卫生间-马桶进水阀",
+      "device_code": null,
+      "ai_summary": "902卫生间冷水支路夜间最小流量0.42L/min，连续5晚，伴随周期性补水，估计日漏水380L。首选马桶进水阀内漏(0.84)，该户属B批次，进水阀批号FV-2512-B。更换进水阀。",
+      "materials": [
+       "马桶进水阀",
+       "密封垫"
+      ],
+      "worker_safety_notice": [
+       "更换前关闭马桶角阀并放空水箱"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "WORKORDER_CREATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260802-1605-0031",
+    "scope": "HOUSE",
+    "house_id": "1605",
+    "related_houses": [
+     "1505"
+    ],
+    "batch_id": "C",
+    "domain": "JOINT",
+    "event_type": "WATER_INTRUSION",
+    "severity": "HIGH",
+    "detected_at": "2026-08-02T13:22:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "WS-1605-WH",
+      "segment_name": "卫生间-电热水器",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.69
+     },
+     {
+      "segment_code": "WS-1605-B-H",
+      "segment_name": "卫生间-热水支路",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.22
+     }
+    ],
+    "evidence": {
+     "water_sensor": "TRIGGERED:SN-1605-WH-WL01",
+     "heater_branch_flow_lpm": 0.9,
+     "occupancy": "ABSENT",
+     "downstairs_report": "1505 卫生间吊顶水浸传感器同时报警"
+    },
+    "evidence_text": "家中无人时热水器下方水浸传感器报警，热水支路有0.9升/分钟持续流量，楼下1505卫生间吊顶同时报警；已自动关闭入户总阀并断开热水器回路",
+    "control_actions_taken": [
+     {
+      "action": "CLOSE_MAIN_VALVE",
+      "target": "WS-1605-IN-MV",
+      "executed_at": "2026-08-02T13:22:03+08:00",
+      "result": "SUCCESS"
+     },
+     {
+      "action": "TRIP_CIRCUIT",
+      "target": "CB-1605-WH",
+      "executed_at": "2026-08-02T13:22:04+08:00",
+      "result": "SUCCESS"
+     }
+    ],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "16层",
+     "layout": "两室一厅一卫",
+     "in_archive": false,
+     "device_name": "电热水器"
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260802-1605-0031",
+    "actionable": true,
+    "priority": "HIGH",
+    "fault_summary": "1605热水器漏水并渗到1505（可能性约69%），已关阀断电",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "1605"
+      ],
+      "title": "卫生间热水器漏水，已自动关水断电",
+      "content": "您家卫生间热水器下方检测到积水，楼下也有渗水，系统已自动关闭入户总阀并断开热水器电源。请不要自行开阀合闸，维修师傅会尽快联系您。",
+      "self_check_steps": [
+       "不要自行打开总阀",
+       "不要触碰热水器及周边插座"
+      ],
+      "show_repair_button": false
+     },
+     {
+      "audience": "NEIGHBOR",
+      "house_ids": [
+       "1505"
+      ],
+      "title": "楼上漏水已处理，请查看卫生间吊顶",
+      "content": "楼上住户热水器漏水，水阀和电源已关闭。请查看卫生间吊顶是否滴水，暂停使用卫生间照明和排风扇，如有积水请点击报修。",
+      "self_check_steps": [
+       "查看卫生间吊顶是否滴水",
+       "暂停使用卫生间照明和排风扇"
+      ],
+      "show_repair_button": true
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "1605",
+       "1505"
+      ],
+      "location": "卫生间-电热水器",
+      "device_code": null,
+      "ai_summary": "1605热水器下方水浸报警，热水支路0.9L/min持续流量，1505吊顶同时报警，总阀已关、热水器回路已分闸。首选热水器进出水接口或泄压阀漏水(0.69)。检查接口与泄压阀，处理后检查1505吊顶受潮情况。",
+      "materials": [
+       "热水器进出水软管",
+       "泄压阀",
+       "生料带",
+       "吸水毛巾"
+      ],
+      "worker_safety_notice": [
+       "热水器回路已分闸，作业前再次验电",
+       "水浸区域有插座，确认卫生间插座回路也已断开",
+       "热水器内可能仍有热水，泄压放水时防烫伤"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "WORKORDER_CREATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260725-706-0017",
+    "scope": "HOUSE",
+    "house_id": "706",
+    "related_houses": [],
+    "batch_id": "B",
+    "domain": "POWER",
+    "event_type": "LEAKAGE_CURRENT",
+    "severity": "HIGH",
+    "detected_at": "2026-07-25T08:10:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "CB-706-BT",
+      "segment_name": "卫生间插座回路",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.8
+     }
+    ],
+    "evidence": {
+     "circuit_code": "CB-706-BT",
+     "residual_ma_baseline": 2.1,
+     "residual_ma_recent": 21.4,
+     "rcd_trip_ma": 30,
+     "trend_days": 9,
+     "humidity_related": true
+    },
+    "evidence_text": "卫生间插座回路剩余电流9天内从2.1毫安升到21.4毫安，淋浴后明显升高，已接近30毫安动作值，判断为回路绝缘受潮劣化",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "7层",
+     "layout": "两室一厅一卫",
+     "in_archive": false,
+     "device_name": "卫生间插座回路"
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260725-706-0017",
+    "actionable": true,
+    "priority": "HIGH",
+    "fault_summary": "706卫生间插座回路绝缘劣化，漏电流接近动作值",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "706"
+      ],
+      "title": "卫生间插座漏电风险提醒",
+      "content": "您家卫生间插座这一路的漏电电流近期明显升高，淋浴后更明显，存在触电隐患。请暂停在卫生间使用吹风机等电器，电工师傅会上门检查。",
+      "self_check_steps": [
+       "暂停使用卫生间插座",
+       "保持卫生间通风干燥"
+      ],
+      "show_repair_button": false
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "电气故障",
+      "suggested_trade": "电工维修",
+      "house_ids": [
+       "706"
+      ],
+      "location": "卫生间插座回路",
+      "device_code": null,
+      "ai_summary": "706卫生间插座回路(CB-706-BT)剩余电流由2.1mA升至21.4mA，9天持续上升，与淋浴湿度相关，接近30mA动作值。首选插座或接线盒受潮导致绝缘下降(0.8)。逐个断开插座测绝缘电阻，更换受潮插座或防水盒。",
+      "materials": [
+       "防溅水插座",
+       "防水盒",
+       "绝缘电阻表"
+      ],
+      "worker_safety_notice": [
+       "作业前验电，断开卫生间插座回路并挂牌上锁",
+       "卫生间地面潮湿，穿绝缘鞋",
+       "测绝缘电阻前确认回路无负载"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "NOTIFIED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260810-1501-0026",
+    "scope": "HOUSE",
+    "house_id": "1501",
+    "related_houses": [],
+    "batch_id": "C",
+    "domain": "POWER",
+    "event_type": "AC_EFFICIENCY_DROP",
+    "severity": "LOW",
+    "detected_at": "2026-08-10T15:00:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "CB-1501-AC2",
+      "segment_name": "客厅空调",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.66
+     }
+    ],
+    "evidence": {
+     "circuit_code": "CB-1501-AC2",
+     "cop_baseline": 3.6,
+     "cop_recent": 2.7,
+     "change_ratio": -0.25,
+     "trend_days": 20,
+     "likely_cause": "滤网脏堵或缺氟"
+    },
+    "evidence_text": "同样室外温度下客厅空调耗电上升、降温变慢，估算能效比从3.6降到2.7，20天内逐渐变差",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "15层",
+     "layout": "三室两厅一卫",
+     "in_archive": false,
+     "device_name": "客厅空调"
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260810-1501-0026",
+    "actionable": true,
+    "priority": "LOW",
+    "fault_summary": "1501客厅空调能效下降25%",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "1501"
+      ],
+      "title": "客厅空调变得费电了",
+      "content": "和刚入住时相比，您家客厅空调在同样天气下耗电多了约三成、降温也慢了，常见原因是滤网脏了。可以先清洗滤网，若仍无改善可预约空调师傅检查是否缺氟。",
+      "self_check_steps": [
+       "断电后取下室内机滤网",
+       "用清水冲洗晾干后装回"
+      ],
+      "show_repair_button": true
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "DEFERRED",
+      "recheck_after_days": 7,
+      "fault_type": "空调故障",
+      "suggested_trade": "空调维修",
+      "house_ids": [
+       "1501"
+      ],
+      "location": "客厅空调",
+      "device_code": null,
+      "ai_summary": "1501客厅空调(CB-1501-AC2)估算COP由3.6降至2.7，20天渐变。首选滤网脏堵，其次缺氟。清洗滤网与换热器，检测压力，必要时补氟。",
+      "materials": [
+       "滤网清洁剂",
+       "压力表",
+       "冷媒"
+      ],
+      "worker_safety_notice": [
+       "登高清洗室内机使用稳固梯子",
+       "作业前断开空调回路"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "NOTIFIED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260805-1203-0024",
+    "scope": "HOUSE",
+    "house_id": "1203",
+    "related_houses": [],
+    "batch_id": "B",
+    "domain": "JOINT",
+    "event_type": "WATER_HEATER_SCALING",
+    "severity": "LOW",
+    "detected_at": "2026-08-05T22:30:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "WS-1203-WH",
+      "segment_name": "卫生间-电热水器",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.73
+     },
+     {
+      "segment_code": "WS-1203-WH-FLT",
+      "segment_name": "卫生间-热水器进水滤网",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.14
+     }
+    ],
+    "evidence": {
+     "efficiency_baseline": 0.93,
+     "efficiency_recent": 0.78,
+     "change_ratio": -0.16,
+     "heating_time_increase": 0.21,
+     "trend_days": 30
+    },
+    "evidence_text": "按热水用量和进出水温差计算，热水器热效率30天内从93%降到78%，加热时间变长约21%，判断为加热管结垢",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "12层",
+     "layout": "两室两厅一卫",
+     "in_archive": false
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260805-1203-0024",
+    "actionable": true,
+    "priority": "LOW",
+    "fault_summary": "1203热水器加热管结垢，热效率下降",
+    "notices": [
+     {
+      "audience": "RESIDENT",
+      "house_ids": [
+       "1203"
+      ],
+      "title": "热水器效率下降，建议除垢",
+      "content": "您家电热水器最近烧同样多的热水需要更长时间，效率下降约15%，多半是加热管结了水垢，每月会多花一些电费。可以预约师傅上门除垢并检查镁棒。",
+      "self_check_steps": [],
+      "show_repair_button": true
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "DEFERRED",
+      "recheck_after_days": 14,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": [
+       "1203"
+      ],
+      "location": "卫生间-电热水器",
+      "device_code": null,
+      "ai_summary": "1203热水器热效率由0.93降至0.78，加热时间增加21%，30天渐变。首选加热管结垢(0.73)，次选进水滤网堵塞(0.14)。放水除垢、更换镁棒、清洗进水滤网。",
+      "materials": [
+       "镁棒",
+       "除垢剂",
+       "密封圈"
+      ],
+      "worker_safety_notice": [
+       "作业前断开热水器回路",
+       "放水前确认水温已降低，防止烫伤"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  },
+  {
+   "origin": "DEMO_SCRIPT",
+   "source_ref": "3D/scripts/build_twin_data.py",
+   "status": "WORKORDER_CREATED",
+   "event": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260820-304-0008",
+    "scope": "HOUSE",
+    "house_id": "304",
+    "related_houses": [],
+    "batch_id": "A",
+    "domain": "WATER",
+    "event_type": "METER_OFFLINE",
+    "severity": "LOW",
+    "detected_at": "2026-08-20T10:00:00+08:00",
+    "location_candidates": [
+     {
+      "segment_code": "WS-304-IN-MT",
+      "segment_name": "入户-智能水表",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.9
+     }
+    ],
+    "evidence": {
+     "sensor_code": "SN-304-IN-FL01",
+     "last_seen": "2026-08-19T03:12:00+08:00",
+     "offline_hours": 30.8
+    },
+    "evidence_text": "304入户智能水表自8月19日03:12起无数据上报，已离线约31小时",
+    "control_actions_taken": [],
+    "archive_context": {
+     "building": "1栋",
+     "unit": "1单元",
+     "floor": "3层",
+     "layout": "两室两厅一卫",
+     "in_archive": false
+    },
+    "data_source": "SIMULATED"
+   },
+   "decision": {
+    "schema_version": "2.0",
+    "event_id": "EVT-20260820-304-0008",
+    "actionable": true,
+    "priority": "LOW",
+    "fault_summary": "304入户智能水表离线",
+    "notices": [
+     {
+      "audience": "PROPERTY",
+      "house_ids": [
+       "304"
+      ],
+      "title": "304智能水表离线",
+      "content": "304入户水表离线约31小时，暗漏、爆管检测对该户暂时失效，请安排运维检查通信模块。",
+      "self_check_steps": [],
+      "show_repair_button": false
+     }
+    ],
+    "workorders": [
+     {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "其他故障",
+      "suggested_trade": "综合维修",
+      "house_ids": [
+       "304"
+      ],
+      "location": "入户管井-智能水表",
+      "device_code": null,
+      "ai_summary": "304入户智能水表(SN-304-IN-FL01)自08-19 03:12起离线30.8小时。检查通信模块供电与信号，必要时更换模块。",
+      "materials": [
+       "水表通信模块",
+       "备用电池"
+      ],
+      "worker_safety_notice": [
+       "管井内作业注意照明，勿误碰其它住户阀门"
+      ]
+     }
+    ],
+    "control_suggestions": [],
+    "escalation": null,
+    "knowledge_refs": []
+   }
+  }
+ ],
+ "work_orders": [
+  {
+   "order_no": "WO-DEMO-001",
+   "event_id": "EVT-20260623-805-0002",
+   "house_id": "805",
+   "status": "ASSIGNED",
+   "repairer": "王工",
+   "priority": "URGENT",
+   "fault_type": "给排水故障",
+   "trade": "水电维修",
+   "location": "厨房-水槽下连接软管",
+   "materials": [
+    "不锈钢编织软管",
+    "角阀",
+    "生料带",
+    "吸水毛巾"
+   ],
+   "safety": [
+    "厨柜下有积水，作业前断开厨房插座回路电源",
+    "开总阀试压前确认接口已紧固，逐步开阀"
+   ],
+   "summary": "805厨房冷水支路突发21.5L/min大流量持续95s，超器具额定上限12L/min且无匹配器具，水浸传感器报警，总阀已关，估计漏水34L。首选水槽下连接软管爆裂(0.74)，次选角阀AF-102接口脱落(0.21)。更换软管并检查角阀接口，清理积水后开阀试压。"
+  },
+  {
+   "order_no": "WO-DEMO-002",
+   "event_id": "EVT-20260806-1302-0011",
+   "house_id": "1302",
+   "status": "PROCESSING",
+   "repairer": "李工",
+   "priority": "URGENT",
+   "fault_type": "电气故障",
+   "trade": "电工维修",
+   "location": "配电箱-厨房回路断路器出线端子",
+   "materials": [
+    "16A断路器",
+    "扭力螺丝刀",
+    "端子清洁剂",
+    "红外测温仪"
+   ],
+   "safety": [
+    "作业前验电，确认厨房回路及配电箱总开关已断开",
+    "断电后挂牌上锁，防止他人误合闸",
+    "端子可能仍有余温，戴绝缘手套操作",
+    "检查端子周边绝缘层是否碳化，碳化需更换导线"
+   ],
+   "summary": "1302厨房插座回路(CB-1302-KT)端子温度92℃(环境31℃)，电流11.8A未超额定16A；单位电流平方温升由0.12升至0.43℃/A²，近12天持续恶化，剩余电流正常(3.1mA)，排除过载与漏电。首选断路器出线端子松动/氧化(0.86)，次选进线端子(0.09)。检查端子烧蚀情况，处理后按规定力矩紧固，必要时更换断路器，合闸后复测温升。"
+  },
+  {
+   "order_no": "WO-DEMO-003",
+   "event_id": "EVT-20260715-BATCHB-0001",
+   "house_id": "701",
+   "status": "ASSIGNED",
+   "repairer": "王工",
+   "priority": "HIGH",
+   "fault_type": "给排水故障",
+   "trade": "水电维修",
+   "location": "卫生间-马桶进水阀",
+   "materials": [
+    "马桶进水阀",
+    "水箱密封圈",
+    "色素检漏片"
+   ],
+   "safety": [
+    "入户前与住户确认时间，佩戴工牌",
+    "关闭马桶角阀后再拆卸进水阀"
+   ],
+   "summary": "B批次45天暗漏7/36户，其它批次4/72户，发生率比3.5(p=0.031)，86%位于马桶进水阀。预防性巡检：关角阀观察水箱水位是否下降，检查进水阀密封与浮球高度，记录部件型号与批号并回写档案。"
+  },
+  {
+   "order_no": "WO-DEMO-004",
+   "event_id": "EVT-20260715-BATCHB-0001",
+   "house_id": "701",
+   "status": "PROCESSING",
+   "repairer": "李工",
+   "priority": "HIGH",
+   "fault_type": "电气故障",
+   "trade": "电工维修",
+   "location": "配电箱-厨房回路断路器端子",
+   "materials": [
+    "红外测温仪",
+    "扭力螺丝刀",
+    "16A断路器"
+   ],
+   "safety": [
+    "复紧端子前验电并断开对应回路，挂牌上锁",
+    "带电红外测温时保持安全距离，不触碰裸露导体"
+   ],
+   "summary": "B批次45天端子发热4/36户，其它批次2/72户，发生率比4.0但p=0.094尚不显著，4例均位于厨房回路断路器端子。预防性巡检：红外测温各回路端子，复紧端子力矩，记录断路器型号批号并回写档案。"
+  },
+  {
+   "order_no": "WO-DEMO-005",
+   "event_id": "EVT-20260728-ST04-0003",
+   "house_id": "904",
+   "status": "ASSIGNED",
+   "repairer": "王工",
+   "priority": "HIGH",
+   "fault_type": "给排水故障",
+   "trade": "水电维修",
+   "location": "公共排水立管ST04 8–9层段",
+   "materials": [
+    "电动管道疏通机",
+    "检查口密封垫",
+    "防水布"
+   ],
+   "safety": [
+    "立管疏通时上层住户必须暂停排水，派专人通知",
+    "打开检查口前做好防污水外溢措施",
+    "疏通机为电动设备，远离积水区域接电"
+   ],
+   "summary": "904地漏在未用水时多次返水，与上层排水时间相关0.83，8层及以下正常。首选ST04 8–9层段堵塞(0.71)。从9层检查口进入疏通，完成后请10–12层配合放水验证。"
+  },
+  {
+   "order_no": "WO-DEMO-006",
+   "event_id": "EVT-20260802-1605-0031",
+   "house_id": "1605",
+   "status": "PROCESSING",
+   "repairer": "王工",
+   "priority": "HIGH",
+   "fault_type": "给排水故障",
+   "trade": "水电维修",
+   "location": "卫生间-电热水器",
+   "materials": [
+    "热水器进出水软管",
+    "泄压阀",
+    "生料带",
+    "吸水毛巾"
+   ],
+   "safety": [
+    "热水器回路已分闸，作业前再次验电",
+    "水浸区域有插座，确认卫生间插座回路也已断开",
+    "热水器内可能仍有热水，泄压放水时防烫伤"
+   ],
+   "summary": "1605热水器下方水浸报警，热水支路0.9L/min持续流量，1505吊顶同时报警，总阀已关、热水器回路已分闸。首选热水器进出水接口或泄压阀漏水(0.69)。检查接口与泄压阀，处理后检查1505吊顶受潮情况。"
+  },
+  {
+   "order_no": "WO-DEMO-007",
+   "event_id": "EVT-20260725-706-0017",
+   "house_id": "706",
+   "status": "ASSIGNED",
+   "repairer": "李工",
+   "priority": "HIGH",
+   "fault_type": "电气故障",
+   "trade": "电工维修",
+   "location": "卫生间插座回路",
+   "materials": [
+    "防溅水插座",
+    "防水盒",
+    "绝缘电阻表"
+   ],
+   "safety": [
+    "作业前验电，断开卫生间插座回路并挂牌上锁",
+    "卫生间地面潮湿，穿绝缘鞋",
+    "测绝缘电阻前确认回路无负载"
+   ],
+   "summary": "706卫生间插座回路(CB-706-BT)剩余电流由2.1mA升至21.4mA，9天持续上升，与淋浴湿度相关，接近30mA动作值。首选插座或接线盒受潮导致绝缘下降(0.8)。逐个断开插座测绝缘电阻，更换受潮插座或防水盒。"
+  },
+  {
+   "order_no": "WO-DEMO-008",
+   "event_id": "EVT-20260820-304-0008",
+   "house_id": "304",
+   "status": "PROCESSING",
+   "repairer": "张工",
+   "priority": "LOW",
+   "fault_type": "其他故障",
+   "trade": "综合维修",
+   "location": "入户管井-智能水表",
+   "materials": [
+    "水表通信模块",
+    "备用电池"
+   ],
+   "safety": [
+    "管井内作业注意照明，勿误碰其它住户阀门"
+   ],
+   "summary": "304入户智能水表(SN-304-IN-FL01)自08-19 03:12起离线30.8小时。检查通信模块供电与信号，必要时更换模块。"
+  }
+ ]
+}

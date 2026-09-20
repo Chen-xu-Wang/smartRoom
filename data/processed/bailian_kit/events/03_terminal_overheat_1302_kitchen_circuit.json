@@ -1,0 +1,61 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260806-1302-0011",
+  "scope": "HOUSE",
+  "house_id": "1302",
+  "related_houses": [],
+  "batch_id": "C",
+  "domain": "POWER",
+  "event_type": "TERMINAL_OVERHEAT",
+  "severity": "CRITICAL",
+  "detected_at": "2026-08-06T19:32:40+08:00",
+  "fault_started_est": "2026-07-25",
+  "location_candidates": [
+    {
+      "segment_code": "CB-1302-KT-OUT",
+      "segment_name": "配电箱-厨房回路断路器出线端子",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.86
+    },
+    {
+      "segment_code": "CB-1302-KT-IN",
+      "segment_name": "配电箱-厨房回路断路器进线端子",
+      "device_code": null,
+      "in_archive": false,
+      "confidence": 0.09
+    }
+  ],
+  "evidence": {
+    "circuit_code": "CB-1302-KT",
+    "circuit_name": "厨房插座回路",
+    "terminal_temp_c": 92,
+    "ambient_temp_c": 31,
+    "current_a": 11.8,
+    "rated_current_a": 16,
+    "rise_per_a2_baseline": 0.12,
+    "rise_per_a2_recent": 0.43,
+    "trend_days": 12,
+    "residual_ma_recent": 3.1
+  },
+  "evidence_text": "厨房插座回路电流11.8安（未超额定16安），断路器出线端子温度达92℃；同样电流下的温升是正常时的3.6倍，近12天持续恶化，判断为接线松动或氧化，已自动分闸",
+  "control_actions_taken": [
+    {
+      "action": "TRIP_CIRCUIT",
+      "target": "CB-1302-KT",
+      "executed_at": "2026-08-06T19:32:45+08:00",
+      "result": "SUCCESS"
+    }
+  ],
+  "archive_context": {
+    "building": "1栋",
+    "unit": "1单元",
+    "floor": "13层",
+    "layout": "三室两厅一卫",
+    "in_archive": true,
+    "device_name": "厨房插座回路（含厨房插座-1、厨房插座-2冰箱位）",
+    "install_date": "2026-03-15",
+    "recent_repairs_180d": 0
+  },
+  "data_source": "SIMULATED"
+}

@@ -1,0 +1,82 @@
+{
+  "house_id": "1302",
+  "neighbors": [
+    "1202",
+    "1402",
+    "1305",
+    "1505",
+    "1105",
+    "1301",
+    "1303"
+  ],
+  "window": {
+    "start": "2026-06-01",
+    "end": "2026-07-12"
+  },
+  "sampling": {
+    "minute_s": 60
+  },
+  "columns": {
+    "sensor_stream": [
+      "ts",
+      "CB-1302-MAIN:voltage_v",
+      "CB-1302-MAIN:voltage_min_v",
+      "CB-1302-MAIN:voltage_max_v",
+      "CB-1302-MAIN:current_a",
+      "CB-1302-LT:current_a",
+      "CB-1302-LT:residual_ma",
+      "CB-1302-LT:closed",
+      "CB-1302-SK:current_a",
+      "CB-1302-SK:residual_ma",
+      "CB-1302-SK:closed",
+      "CB-1302-KT:current_a",
+      "CB-1302-KT:residual_ma",
+      "CB-1302-KT:closed",
+      "CB-1302-BT:current_a",
+      "CB-1302-BT:residual_ma",
+      "CB-1302-BT:closed",
+      "CB-1302-WH:current_a",
+      "CB-1302-WH:residual_ma",
+      "CB-1302-WH:closed",
+      "CB-1302-AC1:current_a",
+      "CB-1302-AC1:residual_ma",
+      "CB-1302-AC1:closed",
+      "CB-1302-AC2:current_a",
+      "CB-1302-AC2:residual_ma",
+      "CB-1302-AC2:closed",
+      "SN-BLDG-OUT-TH01:temp_c",
+      "SN-BLDG-OUT-TH01:rh_pct"
+    ],
+    "neighbors": [
+      "ts",
+      "1202:voltage_v",
+      "1202:current_a",
+      "1402:voltage_v",
+      "1402:current_a",
+      "1305:voltage_v",
+      "1305:current_a",
+      "1505:voltage_v",
+      "1505:current_a",
+      "1105:voltage_v",
+      "1105:current_a",
+      "1301:voltage_v",
+      "1301:current_a",
+      "1303:voltage_v",
+      "1303:current_a"
+    ]
+  },
+  "units": {
+    "voltage_v": "V",
+    "current_a": "A",
+    "residual_ma": "mA",
+    "closed": "1=合闸 0=断开",
+    "rh_pct": "%",
+    "temp_c": "℃"
+  },
+  "scenario": "voltage_supply_high",
+  "seed": 1001,
+  "timezone": "+08:00",
+  "data_source": "SIMULATED",
+  "generator": "data/scripts/run_sample_power.py",
+  "note": "只含传感器读数；故障注入计划与跳闸真值在 _truth/ 中，检测算法不得读取。"
+}

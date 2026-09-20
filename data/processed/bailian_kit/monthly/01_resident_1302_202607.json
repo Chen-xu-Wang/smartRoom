@@ -1,0 +1,74 @@
+{
+  "schema_version": "2.0",
+  "report_type": "RESIDENT_MONTHLY",
+  "house_id": "1302",
+  "month": "2026-07",
+  "days": 31,
+  "household": {
+    "layout": "三室两厅一卫",
+    "area_m2": 89.5,
+    "residents": 3
+  },
+  "weather": {
+    "outdoor_avg_temp_c": 31.4,
+    "outdoor_avg_temp_prev_month_c": 27.1
+  },
+  "water": {
+    "total_m3": 13.6,
+    "by_fixture_m3": {
+      "淋浴": 5.2,
+      "马桶": 3.3,
+      "厨房水槽": 2.6,
+      "洗衣机": 1.9,
+      "洗脸盆": 0.6
+    },
+    "cost_yuan": 47.6,
+    "prev_month_total_m3": 12.1,
+    "benchmark_percentile": 72,
+    "saving_signals": {
+      "avg_shower_min": 14.2,
+      "benchmark_shower_min": 9.5,
+      "toilet_flush_l": 6.0,
+      "hot_water_wait_l_per_day": 11.3
+    }
+  },
+  "power": {
+    "total_kwh": 486,
+    "by_circuit_kwh": {
+      "空调": 231,
+      "热水器": 88,
+      "厨房插座": 61,
+      "普通插座": 72,
+      "照明": 34
+    },
+    "peak_kwh": 301,
+    "valley_kwh": 185,
+    "cost_yuan": 245.82,
+    "prev_month_total_kwh": 318,
+    "shiftable_kwh": 72,
+    "est_saving_yuan": 21.6,
+    "standby_kw": 0.11,
+    "co2_kg": 277.2,
+    "benchmark_percentile": 58,
+    "ac_runtime_hours": {
+      "主卧空调": 214,
+      "客厅空调": 176
+    }
+  },
+  "events_this_month": [
+    {
+      "event_id": "EVT-20260712-1302-0007",
+      "event_type": "SUPPLY_BLOCKAGE",
+      "summary": "卫生间花洒头水垢堵塞",
+      "status": "RESIDENT_SELF_FIXED"
+    }
+  ],
+  "health_scores": {
+    "主卧空调": 88,
+    "客厅空调": 91,
+    "热水器": 93,
+    "花洒": 85
+  },
+  "price_note": "示例价格：峰时电价0.62元/kWh(8:00-22:00)，谷时电价0.32元/kWh；水价3.5元/m³；电网排放因子0.5703kg/kWh。均为可配置示例值，不代表特定城市现行价格。",
+  "data_source": "SIMULATED"
+}

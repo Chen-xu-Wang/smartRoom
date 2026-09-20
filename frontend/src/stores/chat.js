@@ -28,13 +28,8 @@ export const useChatStore = defineStore('chat', {
       this.extractedInfo = {}
 
       try {
-        // 携带当前登录用户 ID，确保工单真实归属到报修人（审计与「我的工单」可用）
-        let reporterId = null
-        try {
-          const saved = JSON.parse(localStorage.getItem('zw_auth') || 'null')
-          reporterId = saved?.id || null
-        } catch { reporterId = null }
-        const res = await api.initChat(houseId, reporterId)
+        // 报修人由后端按登录令牌确定，住户只能为名下房屋报修
+        const res = await api.initChat(houseId)
         this.sessionId = res.data.session_id
         this.orderNo = res.data.order_no
         this.houseId = houseId

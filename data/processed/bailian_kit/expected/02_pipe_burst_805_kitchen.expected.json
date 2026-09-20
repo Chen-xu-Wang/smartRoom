@@ -1,0 +1,66 @@
+{
+  "schema_version": "2.0",
+  "event_id": "EVT-20260623-805-0002",
+  "actionable": true,
+  "priority": "URGENT",
+  "fault_summary": "805厨房水槽下连接软管爆裂（可能性约74%），总阀已自动关闭",
+  "notices": [
+    {
+      "audience": "RESIDENT",
+      "house_ids": ["805"],
+      "title": "紧急：厨房疑似爆管，已自动关水",
+      "content": "14:06 检测到您家中无人时厨房突然大量出水，厨柜下出现积水，系统已在2秒内自动关闭入户总水阀，估计漏出约34升水。维修师傅正在安排上门，请不要自行打开总水阀；回家后请先查看厨柜下方，不要触碰泡水的插座。",
+      "self_check_steps": [
+        "不要自行打开入户总水阀",
+        "回家后先查看厨柜下方积水",
+        "不要触碰被水浸到的插座和电器"
+      ],
+      "show_repair_button": false
+    },
+    {
+      "audience": "NEIGHBOR",
+      "house_ids": ["705"],
+      "title": "楼上住户漏水，请留意厨房天花",
+      "content": "楼上住户厨房刚才发生漏水，水阀已关闭，漏水量不大。请您留意厨房天花板和墙角是否出现水渍或滴水，如发现请点击报修，物业会第一时间处理。",
+      "self_check_steps": ["查看厨房天花板与墙角是否有水渍"],
+      "show_repair_button": true
+    },
+    {
+      "audience": "PROPERTY",
+      "house_ids": ["805"],
+      "title": "805厨房爆管，已自动关总阀",
+      "content": "805厨房冷水支路突发大流量(21.5升/分钟，95秒)，住户不在家，水浸报警，总阀已自动关闭。已生成紧急工单，请尽快联系住户安排上门，并关注楼下705是否渗漏。",
+      "self_check_steps": [],
+      "show_repair_button": false
+    }
+  ],
+  "workorders": [
+    {
+      "create_mode": "IMMEDIATE",
+      "recheck_after_days": null,
+      "fault_type": "给排水故障",
+      "suggested_trade": "水电维修",
+      "house_ids": ["805"],
+      "location": "厨房-水槽下连接软管",
+      "device_code": "EQ-805-K-02",
+      "ai_summary": "805厨房冷水支路突发21.5L/min大流量持续95s，超器具额定上限12L/min且无匹配器具，水浸传感器报警，总阀已关，估计漏水34L。首选水槽下连接软管爆裂(0.74)，次选角阀AF-102接口脱落(0.21)。更换软管并检查角阀接口，清理积水后开阀试压。",
+      "materials": ["不锈钢编织软管", "角阀", "生料带", "吸水毛巾"],
+      "worker_safety_notice": [
+        "厨柜下有积水，作业前断开厨房插座回路电源",
+        "开总阀试压前确认接口已紧固，逐步开阀"
+      ]
+    }
+  ],
+  "control_suggestions": [
+    {
+      "action": "TRIP_CIRCUIT",
+      "target": "CB-805-KT",
+      "reason": "厨柜下积水靠近厨房插座，建议断开厨房插座回路直至积水清理"
+    }
+  ],
+  "escalation": null,
+  "knowledge_refs": [
+    "给排水维修手册-厨房水槽持续漏水",
+    "主动运维补充-爆管与水浸处置"
+  ]
+}

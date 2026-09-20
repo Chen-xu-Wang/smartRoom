@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartroom.example/contracts/v2/monthly_input.schema.json",
+  "title": "契约③-输入 月度聚合（检测模块输出 → 百炼应用② 输入）",
+  "description": "两种报告类型：RESIDENT_MONTHLY 住户月度水电报告；BATCH_BRIEF 物业 MiC 批次质量简报。只含聚合级数据。",
+  "oneOf": [
+    { "$ref": "#/$defs/residentMonthly" },
+    { "$ref": "#/$defs/batchBrief" }
+  ],
+  "$defs": {
+    "kwhMap": {
+      "type": "object",
+      "additionalProperties": { "type": "number", "minimum": 0 }
+    },
+    "residentMonthly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "report_type", "house_id", "month", "days", "household",
+        "water", "power", "events_this_month", "health_scores", "price_note", "data_source"
+      ],
+      "properties": {
+        "schema_version": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+        "report_type": { "const": "RESIDENT_MONTHLY" },
+        "house_id": { "$ref": "common.schema.json#/$defs/houseId" },
+        "month": { "$ref": "common.schema.json#/$defs/month" },
+        "days": { "type": "integer", "minimum": 1, "maximum": 31 },
+        "household": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["layout", "area_m2", "residents"],
+          "properties": {
+            "layout": { "type": "string" },
+            "area_m2": { "type": "number", "exclusiveMinimum": 0 },
+            "residents": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "weather": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["outdoor_avg_temp_c"],
+          "properties": {
+            "outdoor_avg_temp_c": { "type": "number" },
+            "outdoor_avg_temp_prev_month_c": { "type": "number" }
+          }
+        },
+        "water": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total_m3", "by_fixture_m3", "cost_yuan", "prev_month_total_m3", "benchmark_percentile", "saving_signals"],
+          "properties": {
+            "total_m3": { "type": "number", "minimum": 0 },
+            "by_fixture_m3": {
+              "description": "各项之和应等于 total_m3（允许 ±0.1 舍入误差）。",
+              "$ref": "#/$defs/kwhMap"
+            },
+            "cost_yuan": { "type": "number", "minimum": 0 },
+            "prev_month_total_m3": { "anyOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }] },
+            "benchmark_percentile": {
+              "description": "在同户型同人数住户中的用水量百分位（越大越费水）。",
+              "type": "integer", "minimum": 0, "maximum": 100
+            },
+            "saving_signals": {
+              "description": "可用于节水建议的聚合指标，键名见 README。",
+              "type": "object"
+            }
+          }
+        },
+        "power": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total_kwh", "by_circuit_kwh", "peak_kwh", "valley_kwh", "cost_yuan", "prev_month_total_kwh",
+            "shiftable_kwh", "est_saving_yuan", "standby_kw", "co2_kg", "benchmark_percentile"
+          ],
+          "properties": {
+            "total_kwh": { "type": "number", "minimum": 0 },
+            "by_circuit_kwh": {
+              "description": "各回路之和应等于 total_kwh（允许 ±1 舍入误差）。",
+              "$ref": "#/$defs/kwhMap"
+            },
+            "peak_kwh": { "type": "number", "minimum": 0 },
+            "valley_kwh": { "type": "number", "minimum": 0 },
+            "cost_yuan": { "type": "number", "minimum": 0 },
+            "prev_month_total_kwh": { "anyOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }] },
+            "shiftable_kwh": { "type": "number", "minimum": 0 },
+            "est_saving_yuan": { "type": "number", "minimum": 0 },
+            "standby_kw": { "type": "number", "minimum": 0 },
+            "co2_kg": { "type": "number", "minimum": 0 },
+            "benchmark_percentile": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "ac_runtime_hours": { "$ref": "#/$defs/kwhMap" }
+          }
+        },
+        "events_this_month": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_id", "event_type", "summary", "status"],
+            "properties": {
+              "event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+              "event_type": { "$ref": "common.schema.json#/$defs/eventType" },
+              "summary": { "type": "string", "maxLength": 60 },
+              "status": { "type": "string", "enum": ["OPEN", "RESIDENT_SELF_FIXED", "WORKORDER_CREATED", "RESOLVED", "IGNORED"] }
+            }
+          }
+        },
+        "health_scores": {
+          "description": "设备名称 → 健康分(0-100)。",
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 100 }
+        },
+        "price_note": { "type": "string" },
+        "data_source": { "$ref": "common.schema.json#/$defs/dataSource" }
+      }
+    },
+    "batchBrief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "report_type", "batch_id", "period", "batch_house_count", "other_house_count",
+        "defects", "faulted_houses", "inspect_houses", "trigger_event_id", "data_source"
+      ],
+      "properties": {
+        "schema_version": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+        "report_type": { "const": "BATCH_BRIEF" },
+        "batch_id": { "$ref": "common.schema.json#/$defs/batchId" },
+        "period": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "$ref": "common.schema.json#/$defs/date" },
+            "end": { "$ref": "common.schema.json#/$defs/date" }
+          }
+        },
+        "batch_house_count": { "type": "integer", "minimum": 1 },
+        "other_house_count": { "type": "integer", "minimum": 1 },
+        "defects": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_type", "batch_count", "other_count", "rate_ratio", "p_value", "common_location"],
+            "properties": {
+              "event_type": { "$ref": "common.schema.json#/$defs/eventType" },
+              "batch_count": { "type": "integer", "minimum": 0 },
+              "other_count": { "type": "integer", "minimum": 0 },
+              "rate_ratio": { "type": "number", "minimum": 0 },
+              "p_value": {
+                "description": "单侧 Fisher 精确检验。",
+                "type": "number", "minimum": 0, "maximum": 1
+              },
+              "common_location": { "type": "string", "maxLength": 40 },
+              "common_location_share": {
+                "description": "本批次该类故障中发生在 common_location 的比例。",
+                "type": "number", "minimum": 0, "maximum": 1
+              }
+            }
+          }
+        },
+        "faulted_houses": { "$ref": "common.schema.json#/$defs/houseIdList" },
+        "inspect_houses": { "$ref": "common.schema.json#/$defs/houseIdList" },
+        "trigger_event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+        "data_source": { "$ref": "common.schema.json#/$defs/dataSource" }
+      }
+    }
+  }
+}

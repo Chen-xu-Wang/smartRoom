@@ -21,7 +21,20 @@ frontend/node_modules/
 # 打包产物
 frontend/dist/
 
+# ---------- 3D 数字孪生 ----------
+3D/node_modules/
+3D/dist/
+
 # ---------- 编辑器 / 系统文件 ----------
 .idea/
 .vscode/
 .DS_Store
+
+# ---------- 本地工具与缓存 ----------
+.claude/
+.venv/
+backend/.vite/
+
+# ---------- 原始公开数据集（方案已弃用，保存在仓库外，防止误提交）----------
+data/*.zip
+data/*.csv

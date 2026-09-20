@@ -240,6 +240,9 @@
       </template>
     </section>
 
+    <!-- 主动感知：传感器数据成为第二个工单发起人 -->
+    <SensingPanel @workorder-created="() => Promise.all([loadOrders(), loadStats(), loadDispatchOverview()])" />
+
     <!-- 新想法：预测性维护，让物业在故障发生前主动介入 -->
     <section class="card prediction-card" v-loading="maintenanceRiskLoading">
       <div class="prediction-header">
@@ -362,6 +365,7 @@ import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { MagicStick, OfficeBuilding, Refresh, TrendCharts, Warning } from '@element-plus/icons-vue'
 import api from '../api'
+import SensingPanel from '../components/SensingPanel.vue'
 
 const stats = ref({})
 const orders = ref([])
