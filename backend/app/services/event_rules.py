@@ -337,7 +337,7 @@ def _pipe_burst(event: dict) -> dict:
             {"action": "CLOSE_MAIN_VALVE", "target": event["control_actions_taken"][0]["target"] if event["control_actions_taken"] else "入户总阀",
              "reason": "自动关阀失败，需要人工或远程再次关闭"}],
         "escalation": None,
-        "knowledge_refs": ["给排水维修手册-厨房水槽持续漏水"],
+        "knowledge_refs": ["给排水维修手册-厨房水槽持续漏水", "主动运维补充-爆管与水浸处置"],
     }
 
 
@@ -397,7 +397,7 @@ def _leakage_current(event: dict) -> dict:
         }],
         "control_suggestions": [],
         "escalation": None,
-        "knowledge_refs": [],
+        "knowledge_refs": ["电气维修手册-配电箱跳闸"],
     }
 
 
